@@ -119,7 +119,7 @@ address, and the whole flow takes under 10 seconds.
 
 ### Implementation for User Story 1
 
-- [ ] T036 [P] [US1] `ParsedLocation` and result types in `src/parser/types.ts`
+- [X] T036 [P] [US1] `ParsedLocation` and result types in `src/parser/types.ts`
 - [ ] T037 [US1] `parseShared(text)` as a pure function with no network or UI imports, in `src/parser/parseShared.ts` (depends on T036) (R2.1, R2.4)
 - [ ] T038 [P] [US1] Short-link resolver in `src/features/resolve/resolveShortLink.ts` (R2.2)
 - [ ] T039 [US1] `pending_resolve` retry queue in `src/features/resolve/retryQueue.ts` (depends on T021, T038) (R1.5)
