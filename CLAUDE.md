@@ -1,0 +1,67 @@
+# MindPin
+
+Mobile app that saves locations and notes people share with you, organized by person. "Pin it once. Ask for it anytime."
+
+## How we work: spec first
+
+The spec in `docs/spec/` is the source of truth. Read it before writing code.
+
+- `docs/spec/requirements.md`: goals, non-goals, requirements R1 to R10 with acceptance criteria.
+- `docs/spec/design.md`: architecture, data model, link parser rules, design tokens.
+- `docs/spec/tasks.md`: the ordered task list. This is the work queue.
+
+Rules:
+
+1. Work on one task from `tasks.md` at a time, in order, unless told otherwise.
+2. Before coding a task, read the requirements it cites and restate the acceptance criteria you will satisfy.
+3. Write a test for each acceptance criterion the task covers, then make it pass.
+4. When the task is done and tests pass, tick its checkbox in `tasks.md`.
+5. If a requirement is unclear, conflicts with another, or needs to change, stop and ask. Update the spec first, then the code. Never let code and spec drift apart.
+6. Do not build anything listed under non-goals or later phases.
+
+## Stack
+
+Assumed in the spec (see "Assumptions and open decisions"). If the owner changes a choice there, follow the spec.
+
+- React Native with Expo and TypeScript (strict mode), Expo Router
+- SQLite on the device with FTS5 search
+- Supabase for sign-in and encrypted backup only
+- Android first for testing, then iOS
+
+## Commands
+
+The repo starts empty; task 1 sets these up. Update this section when it does.
+
+- Start the app: `npx expo start`
+- Tests: `npm test`
+- Type check: `npx tsc --noEmit`
+- Lint: `npm run lint`
+
+Run tests and the type check before calling a task done.
+
+## Code conventions
+
+- Named exports only, no default exports (except where Expo Router requires them for screens).
+- Tests live next to source: `foo.ts` and `foo.test.ts`.
+- Suggested layout: `app/` screens, `src/parser/` link parser, `src/db/` schema, migrations and data access, `src/features/` feature logic, `src/ui/` shared components, `src/i18n/` strings.
+- The link parser is a pure function with no network or UI imports; network lookups live in a separate module.
+- All database changes go through a migration.
+- All user-facing text goes in translation files, never hard-coded in components.
+
+## Privacy rules (not negotiable)
+
+- Never log, print, or send to analytics any address, coordinate, contact name, phone number, or note text.
+- Never upload the device address book.
+- No background location tracking.
+- Secrets live in `.env` files, which are not committed and which you should not read.
+
+## Design
+
+- Design tokens are in `docs/spec/design.md`. Use them instead of inventing colors or sizes.
+- The Figma MCP server is configured in `.mcp.json`. When building a screen, ask for the Figma frame link if one was not given, and read it before writing UI code.
+- Touch targets at least 44 px, text contrast at least 4.5:1, accessibility labels on every button.
+
+## Git
+
+- One commit per task: `Task 7: build the save sheet`.
+- Do not commit generated folders, `.env` files, or `.claude/settings.local.json`.
