@@ -25,7 +25,7 @@ Decisions from the Figma review (2026-11-25):
 - Navigation: bottom bar with Home, Map, New note (+), and Settings. A place can also be added by hand.
 - Person screen: Call, Message, and Share places are in v1.
 - Verify code: the SMS code fills in automatically; "Call me" is dropped.
-- Tester build: the 10 to 15 person test after stage 1C uses an internal build that skips sign-in.
+- Tester build: the 10 to 15 person test after User Story 2 (tasks phase 1.4) uses an internal build that skips sign-in.
 
 ## v1 goals
 
