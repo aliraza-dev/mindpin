@@ -107,31 +107,32 @@ address, and the whole flow takes under 10 seconds.
 
 > Write these first and confirm they fail before implementing.
 
-- [ ] T027 [P] [US1] Parser unit tests in `src/parser/parseShared.test.ts`, one group per row of the parser table in `design.md`: Google Maps full links (`@lat,lng` and `?q=lat,lng`), Apple Maps `ll`, WhatsApp text with a maps link, `geo:`, plain coordinates with range checks, short links returned as needing resolution, address-only text, no location found, and live-location shares flagged as snapshots (R1.4, R2.1, R2.4, R2.5)
+- [ ] T027 [P] [US1] Parser unit tests in `src/parser/parseShared.test.ts`, one group per row of the parser table in `design.md`: Google Maps full links (`@lat,lng` and `?q=lat,lng`), Apple Maps `ll`, WhatsApp text with a maps link, `geo:`, plain coordinates with range checks, short links returned as needing resolution, address-only text, and no location found; every coordinate result carries a snapshot flag, false until T138 (R1.4, R2.1, R2.4)
 - [ ] T028 [P] [US1] Short-link resolver tests with mocked fetch in `src/features/resolve/resolveShortLink.test.ts`: the redirect is followed and parsed; offline marks the memory `pending_resolve`; the queue retries when the device comes online (R1.5, R2.2)
 - [ ] T029 [P] [US1] Geocoding tests with a mocked geocoder in `src/features/geocode/geocode.test.ts`: coordinates give an address; an address gives coordinates; no match keeps the text (R2.3, R2.4)
 - [ ] T030 [P] [US1] Person matching tests in `src/features/people/matchPerson.test.ts`: a contact with an existing `person.contact_ref` reuses that person; a typed name matching an existing person (ignoring case) is suggested first and never merged; the 3 most recently used people are suggested before typing (R3.3, R3.7, R3.8)
 - [ ] T031 [P] [US1] Duplicate detection tests in `src/features/places/findNearby.test.ts`: a place for the same person within 100 m is offered for update; 101 m or a different person is not (R3.5)
 - [ ] T032 [P] [US1] Save service tests in `src/features/save/savePlace.test.ts`: person and place are written in one transaction; closing mid-save leaves no partial rows; the search index is updated; no network call happens before the write (R1.3, R1.5, non-functional: reliability)
-- [ ] T033 [P] [US1] Contact picker tests in `src/features/people/ContactPicker.test.tsx`: the first use asks for permission with a one-line reason; matches show name and photo; with permission denied a typed name still saves; only name, phone, and photo reference are stored (R3.1, R3.2, R3.4, R3.6)
-- [ ] T034 [P] [US1] Save sheet tests in `src/features/save/SaveSheet.test.tsx`: shows the address and map preview; label chips Home, Office, Shop, and custom; notes and quick tags; Save stores and closes; the no-location state explains and offers a text note with a typed address (R1.3, R1.4, R2.3, R4.1, R4.2)
-- [ ] T035 [US1] End-to-end flows `e2e/r1-save-from-share.yaml`, `e2e/r2-read-locations.yaml`, `e2e/r3-link-person.yaml`: MindPin appears in the share menu, the sheet opens within 2 seconds, Save returns to the source app, and the full flow is timed under 10 seconds (R1.1, R1.2, R1.3, constitution IV)
+- [ ] T033 [P] [US1] Contact picker tests in `src/features/people/ContactPicker.test.tsx`: the first use asks for permission with a one-line reason; matches show name and photo within 300 ms with 1,000 contacts; with permission denied a typed name still saves; only name, phone, and photo reference are stored (R3.1, R3.2, R3.4, R3.6)
+- [ ] T034 [P] [US1] Save sheet tests in `src/features/save/SaveSheet.test.tsx`: shows the address and map preview; label chips Home, Office, Shop, and custom; notes and quick tags; Save stores and closes, with or without a person; the no-location state offers Save as note and Enter address (R1.3, R1.4, R2.3, R3.11, R4.1, R4.2)
+- [ ] T035 [US1] End-to-end flows `e2e/r1-save-from-share.yaml`, `e2e/r2-read-locations.yaml`, `e2e/r3-link-person.yaml`, run on the Android emulator and the iOS simulator: MindPin appears in the share menu, the sheet opens within 2 seconds, Save returns to the source app, and the full flow is timed under 10 seconds (R1.1, R1.2, R1.3, constitution IV)
 
 ### Implementation for User Story 1
 
 - [ ] T036 [P] [US1] `ParsedLocation` and result types in `src/parser/types.ts`
-- [ ] T037 [US1] `parseShared(text)` as a pure function with no network or UI imports, in `src/parser/parseShared.ts` (depends on T036) (R2.1, R2.5)
+- [ ] T037 [US1] `parseShared(text)` as a pure function with no network or UI imports, in `src/parser/parseShared.ts` (depends on T036) (R2.1, R2.4)
 - [ ] T038 [P] [US1] Short-link resolver in `src/features/resolve/resolveShortLink.ts` (R2.2)
 - [ ] T039 [US1] `pending_resolve` retry queue in `src/features/resolve/retryQueue.ts` (depends on T021, T038) (R1.5)
 - [ ] T040 [P] [US1] Address and coordinate lookup with the platform geocoder in `src/features/geocode/geocode.ts` (R2.3, R2.4)
 - [ ] T041 [P] [US1] On-device contacts bridge using `expo-contacts`, with no upload path, in `src/features/people/contacts.ts` (R3.6)
 - [ ] T042 [P] [US1] Person matching and recent people in `src/features/people/matchPerson.ts` (R3.3, R3.7, R3.8)
 - [ ] T043 [P] [US1] Nearby place lookup by distance in `src/features/places/findNearby.ts` (R3.5)
-- [ ] T044 [US1] Save service that writes first and resolves or geocodes afterwards, in `src/features/save/savePlace.ts` (depends on T016, T017, T039, T040) (R1.3, R1.5)
+- [ ] T044 [US1] Save service that writes first and resolves or geocodes afterwards, with migration `src/db/migrations/003_pending_geocode.ts` adding the `pending_geocode` status (design.md `memory.status`), in `src/features/save/savePlace.ts` (depends on T016, T017, T039, T040) (R1.3, R1.5)
 - [ ] T045 [US1] Contact picker with strings in `src/i18n/en/people.json`, in `src/features/people/ContactPicker.tsx` (depends on T041, T042) (R3.1 to R3.4)
 - [ ] T046 [US1] Save sheet with map preview (`react-native-maps`), address, source line, label chips, notes, tags, duplicate prompt, and no-location state, strings in `src/i18n/en/save.json`, in `src/features/save/SaveSheet.tsx` (depends on T037, T043, T044, T045) (R1.2 to R1.4, R4.1, R4.2)
 - [ ] T047 [US1] Android share target: `ACTION_SEND` `text/plain` intent filter through a config plugin in `app.json`, a translucent route `app/share.tsx` that shows the save sheet over the source app and returns to it after Save (depends on T046) (R1.1, R1.2, R1.3)
-- [ ] T048 [US1] iOS Share Extension that shows the same save sheet and writes to the same database through an App Group, configured in `app.json` with extension code under `targets/share-extension/` (depends on T046) (R1.1)
+- [ ] T048 [US1] iOS Share Extension that shows the same save sheet and writes to the same database through an App Group, configured in `app.json` with extension code under `targets/share-extension/`; before first sign-in it stores the share and asks the user to open MindPin (depends on T046) (R1.1, R7.6)
+- [ ] T138 [US1] Detect live-location shares and flag them as snapshots in `src/parser/parseShared.ts`, with tests in `src/parser/parseShared.test.ts`, once a sample live-location share is recorded in the parser table in `design.md` (blocked: finding U4) (R2.5)
 
 **Checkpoint**: User Story 1 passes its unit, component, and end-to-end tests on Android and iOS.
 
@@ -151,9 +152,9 @@ Navigate and Share.
 - [ ] T050 [P] [US2] Share text tests in `src/features/share/shareText.test.ts`: one place gives a maps link and address; Share places gives every place of a person with label, address, and maps link (R4.6, R4.8)
 - [ ] T051 [P] [US2] External link tests in `src/features/links/externalLinks.test.ts`: Navigate opens the preferred maps app; Call opens the dialer; Message opens WhatsApp when installed and SMS otherwise (R3.10, R4.5)
 - [ ] T052 [P] [US2] Home screen tests in `src/features/home/HomeScreen.test.tsx`: People, Places, and Notes views; recently saved items; the search bar has no microphone; Ask MindPin does not appear (R6.3, R6.5)
-- [ ] T053 [P] [US2] Person screen tests in `src/features/people/PersonScreen.test.tsx`: lists all of the person's places; Call and Message only when a phone number is saved; Share places; Add place (R3.10, R4.3, R4.7, R4.8)
+- [ ] T053 [P] [US2] Person screen tests in `src/features/people/PersonScreen.test.tsx`: lists all of the person's places; Call and Message only when a phone number is saved; Share places; Add place opens the save sheet with a typed address or pasted link (R3.10, R4.3, R4.7, R4.8)
 - [ ] T054 [P] [US2] Place screen tests in `src/features/places/PlaceScreen.test.tsx`: map, notes, tags, edit, delete with confirmation, Navigate, Share (R4.2, R4.4, R4.5, R4.6)
-- [ ] T055 [US2] End-to-end flows `e2e/r4-places.yaml` and `e2e/r6-find.yaml`
+- [ ] T055 [US2] End-to-end flows `e2e/r4-places.yaml` and `e2e/r6-find.yaml`, including the map view showing every saved pin (R6.3)
 
 ### Implementation for User Story 2
 
@@ -243,11 +244,11 @@ sheet after sign-in.
 
 ### Tests for User Story 5
 
-- [ ] T092 [P] [US5] Sign-in gate tests in `src/features/auth/AuthGate.test.tsx`: no screen is reachable before sign-in unless `SKIP_SIGN_IN` is on; a share received before sign-in is held and opens in the save sheet afterwards (R7.1, R7.6)
+- [ ] T092 [P] [US5] Sign-in gate tests in `src/features/auth/AuthGate.test.tsx`: no screen is reachable before sign-in unless `SKIP_SIGN_IN` is on; a share received before sign-in is held and opens in the save sheet right after sign-in, before the name prompt and recovery code (R7.1, R7.6, R7.8, R8.7)
 - [ ] T093 [P] [US5] Phone code tests in `src/features/auth/phoneCode.test.ts`: 5 wrong entries require a new code; resend is available after 60 seconds; an arriving SMS code fills in automatically (R7.3, R7.4, R7.7)
-- [ ] T094 [P] [US5] Welcome screen tests in `src/features/auth/WelcomeScreen.test.tsx`: describes only places and notes; offers phone, Google, and email, plus Apple on iOS only; says backup will be on (R7.2, R7.9, R8.2)
+- [ ] T094 [P] [US5] Welcome screen tests in `src/features/auth/WelcomeScreen.test.tsx`: describes only places and notes; offers phone, Google, and email, plus Apple on iOS only, and each button starts its provider's sign-in with Supabase mocked; says backup will be on (R7.2, R7.9, R8.2)
 - [ ] T095 [P] [US5] Name prompt tests in `src/features/auth/NamePrompt.test.tsx`: shown once after first sign-in, pre-filled from Google, skippable; the greeting omits the name when skipped (R7.8)
-- [ ] T096 [P] [US5] Account tests in `src/features/auth/account.test.ts`: sign-out clears the session; deletion removes the account and all backed-up data (R7.5)
+- [ ] T096 [P] [US5] Account tests in `src/features/auth/account.test.ts`: sign-out clears the session; deletion removes the account and all backed-up data; auth tokens are stored only in secure storage (R7.5, non-functional: security)
 
 ### Implementation for User Story 5
 
@@ -311,7 +312,7 @@ pending place; buying the unlock saves it, and a restore on another phone keeps 
 ### Tests for User Story 7
 
 - [ ] T123 [P] [US7] Limit tests in `src/features/purchase/limit.test.ts`: 25 places allowed; the 26th opens the unlock screen and keeps the pending place; notes never count; existing places stay editable at the limit (R9.1, R9.2, R9.4, R10.12)
-- [ ] T124 [P] [US7] Purchase tests with the store mocked, in `src/features/purchase/purchases.test.ts`: a successful purchase removes the limit immediately; restore removes it on another device (R9.3)
+- [ ] T124 [P] [US7] Purchase tests with the store mocked, in `src/features/purchase/purchases.test.ts`: a successful purchase removes the limit immediately; restore removes it on another device; the Restore purchases row on the settings screen calls restore (R9.3)
 
 ### Implementation for User Story 7
 
@@ -432,5 +433,10 @@ Each later phase gets its own spec once v1 shows that people use the save flow.
 - One commit per task, named by its ID: `T046: build the save sheet`. A test task may be committed
   together with the implementation task that makes it pass.
 - Tick a task's box only when its tests pass.
+- UI tasks: build from the matching frame in the Figma file linked in `design.md`. If the frame is
+  missing or contradicts the spec, stop and ask (constitution VI). Missing as of 2026-11-25:
+  Settings, unlock, recovery code and restore, map, search results, edit place, Recently Deleted,
+  "Did you visit?", name prompt, contacts permission, and the save sheet's no-location and
+  duplicate states. Out of date: Welcome, Home, Email, Verify.
 - If a task reveals a gap or conflict in the spec, stop and update `requirements.md` or
   `design.md` first (constitution I).

@@ -27,10 +27,19 @@ Decisions from the Figma review (2026-11-25):
 - Verify code: the SMS code fills in automatically; "Call me" is dropped.
 - Tester build: the 10 to 15 person test after User Story 2 (tasks phase 1.4) uses an internal build that skips sign-in.
 
+Decisions from the spec analysis (2026-11-25):
+
+- Speed budgets apply to every save after first-time setup; first sign-in, the first contacts prompt, the recovery code, and the unlock screen are exempt but must never lose the share (constitution 2.1.0).
+- A share held before sign-in opens in the save sheet right after sign-in, before the name prompt and recovery code. On iOS the share extension stores it and asks the user to open MindPin.
+- Offline exceptions now include map tiles, purchases, and account deletion; offline maps show the address instead.
+- No-location shares offer one pair of choices: Save as note, or Enter address (R1.4 and R10.9 merged).
+- A person is suggested but not required to save a place.
+- Addresses waiting for lookup while offline get the status `pending_geocode`; an address-only place may have no coordinates.
+
 ## v1 goals
 
 - Save a shared location in under 10 seconds without leaving the chat app.
-- Link every saved place to a person, with notes such as gate code or floor.
+- Link saved places to a person (suggested, not required), with notes such as gate code or floor.
 - Show when each place was last visited.
 - Jot down a standalone note as fast as in a phone's notes app, and optionally link it to a person or place.
 - Find any saved place or note by typing a person, label, or any words in it.
@@ -75,7 +84,7 @@ As a user, I want to share a location from any app into MindPin so that I can sa
 1. WHEN the user shares text or a link from another app, MindPin SHALL appear in the system share menu on Android and iOS.
 2. WHEN MindPin receives a share, it SHALL open a save sheet over the current app within 2 seconds.
 3. WHEN the user taps Save, the place SHALL be stored and the sheet SHALL close, returning the user to the original app.
-4. WHEN the shared content contains no recognizable location, the sheet SHALL say so and offer to save it as a text note with a manually entered address.
+4. WHEN the shared content contains no recognizable location, the sheet SHALL say so and offer two choices: Save as note (R10.9), or Enter address, which saves a place at the address the user types and keeps the shared text.
 5. WHEN the device is offline, the share SHALL still be saved, and any link that needs the network to resolve SHALL be resolved on the next connection.
 
 ### R2. Read locations from shared content
@@ -102,6 +111,7 @@ As a user, I want to attach each place to a contact so that I can find places by
 8. WHEN the user types a name that exactly matches an existing person (ignoring case), the app SHALL show that person first and let the user pick them or create a new person; the app SHALL NOT merge people automatically.
 9. WHEN a backup is restored on a new phone and contacts permission is granted, the app SHALL re-link people to device contacts by matching phone number; people with no match SHALL keep their saved name, phone, and places.
 10. WHEN a person has a saved phone number, the person screen SHALL offer Call, which opens the phone dialer, and Message, which opens WhatsApp if installed and SMS otherwise.
+11. A place SHALL be savable without a person; it then appears in the Places view and in search, but under no person.
 
 ### R4. Places, labels, and notes
 
@@ -145,9 +155,9 @@ As a user, I want to sign in once when I first open the app so that my account i
 3. WHEN an SMS code is entered incorrectly 5 times, the app SHALL require a new code.
 4. The user SHALL be able to resend the code after 60 seconds.
 5. The user SHALL be able to sign out and to delete the account with all backed-up data.
-6. WHEN a share arrives before the user has ever signed in, the app SHALL show sign-in first and SHALL keep the shared content until sign-in completes, then open the save sheet with it.
+6. WHEN a share arrives before the user has ever signed in, the app SHALL keep the shared content until sign-in completes, then open the save sheet with it before any other first-launch step. On Android the app SHALL show sign-in straight away. On iOS, where a share extension cannot open the app, the extension SHALL store the share and tell the user to open MindPin to sign in; the app SHALL then show sign-in and open the stored share.
 7. WHEN the SMS code arrives on the device, the app SHALL fill it in automatically.
-8. After the first sign-in, the app SHALL ask once for the user's first name, pre-filled from Google when available; the user SHALL be able to skip, and the home greeting SHALL then omit the name.
+8. After the first sign-in, the app SHALL ask once for the user's first name, pre-filled from Google when available; the user SHALL be able to skip, and the home greeting SHALL then omit the name. WHEN a held share is waiting (R7.6), the prompt SHALL appear after that share is saved.
 9. The welcome screen SHALL describe only v1 features (places and notes).
 
 ### R8. Privacy and backup
@@ -160,7 +170,7 @@ As a user, I want my contacts' addresses kept private so that I can trust the ap
 4. The app SHALL offer an export of all data as a file.
 5. The app SHALL NOT track location in the background in v1.
 6. The backup key SHALL be generated on the device, saved in the platform's synced keychain (iCloud Keychain on iOS, Google Block Store on Android), and SHALL NOT be sent to the MindPin server.
-7. WHEN backup first turns on, the app SHALL show a one-time recovery code and ask the user to keep it. WHEN a restore cannot find the key in the keychain (for example after switching between Android and iOS), the app SHALL ask for the recovery code, and SHALL explain that without the key or code the backup cannot be read.
+7. WHEN backup first turns on, the app SHALL show a one-time recovery code and ask the user to keep it; WHEN a held share is waiting (R7.6), the code SHALL be shown after that share is saved. WHEN a restore cannot find the key in the keychain (for example after switching between Android and iOS), the app SHALL ask for the recovery code, and SHALL explain that without the key or code the backup cannot be read.
 8. WHILE backup is on, the app SHALL upload 5 minutes after the last change, on Wi-Fi or mobile data, sending all changes since the previous upload in one batch. WHEN the device is offline or the system blocks background work, the upload SHALL run on the next connection or the next app open.
 
 ### R9. Free limit and unlock
@@ -186,7 +196,7 @@ The behavior is modeled on Apple Notes; the look stays MindPin's own.
 6. The user SHALL be able to pin a note, and pinned notes SHALL appear in a Pinned section above all others.
 7. The Notes list SHALL sort by last edited and group notes under Today, Previous 7 days, Previous 30 days, then by month.
 8. The user SHALL be able to link a note to a person, a place, or both, and linked notes SHALL appear on that person's and that place's screens.
-9. WHEN text with no location is shared into MindPin from another app, the save sheet SHALL offer "Save as note".
+9. WHEN text with no location is shared into MindPin from another app, the save sheet SHALL offer "Save as note" (the same choice as R1.4).
 10. WHEN a note is deleted, it SHALL move to Recently Deleted and SHALL be removed permanently after 30 days.
 11. Swiping a note in the list SHALL offer pin, link, and delete, and the same actions SHALL be available from a long-press menu.
 12. Standalone notes SHALL NOT count toward the 25-place free limit.
@@ -197,8 +207,8 @@ Folders, locked notes, drawings, and attachments are left out of v1; people, pla
 
 | Area | Requirement |
 | --- | --- |
-| Speed | Save sheet opens within 2 seconds of sharing; search results within 300 ms; cold start under 3 seconds on a mid-range Android phone |
-| Offline | First sign-in needs a connection; after that, every v1 feature except short-link resolution, address lookup, sign-in, and backup works with no connection |
+| Speed | Save from the share menu completes in under 10 seconds after first-time setup; save sheet opens within 2 seconds of sharing; a new note opens within 1 second; search results within 300 ms; cold start under 3 seconds on a mid-range Android phone |
+| Offline | First sign-in needs a connection; after that, every v1 feature except short-link resolution, address lookup, map tiles, sign-in, backup, purchases, and account deletion works with no connection; offline, maps show the address instead |
 | Privacy | No analytics containing addresses, coordinates, or contact names; contacts are read only on the device |
 | Security | Backups encrypted before upload; auth tokens kept in the platform's secure storage |
 | Reliability | No data loss if the app is closed mid-save; database changes use migrations |

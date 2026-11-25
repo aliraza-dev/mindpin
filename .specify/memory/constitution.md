@@ -36,10 +36,11 @@ Rationale: a single leak of a contact's home address would end user trust perman
 ### III. Local-First and Offline
 
 The phone's SQLite database is the source of truth; the backend exists only for sign-in and
-encrypted backup.
+encrypted backup. Purchases go through the app stores.
 
 - Every v1 feature MUST work with no connection, except short-link resolution, address
-  lookup, sign-in, and backup.
+  lookup, map tiles, sign-in, backup, purchases, and account deletion. Offline, maps show the
+  saved address in place of map tiles.
 - A share received offline MUST still be saved; network-dependent resolution is queued as
   `pending_resolve` and retried on the next connection.
 - Closing the app mid-save MUST NOT lose data.
@@ -53,6 +54,10 @@ Capture must be faster than asking again. These budgets are acceptance criteria,
 
 - Saving a shared location MUST take under 10 seconds end to end: from picking MindPin in the
   system share menu to Save completing and the user being back in the chat app.
+- The budgets apply to every save after first-time setup. One-time steps are exempt: the first
+  sign-in, the first contacts permission prompt, the backup recovery code, and the unlock
+  screen when the free limit is reached. Each MUST appear only when needed and MUST NOT lose
+  the share being saved.
 - The save sheet MUST open within 2 seconds of sharing.
 - A new note MUST open, blank and with the keyboard up, within 1 second of tapping the
   new-note button.
@@ -117,7 +122,7 @@ Rationale: a small, fast, finished v1 beats a broad, unfinished one.
 3. Write a failing test per criterion, then make it pass.
 4. Run `npm test`, `npx tsc --noEmit`, and `npm run lint`; all MUST pass.
 5. Tick the task's checkbox in `tasks.md`.
-6. Commit once per task as `Task N: <summary>`. Generated folders, `.env` files, and
+6. Commit once per task as `T###: <summary>`. Generated folders, `.env` files, and
    `.claude/settings.local.json` MUST NOT be committed.
 
 ## Governance
@@ -132,4 +137,4 @@ Rationale: a small, fast, finished v1 beats a broad, unfinished one.
 - Every task review and plan (`/speckit-plan`, `/speckit-analyze`) MUST check compliance with
   these principles; any deviation MUST be justified in writing and approved by the owner.
 
-**Version**: 2.0.0 | **Ratified**: 2026-11-25 | **Last Amended**: 2026-11-25
+**Version**: 2.1.0 | **Ratified**: 2026-11-25 | **Last Amended**: 2026-11-25

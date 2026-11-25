@@ -1,6 +1,6 @@
 # MindPin v1: Design
 
-MindPin is local-first: the phone's database is the source of truth, and the backend exists only for sign-in and encrypted backup.
+MindPin is local-first: the phone's database is the source of truth, and the backend exists only for sign-in and encrypted backup. Purchases go through the app stores.
 
 ## Components
 
@@ -21,7 +21,7 @@ MindPin is local-first: the phone's database is the source of truth, and the bac
 
 1. The user shares a location from a chat app and picks MindPin.
 2. The share target passes the raw text to the link parser.
-3. The parser returns coordinates, an address, and a confidence level, or a "not found" result.
+3. The parser returns coordinates with their source, a short link to resolve, text that may be an address, or a "not found" result.
 4. The save sheet shows a map preview and suggests people.
 5. The user picks a person, label, and notes, then taps Save.
 6. The app writes the memory to SQLite and updates the search index.
@@ -51,14 +51,14 @@ Places and notes are stored as a generic memory item so receipts, voice notes, a
 | person_id | text | Optional link to person |
 | place_id | text | Optional link from a note to a saved place |
 | title | text | Label such as Home or Shop; for a note, its first line |
-| lat, lng | real | Optional; required for `place` once resolved |
+| lat, lng | real | Optional; null for an address-only place whose address lookup found no match (R2.4) |
 | address | text | Readable address |
 | notes | text | Free text; for a note, the body as Markdown with checklists as task items |
 | tags | text (JSON array) | Quick tags such as gate code |
 | pinned | integer | 0 or 1; used by notes |
 | source_app | text | For example WhatsApp |
 | source_raw | text | Original shared text, kept for re-parsing |
-| status | text | `resolved` or `pending_resolve` (offline short link) |
+| status | text | `resolved`, `pending_resolve` (short link waiting for a connection), or `pending_geocode` (address waiting for lookup because the device was offline) |
 | payload | text (JSON) | Type-specific data for later types |
 | created_at, updated_at, deleted_at | integer | Soft delete supports backup merge; deleted notes are purged 30 days after `deleted_at` |
 
@@ -103,7 +103,7 @@ In phase 2 each memory gets an embedding, a question retrieves the closest memor
 
 ## Visual design tokens
 
-Taken from the current app designs. Confirm against the Figma file before building each screen.
+Taken from the app designs in Figma: https://www.figma.com/design/XSdu6UPBCstIuQrupkXPl1/Untitled (page "app flow"). Confirm against the matching frame before building each screen; if a screen has no frame, or its frame contradicts the spec, stop and ask.
 
 | Token | Value |
 | --- | --- |
