@@ -1,0 +1,6 @@
+appId: com.mindpin.app
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: 'app-root'

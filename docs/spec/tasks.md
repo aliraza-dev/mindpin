@@ -48,13 +48,13 @@ foundation, one sub-phase per user story, then release. Later product phases are
 
 **Purpose**: an empty app that builds, lints, type-checks, and runs tests.
 
-- [ ] T001 Initialize the Expo app with TypeScript in strict mode and Expo Router: `package.json`, `tsconfig.json` (`"strict": true`), `app.json`, `app/_layout.tsx`
-- [ ] T002 [P] Configure ESLint and Prettier, with a rule that forbids default exports outside `app/` and a rule that forbids `console.*` outside `src/lib/log.ts`: `eslint.config.js`, `.prettierrc`, `npm run lint` script in `package.json`
-- [ ] T003 [P] Configure Jest with `jest-expo` and React Native Testing Library, tests next to source: `jest.config.js`, `npm test` script, `src/lib/sanity.test.ts`
-- [ ] T004 [P] Create the folder structure with placeholder files: `src/parser/`, `src/db/`, `src/features/`, `src/ui/`, `src/i18n/`, `src/lib/`, `modules/`, `supabase/`, `e2e/`
-- [ ] T005 [P] Set up Maestro for end-to-end flows on an Android emulator: `e2e/README.md`, `e2e/smoke.yaml`, `npm run e2e` script
-- [ ] T006 [P] Ignore generated folders, `.env*` files, and `.claude/settings.local.json` in `.gitignore`; add `.env.example` listing variable names only (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_REVENUECAT_KEY`)
-- [ ] T007 Update the Commands section of `CLAUDE.md` with the working start, test, type check, lint, and e2e commands
+- [X] T001 Initialize the Expo app with TypeScript in strict mode and Expo Router: `package.json`, `tsconfig.json` (`"strict": true`), `app.json`, `app/_layout.tsx`
+- [X] T002 [P] Configure ESLint and Prettier, with a rule that forbids default exports outside `app/` and a rule that forbids `console.*` outside `src/lib/log.ts`: `eslint.config.js`, `.prettierrc`, `npm run lint` script in `package.json`
+- [X] T003 [P] Configure Jest with `jest-expo` and React Native Testing Library, tests next to source: `jest.config.js`, `npm test` script, `src/lib/sanity.test.ts`
+- [X] T004 [P] Create the folder structure with placeholder files: `src/parser/`, `src/db/`, `src/features/`, `src/ui/`, `src/i18n/`, `src/lib/`, `modules/`, `supabase/`, `e2e/`
+- [X] T005 [P] Set up Maestro for end-to-end flows on an Android emulator: `e2e/README.md`, `e2e/smoke.yaml`, `npm run e2e` script
+- [X] T006 [P] Ignore generated folders, `.env*` files, and `.claude/settings.local.json` in `.gitignore`; add `.env.example` listing variable names only (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_REVENUECAT_KEY`)
+- [X] T007 Update the Commands section of `CLAUDE.md` with the working start, test, type check, lint, and e2e commands
 
 **Checkpoint**: `npm test`, `npx tsc --noEmit`, and `npm run lint` pass on the empty app.
 
@@ -67,28 +67,28 @@ uses. No story work starts until this phase is done.
 
 ### Tests
 
-- [ ] T008 [P] Migration runner tests in `src/db/migrate.test.ts`: migrations apply in order once, a failed migration rolls back, and the version is recorded
-- [ ] T009 [P] Schema tests in `src/db/schema.test.ts`: tables and columns match `design.md` for `person`, `memory`, `visit`, and `setting`; a second person with the same non-empty `person.contact_ref` is rejected; `memory.type`, `memory.status`, and `visit.source` reject values outside those listed in `design.md`
-- [ ] T010 [P] Data access tests in `src/db/people.test.ts`, `src/db/memories.test.ts`, `src/db/visits.test.ts`, `src/db/settings.test.ts`: create, read, update, soft delete, and a person with many places (R4.3, R8.1)
-- [ ] T011 [P] Logger tests in `src/lib/log.test.ts`: the logger accepts only an event name and an allow-list of non-personal fields and drops anything else (constitution II)
-- [ ] T012 [P] UI primitive tests in `src/ui/Button.test.tsx`: minimum 44 px touch area and a required accessibility label (non-functional: accessibility)
+- [X] T008 [P] Migration runner tests in `src/db/migrate.test.ts`: migrations apply in order once, a failed migration rolls back, and the version is recorded
+- [X] T009 [P] Schema tests in `src/db/schema.test.ts`: tables and columns match `design.md` for `person`, `memory`, `visit`, and `setting`; a second person with the same non-empty `person.contact_ref` is rejected; `memory.type`, `memory.status`, and `visit.source` reject values outside those listed in `design.md`
+- [X] T010 [P] Data access tests in `src/db/people.test.ts`, `src/db/memories.test.ts`, `src/db/visits.test.ts`, `src/db/settings.test.ts`: create, read, update, soft delete, and a person with many places (R4.3, R8.1)
+- [X] T011 [P] Logger tests in `src/lib/log.test.ts`: the logger accepts only an event name and an allow-list of non-personal fields and drops anything else (constitution II)
+- [X] T012 [P] UI primitive tests in `src/ui/Button.test.tsx`: minimum 44 px touch area and a required accessibility label (non-functional: accessibility)
 
 ### Implementation
 
-- [ ] T013 Migration runner on `expo-sqlite` in `src/db/migrate.ts` and database handle in `src/db/database.ts`
-- [ ] T014 Migration 001 creating the `person`, `memory`, `visit`, and `setting` tables exactly as in `design.md`, including a partial unique index on `person.contact_ref` and checks on `memory.type`, `memory.status`, `visit.source`, in `src/db/migrations/001_initial.ts` (R3.7)
-- [ ] T015 Migration 002 creating the FTS5 index over person name and memory title, address, notes, and tags, with triggers that keep it current, in `src/db/migrations/002_search_index.ts`
-- [ ] T016 [P] Typed data access for people in `src/db/people.ts`
-- [ ] T017 [P] Typed data access for memories (types `place` and `note`, soft delete via `deleted_at`) in `src/db/memories.ts`
-- [ ] T018 [P] Typed data access for visits in `src/db/visits.ts`
-- [ ] T019 [P] Typed data access for settings in `src/db/settings.ts`
-- [ ] T020 [P] Privacy-safe logger in `src/lib/log.ts`
-- [ ] T021 [P] Connectivity watcher that emits an event when the device comes online, in `src/lib/network.ts`
-- [ ] T022 [P] Translation setup with per-feature English files and right-to-left support, in `src/i18n/index.ts` and `src/i18n/en/common.json`
-- [ ] T023 [P] Design tokens from `design.md` (colors, radii, screen padding, touch target) in `src/ui/tokens.ts`; load Space Grotesk and Inter in `app/_layout.tsx`
-- [ ] T024 [P] Shared components `Button`, `Chip`, `Card`, `TextField` in `src/ui/`, using tokens only
-- [ ] T025 Build flag `SKIP_SIGN_IN`, read from app config and false unless set, in `src/lib/buildFlags.ts` (R7.1 tester build)
-- [ ] T026 Navigation shell: bottom bar with Home, Map, New note (+), and Settings in `app/(tabs)/_layout.tsx`, with placeholder routes `app/(tabs)/index.tsx`, `app/(tabs)/map.tsx`, `app/(tabs)/settings.tsx`, and `app/note/[id].tsx` (R6.5)
+- [X] T013 Migration runner on `expo-sqlite` in `src/db/migrate.ts` and database handle in `src/db/database.ts`
+- [X] T014 Migration 001 creating the `person`, `memory`, `visit`, and `setting` tables exactly as in `design.md`, including a partial unique index on `person.contact_ref` and checks on `memory.type`, `memory.status`, `visit.source`, in `src/db/migrations/001_initial.ts` (R3.7)
+- [X] T015 Migration 002 creating the FTS5 index over person name and memory title, address, notes, and tags, with triggers that keep it current, in `src/db/migrations/002_search_index.ts`
+- [X] T016 [P] Typed data access for people in `src/db/people.ts`
+- [X] T017 [P] Typed data access for memories (types `place` and `note`, soft delete via `deleted_at`) in `src/db/memories.ts`
+- [X] T018 [P] Typed data access for visits in `src/db/visits.ts`
+- [X] T019 [P] Typed data access for settings in `src/db/settings.ts`
+- [X] T020 [P] Privacy-safe logger in `src/lib/log.ts`
+- [X] T021 [P] Connectivity watcher that emits an event when the device comes online, in `src/lib/network.ts`
+- [X] T022 [P] Translation setup with per-feature English files and right-to-left support, in `src/i18n/index.ts` and `src/i18n/en/common.json`
+- [X] T023 [P] Design tokens from `design.md` (colors, radii, screen padding, touch target) in `src/ui/tokens.ts`; load Space Grotesk and Inter in `app/_layout.tsx`
+- [X] T024 [P] Shared components `Button`, `Chip`, `Card`, `TextField` in `src/ui/`, using tokens only
+- [X] T025 Build flag `SKIP_SIGN_IN`, read from app config and false unless set, in `src/lib/buildFlags.ts` (R7.1 tester build)
+- [X] T026 Navigation shell: bottom bar with Home, Map, New note (+), and Settings in `app/(tabs)/_layout.tsx`, with placeholder routes `app/(tabs)/index.tsx`, `app/(tabs)/map.tsx`, `app/(tabs)/settings.tsx`, and `app/note/[id].tsx` (R6.5)
 
 **Checkpoint**: the app opens to an empty Home tab; database tests pass.
 
