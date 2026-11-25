@@ -107,7 +107,7 @@ address, and the whole flow takes under 10 seconds.
 
 > Write these first and confirm they fail before implementing.
 
-- [ ] T027 [P] [US1] Parser unit tests in `src/parser/parseShared.test.ts`, one group per row of the parser table in `design.md`: Google Maps full links (`@lat,lng` and `?q=lat,lng`), Apple Maps `ll`, WhatsApp text with a maps link, `geo:`, plain coordinates with range checks, short links returned as needing resolution, address-only text, and no location found; every coordinate result carries a snapshot flag, false until T138 (R1.4, R2.1, R2.4)
+- [X] T027 [P] [US1] Parser unit tests in `src/parser/parseShared.test.ts`, one group per row of the parser table in `design.md`: Google Maps full links (`@lat,lng` and `?q=lat,lng`), Apple Maps `ll`, WhatsApp text with a maps link, `geo:`, plain coordinates with range checks, short links returned as needing resolution, address-only text, and no location found; every coordinate result carries a snapshot flag, false until T138 (R1.4, R2.1, R2.4)
 - [ ] T028 [P] [US1] Short-link resolver tests with mocked fetch in `src/features/resolve/resolveShortLink.test.ts`: the redirect is followed and parsed; offline marks the memory `pending_resolve`; the queue retries when the device comes online (R1.5, R2.2)
 - [ ] T029 [P] [US1] Geocoding tests with a mocked geocoder in `src/features/geocode/geocode.test.ts`: coordinates give an address; an address gives coordinates; no match keeps the text (R2.3, R2.4)
 - [ ] T030 [P] [US1] Person matching tests in `src/features/people/matchPerson.test.ts`: a contact with an existing `person.contact_ref` reuses that person; a typed name matching an existing person (ignoring case) is suggested first and never merged; the 3 most recently used people are suggested before typing (R3.3, R3.7, R3.8)
@@ -120,7 +120,7 @@ address, and the whole flow takes under 10 seconds.
 ### Implementation for User Story 1
 
 - [X] T036 [P] [US1] `ParsedLocation` and result types in `src/parser/types.ts`
-- [ ] T037 [US1] `parseShared(text)` as a pure function with no network or UI imports, in `src/parser/parseShared.ts` (depends on T036) (R2.1, R2.4)
+- [X] T037 [US1] `parseShared(text)` as a pure function with no network or UI imports, in `src/parser/parseShared.ts` (depends on T036) (R2.1, R2.4)
 - [ ] T038 [P] [US1] Short-link resolver in `src/features/resolve/resolveShortLink.ts` (R2.2)
 - [ ] T039 [US1] `pending_resolve` retry queue in `src/features/resolve/retryQueue.ts` (depends on T021, T038) (R1.5)
 - [ ] T040 [P] [US1] Address and coordinate lookup with the platform geocoder in `src/features/geocode/geocode.ts` (R2.3, R2.4)
