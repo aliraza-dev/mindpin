@@ -12,8 +12,9 @@ MindPin is local-first: the phone's database is the source of truth, and the bac
 | Local database | Stores people, memories, visits | SQLite with full-text search (FTS5) |
 | Contacts bridge | Reads contacts on request, never uploads them | expo-contacts |
 | Maps | Map preview, pin map, address lookup | react-native-maps, platform geocoder |
-| Auth | Phone, Google, email sign-in | Supabase Auth |
+| Auth | Phone (SMS code with auto-fill), Google, email sign-in link, Sign in with Apple on iOS | Supabase Auth |
 | Backup | Encrypts the database and uploads it | AES-256 on device, Supabase Storage |
+| Backup key | Generates and keeps the backup key; the server never sees it | iCloud Keychain (synchronizable item) on iOS, Google Block Store on Android; recovery code as fallback |
 | Purchases | One-time unlock | RevenueCat or platform billing |
 
 ## Save flow
@@ -37,7 +38,7 @@ Places and notes are stored as a generic memory item so receipts, voice notes, a
 | id | text (UUID) | Primary key |
 | name | text | Required |
 | phone | text | Optional |
-| contact_ref | text | Device contact ID, optional |
+| contact_ref | text | Device contact ID, optional; unique among people when set; device-specific, so re-linked by phone number after restore |
 | photo_uri | text | Optional |
 | created_at, updated_at | integer | Unix ms |
 
@@ -70,6 +71,13 @@ Places and notes are stored as a generic memory item so receipts, voice notes, a
 | visited_at | integer | Unix ms |
 | note | text | Optional |
 | source | text | `manual` or `navigate_confirm` |
+
+### setting
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| key | text | Primary key, for example `user_first_name` |
+| value | text | Included in backup |
 
 A full-text index covers person name, title, address, notes, and tags.
 

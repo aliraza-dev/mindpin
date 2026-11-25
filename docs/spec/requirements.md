@@ -6,6 +6,27 @@ MindPin is a mobile app that saves the things people share with you, starting wi
 
 **Who it is for.** Everyday smartphone users who receive locations over WhatsApp or SMS, with heavier use expected from people who visit many addresses (salespeople, tutors, home-service workers).
 
+## Clarifications
+
+### Session 2026-11-25
+
+- Q: Should people be able to use MindPin without creating an account, signing in only when they want backup? → A: No. Sign-in is required at first launch before anything else.
+- Q: Should backup to the server be turned on automatically once the user signs in? → A: Yes. Backup turns on at sign-in; users can turn it off in Settings.
+- Q: When someone restores a backup on a new phone, where does the key that unlocks the encrypted backup come from? → A: The platform's synced keychain (iCloud Keychain on iOS, Google Block Store on Android), with a one-time recovery code for switching platforms. The server never holds the key.
+- Q: How soon after a change should it be backed up to the server? → A: 5 minutes after the last change, on any connection, batching all changes since the previous upload.
+- Q: When the user saves a place for someone who may already be in MindPin, how should the app decide it's the same person? → A: By device contact ID; a typed name that matches an existing person is suggested, never merged automatically. After a restore, people are re-linked to contacts by phone number.
+
+Decisions from the Figma review (2026-11-25):
+
+- Welcome screen: shows only v1 features (places and notes) and says backup is on; no Receipts or Voice notes.
+- Sign-in methods: phone, Google, email sign-in link (no password), and Sign in with Apple on iOS. Facebook is dropped for v1.
+- Home: the top bar is plain search with no microphone; Ask MindPin and its tab are hidden until phase 2.
+- User name: asked once after first sign-in, optional, pre-filled from Google; used only for the greeting.
+- Navigation: bottom bar with Home, Map, New note (+), and Settings. A place can also be added by hand.
+- Person screen: Call, Message, and Share places are in v1.
+- Verify code: the SMS code fills in automatically; "Call me" is dropped.
+- Tester build: the 10 to 15 person test after stage 1C uses an internal build that skips sign-in.
+
 ## v1 goals
 
 - Save a shared location in under 10 seconds without leaving the chat app.
@@ -13,7 +34,7 @@ MindPin is a mobile app that saves the things people share with you, starting wi
 - Show when each place was last visited.
 - Jot down a standalone note as fast as in a phone's notes app, and optionally link it to a person or place.
 - Find any saved place or note by typing a person, label, or any words in it.
-- Keep all data on the device by default.
+- Keep all data on the device, with an encrypted backup to the user's account that is on from sign-in.
 
 ## v1 non-goals
 
@@ -31,16 +52,16 @@ MindPin is a mobile app that saves the things people share with you, starting wi
 | Platforms | Android and iOS from one codebase, Android first to test | iOS first |
 | Local storage | SQLite on the device | Realm, WatermelonDB |
 | Backend | Supabase (auth and encrypted backup only) | Firebase, or no backend in v1 |
-| Sign-in | Optional: the app works without an account; sign-in is needed only for backup | Sign-in required at first launch |
-| Sign-in methods | Phone (SMS code), Google, email | Add Facebook; Apple requires Sign in with Apple on iOS when other social logins are offered |
+| Sign-in | Required at first launch, before any other screen (decided 2026-11-25) | Optional, needed only for backup (rejected) |
+| Sign-in methods | Phone (SMS code), Google, email sign-in link (no password), and Sign in with Apple on iOS | Facebook (dropped for v1, 2026-11-25); email with password (rejected) |
 | Free limit | 25 saved places, then a one-time unlock | Subscription |
 | Launch market | Pakistan and nearby WhatsApp-heavy markets | Global English launch |
 
 Open questions:
 
 - [ ] Is the name MindPin free on the App Store, Google Play, and as a trademark in the launch market?
-- [ ] Should sign-in be optional as assumed, or required?
-- [ ] Is Facebook login worth the extra review and maintenance work for v1?
+- [x] Should sign-in be optional as assumed, or required? Required at first launch (see Clarifications).
+- [x] Is Facebook login worth the extra review and maintenance work for v1? No, dropped for v1.
 - [ ] What is the unlock price?
 
 ## Requirements
@@ -77,6 +98,10 @@ As a user, I want to attach each place to a contact so that I can find places by
 4. WHEN permission is denied or partial, the user SHALL still be able to type a name and save.
 5. WHEN a person already has a saved place within 100 m of the new pin, the app SHALL offer to update that place instead of adding a duplicate.
 6. The app SHALL store the contact's name, phone number, and photo reference, and SHALL NOT upload the address book.
+7. WHEN the user picks a device contact that is already linked to a person in MindPin (same contact ID), the app SHALL use that person instead of creating a new one.
+8. WHEN the user types a name that exactly matches an existing person (ignoring case), the app SHALL show that person first and let the user pick them or create a new person; the app SHALL NOT merge people automatically.
+9. WHEN a backup is restored on a new phone and contacts permission is granted, the app SHALL re-link people to device contacts by matching phone number; people with no match SHALL keep their saved name, phone, and places.
+10. WHEN a person has a saved phone number, the person screen SHALL offer Call, which opens the phone dialer, and Message, which opens WhatsApp if installed and SMS otherwise.
 
 ### R4. Places, labels, and notes
 
@@ -88,6 +113,8 @@ As a user, I want to label places and keep practical notes so that I have what I
 4. The user SHALL be able to edit or delete a place, with a confirmation before deleting.
 5. WHEN the user taps Navigate, the app SHALL open the place in the user's preferred maps app.
 6. WHEN the user taps Share, the app SHALL produce a maps link and the address as text for the system share menu.
+7. The user SHALL be able to add a place without a share, from the person screen or the Places view, by typing an address or pasting a link; the same save sheet SHALL open.
+8. WHEN the user taps Share places on a person screen, the app SHALL produce one text listing each of that person's places with its label, address, and maps link.
 
 ### R5. Visits
 
@@ -107,26 +134,34 @@ As a user, I want to search everything I saved so that I can find a place in sec
 2. Results SHALL appear as the user types, within 300 ms for up to 5,000 saved places.
 3. The home screen SHALL offer People, Places, and Notes views, plus a map view showing all pins.
 4. Search SHALL work fully offline.
+5. The app SHALL have a bottom bar with Home, Map, New note (+), and Settings. The home screen search bar SHALL be plain text search with no microphone; Ask MindPin SHALL NOT appear in v1.
 
 ### R7. Account and sign-in
 
-As a user, I want to start without an account and sign in only when I want backup.
+As a user, I want to sign in once when I first open the app so that my account is ready for backup and restore.
 
-1. On first launch, the app SHALL let the user continue without signing in.
-2. The app SHALL support sign-in by phone number with a 6-digit SMS code, by Google, and by email.
+1. On first launch, the app SHALL require sign-in before showing any other screen; there SHALL be no option to continue without an account. Internal test builds MAY skip sign-in behind a build flag; store builds SHALL NOT.
+2. The app SHALL support sign-in by phone number with a 6-digit SMS code, by Google, by an email sign-in link with no password, and on iOS by Sign in with Apple.
 3. WHEN an SMS code is entered incorrectly 5 times, the app SHALL require a new code.
 4. The user SHALL be able to resend the code after 60 seconds.
 5. The user SHALL be able to sign out and to delete the account with all backed-up data.
+6. WHEN a share arrives before the user has ever signed in, the app SHALL show sign-in first and SHALL keep the shared content until sign-in completes, then open the save sheet with it.
+7. WHEN the SMS code arrives on the device, the app SHALL fill it in automatically.
+8. After the first sign-in, the app SHALL ask once for the user's first name, pre-filled from Google when available; the user SHALL be able to skip, and the home greeting SHALL then omit the name.
+9. The welcome screen SHALL describe only v1 features (places and notes).
 
 ### R8. Privacy and backup
 
 As a user, I want my contacts' addresses kept private so that I can trust the app with them.
 
 1. All places, notes, and visits SHALL be stored on the device.
-2. Backup SHALL be off by default and SHALL be encrypted on the device before upload when turned on.
+2. Backup SHALL turn on automatically when the user signs in, and the sign-in screen SHALL say so. Data SHALL be encrypted on the device before upload. The user SHALL be able to turn backup off in Settings, which SHALL stop further uploads.
 3. WHEN a signed-in user installs the app on a new phone, the app SHALL offer to restore the latest backup.
 4. The app SHALL offer an export of all data as a file.
 5. The app SHALL NOT track location in the background in v1.
+6. The backup key SHALL be generated on the device, saved in the platform's synced keychain (iCloud Keychain on iOS, Google Block Store on Android), and SHALL NOT be sent to the MindPin server.
+7. WHEN backup first turns on, the app SHALL show a one-time recovery code and ask the user to keep it. WHEN a restore cannot find the key in the keychain (for example after switching between Android and iOS), the app SHALL ask for the recovery code, and SHALL explain that without the key or code the backup cannot be read.
+8. WHILE backup is on, the app SHALL upload 5 minutes after the last change, on Wi-Fi or mobile data, sending all changes since the previous upload in one batch. WHEN the device is offline or the system blocks background work, the upload SHALL run on the next connection or the next app open.
 
 ### R9. Free limit and unlock
 
@@ -163,11 +198,11 @@ Folders, locked notes, drawings, and attachments are left out of v1; people, pla
 | Area | Requirement |
 | --- | --- |
 | Speed | Save sheet opens within 2 seconds of sharing; search results within 300 ms; cold start under 3 seconds on a mid-range Android phone |
-| Offline | Every v1 feature except short-link resolution, address lookup, sign-in, and backup works with no connection |
+| Offline | First sign-in needs a connection; after that, every v1 feature except short-link resolution, address lookup, sign-in, and backup works with no connection |
 | Privacy | No analytics containing addresses, coordinates, or contact names; contacts are read only on the device |
 | Security | Backups encrypted before upload; auth tokens kept in the platform's secure storage |
 | Reliability | No data loss if the app is closed mid-save; database changes use migrations |
 | Accessibility | Touch targets at least 44 px; text contrast at least 4.5:1; screen reader labels on all buttons |
 | Languages | English in v1; all text in translation files so Urdu can be added, including right-to-left layout |
-| Store rules | Permission prompts explain their purpose; account deletion is available in the app; Sign in with Apple is offered on iOS if Google login is |
+| Store rules | Permission prompts explain their purpose; account deletion is available in the app; Sign in with Apple is offered on iOS (R7.2) |
 | Testing | Unit tests for the link parser and database layer; one end-to-end test per requirement R1 to R6 |
