@@ -189,8 +189,8 @@ Notes list under Today with its first line as title, and search finds a word fro
 - [ ] T068 [P] [US3] Editor tests in `src/features/notes/NoteEditor.test.tsx`: opens blank with the keyboard up; saves as the user types with no Save button; headings, bold, italic, bulleted and numbered lists, and checklists (R10.1, R10.3, R10.4)
 - [ ] T069 [P] [US3] Notes list tests in `src/features/notes/NotesList.test.tsx`: swipe and long-press both offer pin, link, and delete (R10.11)
 - [X] T070 [P] [US3] Linking tests in `src/features/notes/linkNote.test.ts`: a note links to a person, a place, or both, and appears on their screens (R10.8)
-- [ ] T071 [P] [US3] Save-as-note tests in `src/features/save/saveAsNote.test.ts`: shared text with no location offers "Save as note"; notes never count toward the place limit (R10.9, R10.12)
-- [ ] T072 [P] [US3] Extend `src/db/search.test.ts` so standalone note text is found (R6.1)
+- [X] T071 [P] [US3] Save-as-note tests in `src/features/save/saveAsNote.test.ts`: shared text with no location offers "Save as note"; notes never count toward the place limit (R10.9, R10.12)
+- [X] T072 [P] [US3] Extend `src/db/search.test.ts` so standalone note text is found (R6.1)
 - [ ] T073 [US3] End-to-end flow `e2e/r10-notes.yaml`, timing the new note open at under 1 second (R10.1, constitution IV)
 
 ### Implementation for User Story 3
@@ -202,7 +202,7 @@ Notes list under Today with its first line as title, and search finds a word fro
 - [ ] T078 [US3] Notes list with swipe and long-press actions in `src/features/notes/NotesList.tsx`, route `app/notes/index.tsx` (depends on T075) (R10.6, R10.7, R10.11)
 - [ ] T079 [US3] Recently Deleted screen in `src/features/notes/RecentlyDeleted.tsx`, route `app/notes/deleted.tsx` (R10.10)
 - [ ] T080 [US3] Link picker and linked notes on the person and place screens, in `src/features/notes/linkNote.ts` and `src/features/notes/LinkPicker.tsx` (depends on T061, T062) (R10.8)
-- [ ] T081 [US3] "Save as note" option in the save sheet, in `src/features/save/saveAsNote.ts` (depends on T046) (R10.9, R10.12)
+- [X] T081 [US3] "Save as note" option in the save sheet, in `src/features/save/saveAsNote.ts` (depends on T046) (R10.9, R10.12)
 
 **Checkpoint**: User Stories 1 to 3 pass all tests.
 

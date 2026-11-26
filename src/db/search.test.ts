@@ -95,6 +95,17 @@ describe('searchMemories', () => {
     expect(await ids(db, 'shop')).toEqual([]);
   });
 
+  it('finds a standalone note by any word in its title, text, or checklist (R6.1)', async () => {
+    const { db } = await seeded();
+    const note = await createNote(db, {
+      title: 'Shop opening',
+      notes: 'Shop opening\nFriday at 6pm, family first.\n- [ ] Sweets from the bakery\n- [x] Framed gift',
+    });
+    for (const word of ['opening', 'friday', 'bakery', 'framed']) {
+      expect(await ids(db, word)).toContain(note.id);
+    }
+  });
+
   it('returns nothing for an empty or punctuation-only search, without failing', async () => {
     const { db } = await seeded();
     expect(await searchMemories(db, '   ')).toEqual([]);
