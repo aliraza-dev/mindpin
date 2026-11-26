@@ -49,7 +49,8 @@ export type NewNote = Pick<EditableFields, 'personId' | 'placeId' | 'pinned'> & 
   notes: string;
 };
 
-type MemoryRow = {
+// A row as stored. Exported for other queries in the database layer, such as search.
+export type MemoryRow = {
   id: string;
   type: MemoryType;
   person_id: string | null;
@@ -70,7 +71,7 @@ type MemoryRow = {
   deleted_at: number | null;
 };
 
-function toMemory(row: MemoryRow): Memory {
+export function toMemory(row: MemoryRow): Memory {
   return {
     id: row.id,
     type: row.type,
