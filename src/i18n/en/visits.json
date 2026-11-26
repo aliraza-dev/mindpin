@@ -1,0 +1,19 @@
+{
+  "notVisitedYet": "Not visited yet",
+  "lastVisited": "Last visited {{when}}",
+  "ago": {
+    "now": "just now",
+    "minute_one": "{{count}} minute ago",
+    "minute_other": "{{count}} minutes ago",
+    "hour_one": "{{count}} hour ago",
+    "hour_other": "{{count}} hours ago",
+    "day_one": "{{count}} day ago",
+    "day_other": "{{count}} days ago",
+    "week_one": "{{count}} week ago",
+    "week_other": "{{count}} weeks ago",
+    "month_one": "{{count}} month ago",
+    "month_other": "{{count}} months ago",
+    "year_one": "{{count}} year ago",
+    "year_other": "{{count}} years ago"
+  }
+}

@@ -2,11 +2,12 @@ import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import enCommon from './en/common.json';
+import enVisits from './en/visits.json';
 
 // All user-facing text lives in translation files, one per feature: src/i18n/en/<feature>.json.
 // Add each new feature file to `resources` below.
 export const resources = {
-  en: { common: enCommon },
+  en: { common: enCommon, visits: enVisits },
 } as const;
 
 const RTL_LANGUAGES = new Set(['ar', 'fa', 'he', 'ur']);
@@ -16,6 +17,11 @@ export function isRtlLanguage(language: string): boolean {
 }
 
 export const i18n = i18next;
+
+// A plainly typed way to translate from code outside React components.
+export type Translate = (key: string, options?: Record<string, unknown>) => string;
+
+export const translate: Translate = (key, options) => i18n.t(key, options ?? {});
 
 export async function initI18n(language: string): Promise<void> {
   if (i18n.isInitialized) {

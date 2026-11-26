@@ -217,14 +217,14 @@ appears at the top of its history. A place unvisited for 7 months appears on the
 
 ### Tests for User Story 4
 
-- [ ] T082 [P] [US4] Last-visited tests in `src/features/visits/lastVisited.test.ts`: relative time or "Not visited yet"; history newest first with optional notes (R5.3, R5.4)
+- [X] T082 [P] [US4] Last-visited tests in `src/features/visits/lastVisited.test.ts`: relative time or "Not visited yet"; history newest first with optional notes (R5.3, R5.4)
 - [ ] T083 [P] [US4] Stale place tests in `src/features/visits/stalePlaces.test.ts`: at most 3 places not visited in over 6 months (R5.5)
 - [ ] T084 [P] [US4] Navigate-confirm tests in `src/features/visits/navigateConfirm.test.ts`: after Navigate, the next app open asks whether the visit happened and records it with `visit.source` `navigate_confirm` when confirmed (R5.2)
 - [ ] T085 [US4] End-to-end flow `e2e/r5-visits.yaml` (R5.1)
 
 ### Implementation for User Story 4
 
-- [ ] T086 [P] [US4] Last-visited text and visit history in `src/features/visits/lastVisited.ts` (R5.3, R5.4)
+- [X] T086 [P] [US4] Last-visited text and visit history in `src/features/visits/lastVisited.ts` (R5.3, R5.4)
 - [ ] T087 [P] [US4] Stale place query in `src/features/visits/stalePlaces.ts` (R5.5)
 - [ ] T088 [P] [US4] Pending navigate record and prompt logic in `src/features/visits/navigateConfirm.ts` (R5.2)
 - [ ] T089 [US4] "I'm here" button and visit list with notes on the place screen, strings in `src/i18n/en/visits.json`, in `src/features/visits/VisitList.tsx` (depends on T062, T086) (R5.1, R5.3, R5.4)
