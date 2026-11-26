@@ -46,6 +46,38 @@ describe('parseShared', () => {
       expectCoordinates('https://www.google.com.pk/maps/@31.5,74.35,15z', 31.5, 74.35, 'google_maps');
     });
 
+    it('reads coordinates written in the /place/ or /search/ path', () => {
+      expectCoordinates(
+        'https://www.google.com/maps/place/31.5204,74.3587/data=!4m2!3m1',
+        31.5204,
+        74.3587,
+        'google_maps',
+      );
+      expectCoordinates(
+        'https://www.google.com/maps/search/31.5204,+74.3587?entry=tts',
+        31.5204,
+        74.3587,
+        'google_maps',
+      );
+    });
+
+    it('returns a place named in the path as text when the link has no coordinates', () => {
+      expect(
+        parseShared(
+          'https://www.google.com/maps/place/Corner+Shop,+Sample+Road,+Sample+Town/data=!4m2!3m1!1s0x1:0x2?entry=gps',
+        ),
+      ).toEqual({ kind: 'text', text: 'Corner Shop, Sample Road, Sample Town' });
+    });
+
+    it('prefers coordinates over the place name in the same link', () => {
+      expectCoordinates(
+        'https://www.google.com/maps/place/Corner+Shop/@31.5204,74.3587,17z',
+        31.5204,
+        74.3587,
+        'google_maps',
+      );
+    });
+
     it('returns a place name in q as text for address lookup (R2.4)', () => {
       expect(parseShared('https://maps.google.com/?q=Main+Boulevard+Gulberg')).toEqual({
         kind: 'text',

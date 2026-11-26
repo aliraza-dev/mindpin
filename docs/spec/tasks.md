@@ -121,7 +121,7 @@ address, and the whole flow takes under 10 seconds.
 
 - [X] T036 [P] [US1] `ParsedLocation` and result types in `src/parser/types.ts`
 - [X] T037 [US1] `parseShared(text)` as a pure function with no network or UI imports, in `src/parser/parseShared.ts` (depends on T036) (R2.1, R2.4)
-- [ ] T038 [P] [US1] Short-link resolver in `src/features/resolve/resolveShortLink.ts` (R2.2)
+- [X] T038 [P] [US1] Short-link resolver in `src/features/resolve/resolveShortLink.ts` (R2.2)
 - [ ] T039 [US1] Retry queue for `pending_resolve` and `pending_geocode` memories in `src/features/resolve/retryQueue.ts`, with migration `src/db/migrations/003_pending_geocode.ts` adding the `pending_geocode` status (design.md `memory.status`) (depends on T021, T038, T040) (R1.5, R2.3, R2.4)
 - [X] T040 [P] [US1] Address and coordinate lookup logic behind a `PlatformGeocoder` interface in `src/features/geocode/geocode.ts` (R2.3, R2.4)
 - [ ] T139 [US1] Platform geocoder adapter in `src/features/geocode/platformGeocoder.ts` (blocked: owner decision on how Android looks up addresses; `expo-location` requires the location permission for it) (R2.3, R2.4)

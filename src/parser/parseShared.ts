@@ -14,6 +14,8 @@ const PAIR = new RegExp(`^(?:loc:)?\\s*${NUMBER}\\s*,\\s*${NUMBER}\\s*$`);
 const PAIR_WITH_LABEL = new RegExp(`^${NUMBER}\\s*,\\s*${NUMBER}\\s*(?:\\(.*\\))?\\s*$`);
 const GOOGLE_PIN = new RegExp(`!3d${NUMBER}!4d${NUMBER}`);
 const GOOGLE_VIEW = new RegExp(`@${NUMBER},${NUMBER}`);
+// The place or search term in the path: /maps/place/<term>/... (the usual result of a short link).
+const GOOGLE_PATH_TERM = /\/maps\/(?:place|search)\/([^/?#]+)/;
 const GOOGLE_HOST = /^(?:www\.|maps\.)?google\.[a-z.]{2,6}$/;
 const LINK = /(?:https?:\/\/|geo:)[^\s<>"]+/gi;
 
@@ -114,13 +116,15 @@ function parseHttp(link: string): LinkResult {
   }
 
   if (GOOGLE_HOST.test(host) && (host.startsWith('maps.') || path.startsWith('/maps'))) {
-    // The exact pin, then an explicit coordinate parameter, then the map centre.
+    const pathTerm = decode(path.match(GOOGLE_PATH_TERM)?.[1] ?? '').trim();
+    // The exact pin, then explicit coordinates in a parameter or the path, then the map centre.
     const coords =
       fromMatch(path.match(GOOGLE_PIN)) ??
       firstCoordinates(params, ['q', 'query', 'll', 'destination', 'daddr', 'center']) ??
+      fromMatch(pathTerm.match(PAIR)) ??
       fromMatch(path.match(GOOGLE_VIEW));
     if (coords) return { kind: 'coordinates', coords, source: 'google_maps' };
-    const text = firstText(params, ['q', 'query', 'destination', 'daddr']);
+    const text = firstText(params, ['q', 'query', 'destination', 'daddr']) ?? pathTerm;
     return text ? { kind: 'text', text } : null;
   }
 
