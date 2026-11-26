@@ -95,6 +95,20 @@ export async function listPeople(db: SqlDatabase): Promise<Person[]> {
   return rows.map(toPerson);
 }
 
+// People ordered by when they were last used: the latest of their newest place or note and
+// their own last change (R3.3).
+export async function listRecentlyUsedPeople(db: SqlDatabase, limit: number): Promise<Person[]> {
+  const rows = await db.getAllAsync<PersonRow>(
+    `SELECT p.* FROM person p
+     LEFT JOIN memory m ON m.person_id = p.id AND m.deleted_at IS NULL
+     GROUP BY p.id
+     ORDER BY max(coalesce(max(m.created_at), 0), p.updated_at) DESC, p.rowid DESC
+     LIMIT ?`,
+    [limit],
+  );
+  return rows.map(toPerson);
+}
+
 export async function updatePerson(
   db: SqlDatabase,
   id: string,
