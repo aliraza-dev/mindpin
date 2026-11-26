@@ -40,6 +40,9 @@ Decisions during the build (2026-11-26):
 
 - Address lookup uses the phone's built-in service through a small native module, so MindPin does not ask for the location permission. `expo-location` was rejected because it requires that permission on Android and adds location permissions to the app.
 - MindPin only reads contacts; the permission to edit contacts is blocked in the app config.
+- Navigate (R4.5) opens the phone's default maps app on Android (or its app chooser) and Apple Maps on iOS, falling back to a Google Maps web link. Choosing a different maps app on iOS is not in v1.
+- Message (R3.10) opens WhatsApp only for numbers saved in international format (starting with + and the country code), because WhatsApp rejects local-format numbers; other numbers open SMS.
+- Shared text (R4.6, R4.8) contains the label, address, and maps link only, never notes or tags, which can hold gate codes.
 
 ## v1 goals
 
