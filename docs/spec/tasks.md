@@ -188,7 +188,7 @@ Notes list under Today with its first line as title, and search finds a word fro
 - [X] T067 [P] [US3] Purge tests in `src/features/notes/purge.test.ts`: a deleted note moves to Recently Deleted and is removed permanently 30 days after `memory.deleted_at` (R10.10)
 - [ ] T068 [P] [US3] Editor tests in `src/features/notes/NoteEditor.test.tsx`: opens blank with the keyboard up; saves as the user types with no Save button; headings, bold, italic, bulleted and numbered lists, and checklists (R10.1, R10.3, R10.4)
 - [ ] T069 [P] [US3] Notes list tests in `src/features/notes/NotesList.test.tsx`: swipe and long-press both offer pin, link, and delete (R10.11)
-- [ ] T070 [P] [US3] Linking tests in `src/features/notes/linkNote.test.ts`: a note links to a person, a place, or both, and appears on their screens (R10.8)
+- [X] T070 [P] [US3] Linking tests in `src/features/notes/linkNote.test.ts`: a note links to a person, a place, or both, and appears on their screens (R10.8)
 - [ ] T071 [P] [US3] Save-as-note tests in `src/features/save/saveAsNote.test.ts`: shared text with no location offers "Save as note"; notes never count toward the place limit (R10.9, R10.12)
 - [ ] T072 [P] [US3] Extend `src/db/search.test.ts` so standalone note text is found (R6.1)
 - [ ] T073 [US3] End-to-end flow `e2e/r10-notes.yaml`, timing the new note open at under 1 second (R10.1, constitution IV)
