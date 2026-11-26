@@ -9,6 +9,7 @@ import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { I18nManager, View } from 'react-native';
 
+import { purgeDeletedNotesAtStart } from '../src/features/notes/purge';
 import { startBackgroundLookups } from '../src/features/save/lookups';
 import { initI18n } from '../src/i18n';
 import { tokens } from '../src/ui/tokens';
@@ -33,6 +34,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     const background = startBackgroundLookups();
+    void purgeDeletedNotesAtStart();
     return () => background.stop();
   }, []);
 

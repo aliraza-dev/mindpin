@@ -44,7 +44,10 @@ type EditableFields = {
 };
 
 export type NewPlace = Omit<EditableFields, 'placeId' | 'pinned'> & { title: string };
-export type NewNote = Pick<EditableFields, 'personId' | 'placeId' | 'pinned'> & {
+export type NewNote = Pick<
+  EditableFields,
+  'personId' | 'placeId' | 'pinned' | 'sourceApp' | 'sourceRaw'
+> & {
   title: string;
   notes: string;
 };
@@ -213,6 +216,50 @@ export async function softDeleteMemory(db: SqlDatabase, id: string): Promise<voi
     now,
     id,
   ]);
+}
+
+async function selectNotes(db: SqlDatabase, where: string, params: SqlValue[], orderBy: string) {
+  const rows = await db.getAllAsync<MemoryRow>(
+    `SELECT * FROM memory WHERE type = 'note' AND ${where} ORDER BY ${orderBy}, rowid DESC`,
+    params,
+  );
+  return rows.map(toMemory);
+}
+
+// Notes that are not deleted, most recently edited first (R10.7).
+export function listNotes(db: SqlDatabase): Promise<Memory[]> {
+  return selectNotes(db, 'deleted_at IS NULL', [], 'updated_at DESC');
+}
+
+// Recently Deleted: deleted notes, most recently deleted first (R10.10).
+export function listDeletedNotes(db: SqlDatabase): Promise<Memory[]> {
+  return selectNotes(db, 'deleted_at IS NOT NULL', [], 'deleted_at DESC');
+}
+
+// Notes linked to a person or to a place, for their screens (R10.8).
+export function listNotesForPerson(db: SqlDatabase, personId: string): Promise<Memory[]> {
+  return selectNotes(db, 'deleted_at IS NULL AND person_id = ?', [personId], 'updated_at DESC');
+}
+
+export function listNotesForPlace(db: SqlDatabase, placeId: string): Promise<Memory[]> {
+  return selectNotes(db, 'deleted_at IS NULL AND place_id = ?', [placeId], 'updated_at DESC');
+}
+
+// Removes for good the notes deleted at or before the given time. Returns how many.
+export async function purgeNotesDeletedBefore(db: SqlDatabase, cutoff: number): Promise<number> {
+  const result = await db.runAsync(
+    "DELETE FROM memory WHERE type = 'note' AND deleted_at IS NOT NULL AND deleted_at <= ?",
+    [cutoff],
+  );
+  return result.changes;
+}
+
+// The number the free limit is measured against: saved places only, never notes (R10.12).
+export async function countSavedPlaces(db: SqlDatabase): Promise<number> {
+  const row = await db.getFirstAsync<{ n: number }>(
+    "SELECT count(*) AS n FROM memory WHERE type = 'place' AND deleted_at IS NULL",
+  );
+  return row?.n ?? 0;
 }
 
 // Places still waiting for a link or address lookup, oldest first.
