@@ -124,7 +124,7 @@ address, and the whole flow takes under 10 seconds.
 - [X] T038 [P] [US1] Short-link resolver in `src/features/resolve/resolveShortLink.ts` (R2.2)
 - [X] T039 [US1] Retry queue for `pending_resolve` and `pending_geocode` memories in `src/features/resolve/retryQueue.ts`, with migration `src/db/migrations/003_pending_geocode.ts` adding the `pending_geocode` status (design.md `memory.status`) (depends on T021, T038, T040) (R1.5, R2.3, R2.4)
 - [X] T040 [P] [US1] Address and coordinate lookup logic behind a `PlatformGeocoder` interface in `src/features/geocode/geocode.ts` (R2.3, R2.4)
-- [ ] T139 [US1] Platform geocoder adapter in `src/features/geocode/platformGeocoder.ts` (blocked: owner decision on how Android looks up addresses; `expo-location` requires the location permission for it) (R2.3, R2.4)
+- [ ] T139 [US1] Local native module `modules/place-geocoder` (Android `Geocoder`, iOS `CLGeocoder`, no location permission), its adapter with tests in `src/features/geocode/platformGeocoder.ts`, the device lookups in `src/features/save/lookups.ts`, and the retry queue started from `app/_layout.tsx`; the native code must be compiled and checked on an Android and an iOS device before this is ticked (R1.5, R2.3, R2.4)
 - [X] T041 [P] [US1] On-device contacts bridge using `expo-contacts`, with no upload path, in `src/features/people/contacts.ts` (R3.6)
 - [X] T042 [P] [US1] Person matching and recent people in `src/features/people/matchPerson.ts` (R3.3, R3.7, R3.8)
 - [X] T043 [P] [US1] Nearby place lookup by distance in `src/features/places/findNearby.ts` (R3.5)

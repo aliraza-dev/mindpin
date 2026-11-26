@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["PlaceGeocoderModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.placegeocoder.PlaceGeocoderModule"]
+  }
+}

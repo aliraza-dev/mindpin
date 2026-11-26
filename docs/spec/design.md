@@ -11,7 +11,8 @@ MindPin is local-first: the phone's database is the source of truth, and the bac
 | Link parser | Turns shared content into coordinates and an address | Pure TypeScript module, fully unit tested |
 | Local database | Stores people, memories, visits | SQLite with full-text search (FTS5) |
 | Contacts bridge | Reads contacts on request, never uploads them | expo-contacts |
-| Maps | Map preview, pin map, address lookup | react-native-maps, platform geocoder |
+| Maps | Map preview, pin map | react-native-maps |
+| Address lookup | Turns coordinates into an address and an address into coordinates, without asking for the location permission | Local native module `modules/place-geocoder`: Android `Geocoder`, iOS `CLGeocoder` |
 | Auth | Phone (SMS code with auto-fill), Google, email sign-in link, Sign in with Apple on iOS | Supabase Auth |
 | Backup | Encrypts the database and uploads it | AES-256 on device, Supabase Storage |
 | Backup key | Generates and keeps the backup key; the server never sees it | iCloud Keychain (synchronizable item) on iOS, Google Block Store on Android; recovery code as fallback |

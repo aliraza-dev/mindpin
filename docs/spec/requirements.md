@@ -36,6 +36,11 @@ Decisions from the spec analysis (2026-11-25):
 - A person is suggested but not required to save a place.
 - Addresses waiting for lookup while offline get the status `pending_geocode`; an address-only place may have no coordinates.
 
+Decisions during the build (2026-11-26):
+
+- Address lookup uses the phone's built-in service through a small native module, so MindPin does not ask for the location permission. `expo-location` was rejected because it requires that permission on Android and adds location permissions to the app.
+- MindPin only reads contacts; the permission to edit contacts is blocked in the app config.
+
 ## v1 goals
 
 - Save a shared location in under 10 seconds without leaving the chat app.

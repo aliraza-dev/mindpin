@@ -46,7 +46,7 @@ Run tests and the type check before calling a task done.
 
 - Named exports only, no default exports (except where Expo Router requires them for screens).
 - Tests live next to source: `foo.ts` and `foo.test.ts`.
-- Suggested layout: `app/` screens, `src/parser/` link parser, `src/db/` schema, migrations and data access, `src/features/` feature logic, `src/ui/` shared components, `src/i18n/` strings.
+- Suggested layout: `app/` screens, `src/parser/` link parser, `src/db/` schema, migrations and data access, `src/features/` feature logic, `src/ui/` shared components, `src/i18n/` strings, `modules/` local native modules (Kotlin and Swift).
 - The link parser is a pure function with no network or UI imports; network lookups live in a separate module.
 - All database changes go through a migration.
 - All user-facing text goes in translation files, never hard-coded in components.

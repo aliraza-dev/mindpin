@@ -9,6 +9,7 @@ import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { I18nManager, View } from 'react-native';
 
+import { startBackgroundLookups } from '../src/features/save/lookups';
 import { initI18n } from '../src/i18n';
 import { tokens } from '../src/ui/tokens';
 
@@ -28,6 +29,11 @@ export default function RootLayout() {
 
   useEffect(() => {
     initI18n(getLocales()[0]?.languageCode ?? 'en').then(() => setI18nReady(true));
+  }, []);
+
+  useEffect(() => {
+    const background = startBackgroundLookups();
+    return () => background.stop();
   }, []);
 
   if (!fontsLoaded || !i18nReady) return null;
