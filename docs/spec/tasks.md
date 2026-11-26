@@ -184,7 +184,7 @@ Notes list under Today with its first line as title, and search finds a word fro
 ### Tests for User Story 3
 
 - [X] T065 [P] [US3] Note text tests in `src/features/notes/noteText.test.ts`: first line becomes `memory.title`, the rest is the preview; ticking a checklist item moves it to the bottom of its checklist (R10.2, R10.5)
-- [ ] T066 [P] [US3] Grouping tests in `src/features/notes/groupNotes.test.ts`: pinned notes first; sorted by last edited; groups Today, Previous 7 days, Previous 30 days, then by month (R10.6, R10.7)
+- [X] T066 [P] [US3] Grouping tests in `src/features/notes/groupNotes.test.ts`: pinned notes first; sorted by last edited; groups Today, Previous 7 days, Previous 30 days, then by month (R10.6, R10.7)
 - [ ] T067 [P] [US3] Purge tests in `src/features/notes/purge.test.ts`: a deleted note moves to Recently Deleted and is removed permanently 30 days after `memory.deleted_at` (R10.10)
 - [ ] T068 [P] [US3] Editor tests in `src/features/notes/NoteEditor.test.tsx`: opens blank with the keyboard up; saves as the user types with no Save button; headings, bold, italic, bulleted and numbered lists, and checklists (R10.1, R10.3, R10.4)
 - [ ] T069 [P] [US3] Notes list tests in `src/features/notes/NotesList.test.tsx`: swipe and long-press both offer pin, link, and delete (R10.11)
@@ -196,7 +196,7 @@ Notes list under Today with its first line as title, and search finds a word fro
 ### Implementation for User Story 3
 
 - [X] T074 [P] [US3] Title, preview, and checklist sinking in `src/features/notes/noteText.ts` (R10.2, R10.5)
-- [ ] T075 [P] [US3] Pinned section and date grouping in `src/features/notes/groupNotes.ts` (R10.6, R10.7)
+- [X] T075 [P] [US3] Pinned section and date grouping in `src/features/notes/groupNotes.ts` (R10.6, R10.7)
 - [ ] T076 [P] [US3] Recently Deleted purge, run at app start from `app/_layout.tsx`, in `src/features/notes/purge.ts` (R10.10)
 - [ ] T077 [US3] Rich-text note editor that reads and writes Markdown, opens before the database row exists and creates it on the first keystroke, strings in `src/i18n/en/notes.json`, in `src/features/notes/NoteEditor.tsx`, route `app/note/[id].tsx` (R10.1 to R10.5)
 - [ ] T078 [US3] Notes list with swipe and long-press actions in `src/features/notes/NotesList.tsx`, route `app/notes/index.tsx` (depends on T075) (R10.6, R10.7, R10.11)
