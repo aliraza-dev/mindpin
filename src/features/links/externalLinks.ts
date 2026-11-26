@@ -1,5 +1,6 @@
 // Handing off to other apps: maps (R4.5), the dialer, WhatsApp, and SMS (R3.10).
 // MindPin does not navigate, call, or message itself. Nothing here is logged.
+import { getLocales } from 'expo-localization';
 import { Linking, Platform } from 'react-native';
 
 import { coordinatePair, webMapsLink, type Locatable } from './mapsLinks';
@@ -78,16 +79,45 @@ export async function callPerson(
   return number ? tryOpen(open, `tel:${number}`) : false;
 }
 
-// Opens a chat with the number: WhatsApp when installed, otherwise SMS (R3.10). WhatsApp only
-// accepts numbers with a country code, so other numbers go straight to SMS.
-// Returns which app opened, or null when none did.
+// How a local mobile number becomes an international one, per phone region. Only the launch
+// market is listed (requirements.md, decisions of 2026-11-26); add a region here to support it.
+const LOCAL_MOBILE: Record<string, { pattern: RegExp; countryCode: string; dropDigits: number }> = {
+  // Pakistan: 03XX XXXXXXX becomes +92 3XX XXXXXXX.
+  PK: { pattern: /^03\d{9}$/, countryCode: '92', dropDigits: 1 },
+};
+
+// The number in the form WhatsApp accepts: country code and number, digits only. Null when the
+// number has no country code and cannot be converted safely for the phone's region.
+function whatsAppNumber(number: string, region: string | null): string | null {
+  if (number.startsWith('+')) return number.slice(1);
+  const rule = region ? LOCAL_MOBILE[region.toUpperCase()] : undefined;
+  if (!rule || !rule.pattern.test(number)) return null;
+  return rule.countryCode + number.slice(rule.dropDigits);
+}
+
+function deviceRegion(): string | null {
+  try {
+    return getLocales()[0]?.regionCode ?? null;
+  } catch {
+    return null;
+  }
+}
+
+type MessageOptions = { open?: Opener; region?: string | null };
+
+// Opens a chat with the number: WhatsApp when installed, otherwise SMS (R3.10). WhatsApp needs
+// a country code, so a local number is converted for the phone's region where that is safe,
+// and otherwise goes straight to SMS. Returns which app opened, or null when none did.
 export async function messagePerson(
   phone: string | null | undefined,
-  open: Opener = openUrl,
+  options: MessageOptions = {},
 ): Promise<'whatsapp' | 'sms' | null> {
+  const { open = openUrl } = options;
   const number = normalizePhone(phone);
   if (!number) return null;
-  if (number.startsWith('+') && (await tryOpen(open, `whatsapp://send?phone=${number.slice(1)}`))) {
+  const region = options.region === undefined ? deviceRegion() : options.region;
+  const forWhatsApp = whatsAppNumber(number, region);
+  if (forWhatsApp && (await tryOpen(open, `whatsapp://send?phone=${forWhatsApp}`))) {
     return 'whatsapp';
   }
   return (await tryOpen(open, `sms:${number}`)) ? 'sms' : null;

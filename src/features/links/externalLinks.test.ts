@@ -89,31 +89,51 @@ describe('callPerson (R3.10)', () => {
 });
 
 describe('messagePerson (R3.10)', () => {
+  const urls = (open: ReturnType<typeof opener>) => open.mock.calls.map((call) => call[0]);
+
   it('opens WhatsApp when it is installed', async () => {
     const open = opener('whatsapp:', 'sms:');
-    expect(await messagePerson('+1 000 000-0000', open)).toBe('whatsapp');
-    expect(open.mock.calls.map((call) => call[0])).toEqual(['whatsapp://send?phone=10000000000']);
+    expect(await messagePerson('+1 000 000-0000', { open, region: null })).toBe('whatsapp');
+    expect(urls(open)).toEqual(['whatsapp://send?phone=10000000000']);
   });
 
   it('opens SMS when WhatsApp is not installed', async () => {
     const open = opener('sms:');
-    expect(await messagePerson('+10000000000', open)).toBe('sms');
-    expect(open.mock.calls.map((call) => call[0])).toEqual([
-      'whatsapp://send?phone=10000000000',
-      'sms:+10000000000',
-    ]);
+    expect(await messagePerson('+10000000000', { open, region: null })).toBe('sms');
+    expect(urls(open)).toEqual(['whatsapp://send?phone=10000000000', 'sms:+10000000000']);
   });
 
-  it('goes straight to SMS for a number without a country code', async () => {
+  it("converts a local Pakistani mobile number when the phone's region is Pakistan", async () => {
     const open = opener('whatsapp:', 'sms:');
-    expect(await messagePerson('0300 0000000', open)).toBe('sms');
-    expect(open.mock.calls.map((call) => call[0])).toEqual(['sms:03000000000']);
+    expect(await messagePerson('0300 0000000', { open, region: 'PK' })).toBe('whatsapp');
+    expect(urls(open)).toEqual(['whatsapp://send?phone=923000000000']);
+  });
+
+  it('falls back to SMS with the number as it was saved', async () => {
+    const open = opener('sms:');
+    expect(await messagePerson('0300 0000000', { open, region: 'PK' })).toBe('sms');
+    expect(urls(open)).toEqual(['whatsapp://send?phone=923000000000', 'sms:03000000000']);
+  });
+
+  it('goes straight to SMS for local numbers it cannot convert safely', async () => {
+    // Another region, an unknown region, a landline, and a number of the wrong length.
+    const cases: [string, string | null][] = [
+      ['0300 0000000', 'US'],
+      ['0300 0000000', null],
+      ['042 0000000', 'PK'],
+      ['0300 000', 'PK'],
+    ];
+    for (const [phone, region] of cases) {
+      const open = opener('whatsapp:', 'sms:');
+      expect(await messagePerson(phone, { open, region })).toBe('sms');
+      expect(urls(open)).toEqual([`sms:${phone.replace(/\s/g, '')}`]);
+    }
   });
 
   it('reports when nothing can be opened or there is no number', async () => {
-    expect(await messagePerson('+10000000000', opener())).toBeNull();
+    expect(await messagePerson('+10000000000', { open: opener(), region: null })).toBeNull();
     const open = opener('sms:');
-    expect(await messagePerson(null, open)).toBeNull();
+    expect(await messagePerson(null, { open, region: null })).toBeNull();
     expect(open).not.toHaveBeenCalled();
   });
 });
