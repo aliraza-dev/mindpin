@@ -58,7 +58,7 @@ Places and notes are stored as a generic memory item so receipts, voice notes, a
 | pinned | integer | 0 or 1; used by notes |
 | source_app | text | For example WhatsApp |
 | source_raw | text | Original shared text, kept for re-parsing |
-| status | text | `resolved`, `pending_resolve` (short link waiting for a connection), or `pending_geocode` (address waiting for lookup because the device was offline) |
+| status | text | `resolved`, `pending_resolve` (short link waiting for a connection), or `pending_geocode` (waiting for a connection to look up the address for known coordinates, or the coordinates for a known address) |
 | payload | text (JSON) | Type-specific data for later types |
 | created_at, updated_at, deleted_at | integer | Soft delete supports backup merge; deleted notes are purged 30 days after `deleted_at` |
 

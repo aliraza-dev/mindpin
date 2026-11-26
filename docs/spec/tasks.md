@@ -108,8 +108,8 @@ address, and the whole flow takes under 10 seconds.
 > Write these first and confirm they fail before implementing.
 
 - [X] T027 [P] [US1] Parser unit tests in `src/parser/parseShared.test.ts`, one group per row of the parser table in `design.md`: Google Maps full links (`@lat,lng` and `?q=lat,lng`), Apple Maps `ll`, WhatsApp text with a maps link, `geo:`, plain coordinates with range checks, short links returned as needing resolution, address-only text, and no location found; every coordinate result carries a snapshot flag, false until T138 (R1.4, R2.1, R2.4)
-- [ ] T028 [P] [US1] Short-link resolver tests with mocked fetch in `src/features/resolve/resolveShortLink.test.ts`: the redirect is followed and parsed; offline marks the memory `pending_resolve`; the queue retries when the device comes online (R1.5, R2.2)
-- [ ] T029 [P] [US1] Geocoding tests with a mocked geocoder in `src/features/geocode/geocode.test.ts`: coordinates give an address; an address gives coordinates; no match keeps the text (R2.3, R2.4)
+- [ ] T028 [P] [US1] Short-link resolver tests with mocked fetch in `src/features/resolve/resolveShortLink.test.ts`, and queue tests in `src/features/resolve/retryQueue.test.ts`: the redirect is followed and parsed; offline leaves the memory `pending_resolve`; the queue retries when the device comes online (R1.5, R2.2)
+- [X] T029 [P] [US1] Geocoding tests with a mocked geocoder in `src/features/geocode/geocode.test.ts`: coordinates give an address; an address gives coordinates; no match is reported so the text is kept (R2.3, R2.4)
 - [ ] T030 [P] [US1] Person matching tests in `src/features/people/matchPerson.test.ts`: a contact with an existing `person.contact_ref` reuses that person; a typed name matching an existing person (ignoring case) is suggested first and never merged; the 3 most recently used people are suggested before typing (R3.3, R3.7, R3.8)
 - [ ] T031 [P] [US1] Duplicate detection tests in `src/features/places/findNearby.test.ts`: a place for the same person within 100 m is offered for update; 101 m or a different person is not (R3.5)
 - [ ] T032 [P] [US1] Save service tests in `src/features/save/savePlace.test.ts`: person and place are written in one transaction; closing mid-save leaves no partial rows; the search index is updated; no network call happens before the write (R1.3, R1.5, non-functional: reliability)
@@ -122,12 +122,13 @@ address, and the whole flow takes under 10 seconds.
 - [X] T036 [P] [US1] `ParsedLocation` and result types in `src/parser/types.ts`
 - [X] T037 [US1] `parseShared(text)` as a pure function with no network or UI imports, in `src/parser/parseShared.ts` (depends on T036) (R2.1, R2.4)
 - [ ] T038 [P] [US1] Short-link resolver in `src/features/resolve/resolveShortLink.ts` (R2.2)
-- [ ] T039 [US1] `pending_resolve` retry queue in `src/features/resolve/retryQueue.ts` (depends on T021, T038) (R1.5)
-- [ ] T040 [P] [US1] Address and coordinate lookup with the platform geocoder in `src/features/geocode/geocode.ts` (R2.3, R2.4)
+- [ ] T039 [US1] Retry queue for `pending_resolve` and `pending_geocode` memories in `src/features/resolve/retryQueue.ts`, with migration `src/db/migrations/003_pending_geocode.ts` adding the `pending_geocode` status (design.md `memory.status`) (depends on T021, T038, T040) (R1.5, R2.3, R2.4)
+- [X] T040 [P] [US1] Address and coordinate lookup logic behind a `PlatformGeocoder` interface in `src/features/geocode/geocode.ts` (R2.3, R2.4)
+- [ ] T139 [US1] Platform geocoder adapter in `src/features/geocode/platformGeocoder.ts` (blocked: owner decision on how Android looks up addresses; `expo-location` requires the location permission for it) (R2.3, R2.4)
 - [ ] T041 [P] [US1] On-device contacts bridge using `expo-contacts`, with no upload path, in `src/features/people/contacts.ts` (R3.6)
 - [ ] T042 [P] [US1] Person matching and recent people in `src/features/people/matchPerson.ts` (R3.3, R3.7, R3.8)
 - [ ] T043 [P] [US1] Nearby place lookup by distance in `src/features/places/findNearby.ts` (R3.5)
-- [ ] T044 [US1] Save service that writes first and resolves or geocodes afterwards, with migration `src/db/migrations/003_pending_geocode.ts` adding the `pending_geocode` status (design.md `memory.status`), in `src/features/save/savePlace.ts` (depends on T016, T017, T039, T040) (R1.3, R1.5)
+- [ ] T044 [US1] Save service that writes first and resolves or geocodes afterwards, in `src/features/save/savePlace.ts` (depends on T016, T017, T039, T040, T042) (R1.3, R1.5, R3.11)
 - [ ] T045 [US1] Contact picker with strings in `src/i18n/en/people.json`, in `src/features/people/ContactPicker.tsx` (depends on T041, T042) (R3.1 to R3.4)
 - [ ] T046 [US1] Save sheet with map preview (`react-native-maps`), address, source line, label chips, notes, tags, duplicate prompt, and no-location state, strings in `src/i18n/en/save.json`, in `src/features/save/SaveSheet.tsx` (depends on T037, T043, T044, T045) (R1.2 to R1.4, R4.1, R4.2)
 - [ ] T047 [US1] Android share target: `ACTION_SEND` `text/plain` intent filter through a config plugin in `app.json`, a translucent route `app/share.tsx` that shows the save sheet over the source app and returns to it after Save (depends on T046) (R1.1, R1.2, R1.3)
