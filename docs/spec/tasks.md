@@ -151,7 +151,7 @@ Navigate and Share.
 
 - [X] T049 [P] [US2] Search tests in `src/db/search.test.ts`: matches person names, labels, addresses, place notes, and tags; works with no connection; returns within 300 ms for 5,000 places (R6.1, R6.2, R6.4)
 - [X] T050 [P] [US2] Share text tests in `src/features/share/shareText.test.ts`: one place gives a maps link and address; Share places gives every place of a person with label, address, and maps link (R4.6, R4.8)
-- [ ] T051 [P] [US2] External link tests in `src/features/links/externalLinks.test.ts`: Navigate opens the preferred maps app; Call opens the dialer; Message opens WhatsApp when installed and SMS otherwise (R3.10, R4.5)
+- [X] T051 [P] [US2] External link tests in `src/features/links/externalLinks.test.ts`: Navigate opens the preferred maps app; Call opens the dialer; Message opens WhatsApp when installed and SMS otherwise (R3.10, R4.5)
 - [ ] T052 [P] [US2] Home screen tests in `src/features/home/HomeScreen.test.tsx`: People, Places, and Notes views; recently saved items; the search bar has no microphone; Ask MindPin does not appear (R6.3, R6.5)
 - [ ] T053 [P] [US2] Person screen tests in `src/features/people/PersonScreen.test.tsx`: lists all of the person's places; Call and Message only when a phone number is saved; Share places; Add place opens the save sheet with a typed address or pasted link (R3.10, R4.3, R4.7, R4.8)
 - [ ] T054 [P] [US2] Place screen tests in `src/features/places/PlaceScreen.test.tsx`: map, notes, tags, edit, delete with confirmation, Navigate, Share (R4.2, R4.4, R4.5, R4.6)
@@ -161,7 +161,7 @@ Navigate and Share.
 
 - [X] T056 [P] [US2] FTS5 search query in `src/db/search.ts` (R6.1, R6.2, R6.4)
 - [X] T057 [P] [US2] Share text builder in `src/features/share/shareText.ts` (R4.6, R4.8)
-- [ ] T058 [P] [US2] External links for maps, dialer, WhatsApp, and SMS in `src/features/links/externalLinks.ts` (R3.10, R4.5)
+- [X] T058 [P] [US2] External links for maps, dialer, WhatsApp, and SMS in `src/features/links/externalLinks.ts` (R3.10, R4.5)
 - [ ] T059 [US2] Home screen with search bar, People, Places, and Notes views, and recently saved items, strings in `src/i18n/en/home.json`, in `src/features/home/HomeScreen.tsx`, rendered by `app/(tabs)/index.tsx` (R6.3, R6.5)
 - [ ] T060 [US2] Results as you type in `src/features/search/SearchResults.tsx`, shown from the home screen (depends on T056) (R6.2)
 - [ ] T061 [US2] Person screen in `src/features/people/PersonScreen.tsx`, route `app/person/[id].tsx` (depends on T057, T058) (R3.10, R4.3, R4.8)
