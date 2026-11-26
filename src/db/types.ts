@@ -17,4 +17,8 @@ export type Migration = {
   version: number;
   name: string;
   sql: string;
+  // Set for migrations that rebuild a table (SQLite cannot alter a CHECK constraint in place).
+  // The runner turns foreign keys off for the migration, checks that no link is left broken,
+  // and turns them back on.
+  foreignKeysOff?: boolean;
 };

@@ -2,7 +2,9 @@ import { newId } from '../lib/id';
 import type { SqlDatabase, SqlValue } from './types';
 
 export type MemoryType = 'place' | 'note';
-export type MemoryStatus = 'resolved' | 'pending_resolve';
+// pending_resolve: a short link is waiting for a connection.
+// pending_geocode: an address or coordinates lookup is waiting for a connection.
+export type MemoryStatus = 'resolved' | 'pending_resolve' | 'pending_geocode';
 
 export type Memory = {
   id: string;
@@ -210,6 +212,42 @@ export async function softDeleteMemory(db: SqlDatabase, id: string): Promise<voi
     now,
     id,
   ]);
+}
+
+// Places still waiting for a link or address lookup, oldest first.
+export async function listPendingPlaces(db: SqlDatabase): Promise<Memory[]> {
+  const rows = await db.getAllAsync<MemoryRow>(
+    `SELECT * FROM memory
+     WHERE type = 'place' AND status <> 'resolved' AND deleted_at IS NULL
+     ORDER BY created_at, rowid`,
+  );
+  return rows.map(toMemory);
+}
+
+export type LookupResult = {
+  lat: number | null;
+  lng: number | null;
+  address: string | null;
+  status: MemoryStatus;
+};
+
+// Stores what a background lookup found. It only fills in coordinates or an address that are
+// still empty, so anything the user typed while the lookup was running is kept.
+export async function saveLookupResult(
+  db: SqlDatabase,
+  id: string,
+  result: LookupResult,
+): Promise<void> {
+  await db.runAsync(
+    `UPDATE memory SET
+       lat = CASE WHEN lat IS NULL OR lng IS NULL THEN ? ELSE lat END,
+       lng = CASE WHEN lat IS NULL OR lng IS NULL THEN ? ELSE lng END,
+       address = CASE WHEN address IS NULL OR trim(address) = '' THEN ? ELSE address END,
+       status = ?,
+       updated_at = max(updated_at, ?)
+     WHERE id = ? AND deleted_at IS NULL`,
+    [result.lat, result.lng, result.address, result.status, Date.now(), id],
+  );
 }
 
 export async function listPlacesForPerson(db: SqlDatabase, personId: string): Promise<Memory[]> {

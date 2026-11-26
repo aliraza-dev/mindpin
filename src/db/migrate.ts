@@ -19,11 +19,25 @@ export async function migrate(db: SqlDatabase, migrations: Migration[]): Promise
   let current = await getSchemaVersion(db);
   for (const migration of sorted) {
     if (migration.version <= current) continue;
-    await db.withTransactionAsync(async () => {
-      await db.execAsync(migration.sql);
-      // PRAGMA does not accept bound parameters; version is a trusted integer from code.
-      await db.execAsync(`PRAGMA user_version = ${Math.trunc(migration.version)}`);
-    });
+    // Foreign keys can only be switched outside a transaction. The app always runs with them on.
+    if (migration.foreignKeysOff) await db.execAsync('PRAGMA foreign_keys = OFF');
+    try {
+      await db.withTransactionAsync(async () => {
+        await db.execAsync(migration.sql);
+        if (migration.foreignKeysOff) {
+          const broken = await db.getAllAsync('PRAGMA foreign_key_check');
+          if (broken.length > 0) {
+            throw new Error(
+              `Migration ${migration.version} left ${broken.length} broken link(s) between tables`,
+            );
+          }
+        }
+        // PRAGMA does not accept bound parameters; version is a trusted integer from code.
+        await db.execAsync(`PRAGMA user_version = ${Math.trunc(migration.version)}`);
+      });
+    } finally {
+      if (migration.foreignKeysOff) await db.execAsync('PRAGMA foreign_keys = ON');
+    }
     current = migration.version;
   }
   return current;

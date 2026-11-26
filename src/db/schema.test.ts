@@ -1,5 +1,8 @@
 // Schema checks against the data model in docs/spec/design.md.
+import { migrate } from './migrate';
+import { migrations } from './migrations';
 import { freshDb } from './testing/freshDb';
+import { openTestDatabase } from './testing/nodeSqlite';
 import type { SqlDatabase } from './types';
 
 async function columns(db: SqlDatabase, table: string) {
@@ -89,9 +92,12 @@ describe('schema (design.md data model)', () => {
     await expect(insertMemory(db, { type: 'receipt' })).rejects.toThrow();
   });
 
-  it('rejects memory.status values other than resolved and pending_resolve', async () => {
+  it('accepts only the memory.status values listed in design.md', async () => {
     const db = await freshDb();
-    await expect(insertMemory(db, { status: 'unknown' })).rejects.toThrow();
+    await insertMemory(db, { id: 'a', status: 'resolved' });
+    await insertMemory(db, { id: 'b', status: 'pending_resolve' });
+    await insertMemory(db, { id: 'c', status: 'pending_geocode' });
+    await expect(insertMemory(db, { id: 'd', status: 'unknown' })).rejects.toThrow();
   });
 
   it('rejects visit.source values other than manual and navigate_confirm', async () => {
@@ -107,6 +113,83 @@ describe('schema (design.md data model)', () => {
   it('rejects a memory linked to a person that does not exist', async () => {
     const db = await freshDb();
     await expect(insertMemory(db, { person_id: 'missing' })).rejects.toThrow();
+  });
+});
+
+describe('upgrade from schema version 2 to 3 (memory table rebuild)', () => {
+  async function upgraded() {
+    const db = openTestDatabase();
+    await migrate(
+      db,
+      migrations.filter((m) => m.version <= 2),
+    );
+    await insertPerson(db, 'p1', 'Sample Person', 'contact-1');
+    await insertMemory(db, {
+      id: 'place-1',
+      person_id: 'p1',
+      title: 'Shop',
+      lat: 31.5,
+      lng: 74.3,
+      address: 'Sample Road',
+      notes: 'Blue door',
+      tags: '["parking"]',
+      status: 'pending_resolve',
+      source_raw: 'https://maps.app.goo.gl/x',
+      payload: '{"k":1}',
+    });
+    await insertMemory(db, { id: 'note-1', type: 'note', place_id: 'place-1', pinned: 1 });
+    await insertMemory(db, { id: 'gone-1', title: 'Old flat', deleted_at: now });
+    await db.runAsync(
+      "INSERT INTO visit (id, memory_id, visited_at, note, source) VALUES ('v1', 'place-1', 5, 'Dinner', 'manual')",
+    );
+    const before = await db.getAllAsync('SELECT * FROM memory ORDER BY id');
+    await migrate(db, migrations);
+    return { db, before };
+  }
+
+  async function searchIds(db: SqlDatabase, query: string) {
+    const rows = await db.getAllAsync<{ memory_id: string }>(
+      'SELECT memory_id FROM memory_fts WHERE memory_fts MATCH ?',
+      [query],
+    );
+    return rows.map((r) => r.memory_id);
+  }
+
+  it('keeps every memory row, visit, and link exactly as it was', async () => {
+    const { db, before } = await upgraded();
+    expect(await db.getAllAsync('SELECT * FROM memory ORDER BY id')).toEqual(before);
+    expect(await db.getAllAsync('SELECT id, memory_id, note FROM visit')).toEqual([
+      { id: 'v1', memory_id: 'place-1', note: 'Dinner' },
+    ]);
+  });
+
+  it('keeps the search index and its triggers working', async () => {
+    const { db } = await upgraded();
+    expect(await searchIds(db, 'sample')).toEqual(['place-1']);
+    expect(await searchIds(db, 'flat')).toEqual([]);
+    await db.runAsync("UPDATE memory SET address = 'Other Street' WHERE id = 'place-1'");
+    expect(await searchIds(db, 'other')).toEqual(['place-1']);
+    await db.runAsync("UPDATE person SET name = 'Renamed Person' WHERE id = 'p1'");
+    expect(await searchIds(db, 'renamed')).toEqual(['place-1']);
+    await insertMemory(db, { id: 'new-1', title: 'Office', status: 'pending_geocode' });
+    expect(await searchIds(db, 'office')).toEqual(['new-1']);
+    await db.runAsync("UPDATE memory SET deleted_at = 1 WHERE id = 'new-1'");
+    expect(await searchIds(db, 'office')).toEqual([]);
+  });
+
+  it('keeps links enforced and indexes in place', async () => {
+    const { db } = await upgraded();
+    await expect(insertMemory(db, { id: 'x', person_id: 'missing' })).rejects.toThrow();
+    await expect(insertMemory(db, { id: 'y', place_id: 'missing' })).rejects.toThrow();
+    await expect(
+      db.runAsync(
+        "INSERT INTO visit (id, memory_id, visited_at, source) VALUES ('v2', 'missing', 1, 'manual')",
+      ),
+    ).rejects.toThrow();
+    const indexes = await db.getAllAsync<{ name: string }>(
+      "SELECT name FROM sqlite_master WHERE type = 'index' AND tbl_name = 'memory' AND name NOT LIKE 'sqlite_%' ORDER BY name",
+    );
+    expect(indexes.map((i) => i.name)).toEqual(['memory_person', 'memory_type_updated']);
   });
 });
 
