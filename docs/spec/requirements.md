@@ -41,8 +41,12 @@ Decisions during the build (2026-11-26):
 - Address lookup uses the phone's built-in service through a small native module, so MindPin does not ask for the location permission. `expo-location` was rejected because it requires that permission on Android and adds location permissions to the app.
 - MindPin only reads contacts; the permission to edit contacts is blocked in the app config.
 - Navigate (R4.5) opens the phone's default maps app on Android (or its app chooser) and Apple Maps on iOS, falling back to a Google Maps web link. Choosing a different maps app on iOS is not in v1.
-- Message (R3.10) opens WhatsApp only for numbers saved in international format (starting with + and the country code), because WhatsApp rejects local-format numbers; other numbers open SMS.
+- Message (R3.10) opens WhatsApp for numbers saved with a country code. WhatsApp rejects local-format numbers, so a local mobile number is first converted using the phone's region, for the launch market only (Pakistan: `03…` becomes `+92 3…`). Any other local number opens SMS.
 - Shared text (R4.6, R4.8) contains the label, address, and maps link only, never notes or tags, which can hold gate codes.
+- Checklists (R10.5): unticking an item moves it back above the ticked items, as in Apple Notes. An item's indented sub-items move with it.
+- Notes list (R10.7): groups use calendar days in the phone's time zone. Today is the current day, Previous 7 days is 1 to 7 days ago, Previous 30 days is 8 to 30 days ago, and older notes are grouped by month and year.
+- Visits: a visit note is kept as one line (R5.4). The home card (R5.5) uses 6 calendar months and also counts a place that was saved over 6 months ago and never visited.
+- After Navigate (R5.2): only the latest Navigate is remembered. The question appears the first time the app is opened at least 15 minutes later, so going back to check a gate code does not trigger it. Yes records the visit at the time of Navigate; No drops it.
 
 ## v1 goals
 
