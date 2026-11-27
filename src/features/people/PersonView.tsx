@@ -9,6 +9,7 @@ import { isSameDay, shortDate } from '../../lib/dates';
 import { Avatar } from '../../ui/Avatar';
 import { BackButton } from '../../ui/BackButton';
 import { Button } from '../../ui/Button';
+import { IconButton } from '../../ui/IconButton';
 import { PlaceTile } from '../../ui/PlaceTile';
 import { SectionHeader } from '../../ui/SectionHeader';
 import { tokens } from '../../ui/tokens';
@@ -25,6 +26,8 @@ type Props = {
   // Space for the status bar, supplied by the screen.
   topInset?: number;
   onBack: () => void;
+  // Opens the form that changes the name and phone number (R3.12).
+  onEdit: () => void;
   onCall: () => void;
   onMessage: () => void;
   onSharePlaces: () => void;
@@ -47,7 +50,14 @@ export function PersonView(props: Props) {
       style={styles.screen}
       contentContainerStyle={[styles.content, { paddingTop: topInset + 8 }]}
     >
-      <BackButton onPress={props.onBack} accessibilityLabel={t('people:back')} />
+      <View style={styles.topRow}>
+        <BackButton onPress={props.onBack} accessibilityLabel={t('people:back')} />
+        <IconButton
+          icon="edit"
+          accessibilityLabel={t('people:editA11y', { name: person.name })}
+          onPress={props.onEdit}
+        />
+      </View>
 
       <View style={styles.identity}>
         <Avatar name={person.name} tintKey={person.id} size="large" />
@@ -166,6 +176,7 @@ export function PersonView(props: Props) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: tokens.color.background },
   content: { paddingHorizontal: tokens.screenPadding, paddingBottom: 32 },
+  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   identity: { alignItems: 'center', marginTop: 18, marginBottom: 25 },
   name: {
     marginTop: 8,

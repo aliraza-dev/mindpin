@@ -92,6 +92,13 @@ describe('PersonScreen', () => {
     expect(message).not.toContain('4471');
   });
 
+  it('opens the edit form for the person (R3.12)', async () => {
+    const { person } = await seeded();
+    await render(<PersonScreen personId={person.id} />);
+    await fireEvent.press(await screen.findByRole('button', { name: 'Edit Sample Person' }));
+    expect(mockRouter.push).toHaveBeenCalledWith(`/person/${person.id}/edit`);
+  });
+
   it('opens places, notes, and the add screens', async () => {
     const { person, place, note } = await seeded();
     await render(<PersonScreen personId={person.id} />);

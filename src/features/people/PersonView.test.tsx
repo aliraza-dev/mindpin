@@ -68,6 +68,7 @@ const notes = [
 function setup(overrides: Partial<Parameters<typeof PersonView>[0]> = {}) {
   const handlers = {
     onBack: jest.fn(),
+    onEdit: jest.fn(),
     onCall: jest.fn(),
     onMessage: jest.fn(),
     onSharePlaces: jest.fn(),
@@ -127,6 +128,13 @@ describe('PersonView', () => {
     expect(screen.queryByRole('button', { name: 'Message Sample Person' })).toBeNull();
     expect(screen.getByRole('button', { name: "Share Sample Person's places" })).toBeTruthy();
     expect(screen.queryByText(/from contacts/)).toBeNull();
+  });
+
+  it('offers to edit the person (R3.12)', async () => {
+    const { handlers, view } = setup();
+    await view;
+    await fireEvent.press(screen.getByRole('button', { name: 'Edit Sample Person' }));
+    expect(handlers.onEdit).toHaveBeenCalledTimes(1);
   });
 
   it('offers Add place (R4.7) and goes back', async () => {

@@ -1,5 +1,6 @@
 {
   "back": "Go back",
+  "editA11y": "Edit {{name}}",
   "fromContacts": "from contacts",
   "call": "Call",
   "callA11y": "Call {{name}}",
@@ -23,5 +24,21 @@
   "cannotCall": "No app on this phone can make the call.",
   "cannotMessage": "No app on this phone can send the message.",
   "nothingToShare": "There is nothing to share yet.",
-  "loadFailed": "This screen could not be loaded. Go back and try again."
+  "loadFailed": "This screen could not be loaded. Go back and try again.",
+  "editForm": {
+    "title": "Edit person",
+    "cancel": "Cancel",
+    "cancelA11y": "Close without saving",
+    "save": "Save",
+    "saveA11y": "Save the changes to this person",
+    "name": "Name",
+    "phone": "Phone number",
+    "contactsNote": "Changes stay in MindPin. Your phone's contacts are not changed.",
+    "saveFailed": "The changes could not be saved. Try again.",
+    "errors": {
+      "nameRequired": "Type a name.",
+      "nameTooLong": "Use 100 characters or fewer.",
+      "phoneInvalid": "Enter a valid phone number, for example +92 300 0000000."
+    }
+  }
 }

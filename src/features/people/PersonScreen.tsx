@@ -74,6 +74,7 @@ export function PersonScreen({ personId }: Props) {
       now={now}
       topInset={insets.top}
       onBack={() => router.back()}
+      onEdit={() => router.push(`/person/${person.id}/edit`)}
       onCall={async () => {
         if (!(await callPerson(person.phone))) Alert.alert(t('people:cannotCall'));
       }}

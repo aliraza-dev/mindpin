@@ -155,7 +155,7 @@ Navigate and Share.
 - [X] T052 [P] [US2] Home screen tests in `src/features/home/HomeScreen.test.tsx`: People, Places, and Notes views; recently saved items; the search bar has no microphone; Ask MindPin does not appear (R6.3, R6.5)
 - [X] T053 [P] [US2] Person screen tests in `src/features/people/PersonScreen.test.tsx`: lists all of the person's places; Call and Message only when a phone number is saved; Share places; Add place opens the save sheet with a typed address or pasted link (R3.10, R4.3, R4.7, R4.8)
 - [X] T054 [P] [US2] Place screen tests in `src/features/places/PlaceScreen.test.tsx`, `EditPlaceScreen.test.tsx`, `placeForm.test.ts`, and `editPlace.test.ts`: map shown only with a key, a connection, and a pin; notes, tags; the "⋯" menu; edit of label, address, notes, and tags within the limits in `design.md`; delete with confirmation, keeping linked notes; Navigate, Share (R4.2, R4.4, R4.5, R4.6, R4.9, R4.10)
-- [ ] T141 [P] [US2] Edit person tests in `src/features/people/personForm.test.ts` and `src/features/people/EditPersonScreen.test.tsx`: the name is required; a phone number must be valid or empty; saving changes only MindPin's copy; search finds the new name (R3.12)
+- [X] T141 [P] [US2] Edit person tests in `src/features/people/personForm.test.ts` and `src/features/people/EditPersonScreen.test.tsx`: the name is required; a phone number must be valid or empty; saving changes only MindPin's copy; search finds the new name (R3.12)
 - [ ] T055 [US2] End-to-end flows `e2e/r4-places.yaml` and `e2e/r6-find.yaml`, including the map view showing every saved pin (R6.3)
 
 ### Implementation for User Story 2
@@ -168,7 +168,7 @@ Navigate and Share.
 - [X] T061 [US2] Person screen in `src/features/people/PersonScreen.tsx`, route `app/person/[id].tsx` (depends on T057, T058) (R3.10, R4.3, R4.8)
 - [X] T062 [US2] Place screen with the "⋯" menu, and the edit form, in `src/features/places/PlaceScreen.tsx`, `src/features/places/EditPlaceScreen.tsx`, and `src/features/places/editPlace.ts`, routes `app/place/[id]/index.tsx` and `app/place/[id]/edit.tsx` (R4.2, R4.4, R4.5, R4.6, R4.9, R4.10)
 - [ ] T140 [US2] Map header on the place screen with `react-native-maps` in `src/features/map/PlaceMap.tsx`, the key read from `GOOGLE_MAPS_ANDROID_KEY` in `app.config.js`; needs the owner's Google Maps key, and must be seen working on an Android and an iOS device before this is ticked (design.md: Maps)
-- [ ] T142 [US2] Edit person form in `src/features/people/EditPersonScreen.tsx` and `src/features/people/personForm.ts`, opened by the edit button on the person screen, route `app/person/[id]/edit.tsx` (depends on T061) (R3.12)
+- [X] T142 [US2] Edit person form in `src/features/people/EditPersonScreen.tsx` and `src/features/people/personForm.ts`, opened by the edit button on the person screen, route `app/person/[id]/edit.tsx` (depends on T061) (R3.12)
 - [ ] T063 [US2] Add a place by hand from a typed address or pasted link, opening the save sheet, route `app/place/new.tsx` (R4.7)
 - [ ] T064 [US2] Map of all pins in `src/features/map/MapScreen.tsx`, rendered by `app/(tabs)/map.tsx` (R6.3)
 
