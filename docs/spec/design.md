@@ -177,7 +177,7 @@ Values read from the Save sheet frame for the sheet itself:
 | Location card | white, 1 px border, radius 16; map thumbnail 88 by 72, radius 12 |
 | Suggestion list | white, 1 px border, radius 14; rows 52 high; picked row `#E3F2EF` with a check; photo or initials 32 px |
 
-The edit forms and the "⋯" menu have no frame of their own; they are built from these values. The "⋯" icon is not in Figma: it is drawn to match the edit button.
+The edit forms and the "⋯" menu were built from these values before they had frames. Frames 15 to 21 were then drawn from the code on 2026-11-27 ("15 Edit place", "16 Edit person", "17 Add a place", "18 Place menu", and three save sheet states), so they record what was built and are not yet an owner-approved design. The "⋯" icon is drawn to match the edit button.
 
 Icons are the SVG files exported from the frames, kept in `assets/icons/`. A label without an icon in Figma (Office, custom) shows its first letter until one is drawn.
 

@@ -46,7 +46,7 @@ Advise the owner to turn on two-factor sign-in for the Expo account, download a 
 - **Go-ahead for EAS Build**, as above.
 - **Google Maps key.** It goes in `.env` as `GOOGLE_MAPS_ANDROID_KEY`, and later as an EAS secret. Until it is set, the build uses a stand-in value and the app shows the address instead of the map. The owner also needs to add the line `GOOGLE_MAPS_ANDROID_KEY=` to `.env.example` by hand, because the assistant is not allowed to read or write `.env` files. The key must be locked to the app in the Google console.
 - **A sample live-location share** for T138 (finding U4 in the spec).
-- **Figma frames** for the screens that have none. See the next section.
+- **Figma frames.** Frames 15 to 21 were drawn from the code on 2026-11-27 for the screens already built; the owner has not reviewed them. Frames for the screens not built yet (Settings, unlock, recovery code and restore, map, search results, the Undo bar, "Did you visit?", the name prompt) are still missing: the Figma plan's tool-call limit was reached before they could be drawn.
 
 ## Decisions the owner has made
 
