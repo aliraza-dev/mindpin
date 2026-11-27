@@ -49,6 +49,14 @@ Decisions during the build (2026-11-26):
 - Deleting a note (R10.10, owner decision 2026-11-27): a deleted note is gone for good. Recently Deleted and the 30-day wait are removed; an Undo button for 5 seconds on the same screen replaces them. If the app is closed while Undo is showing, the note is removed at the next start.
 - After Navigate (R5.2): only the latest Navigate is remembered. The question appears the first time the app is opened at least 15 minutes later, so going back to check a gate code does not trigger it. Yes records the visit at the time of Navigate; No drops it.
 
+Decisions during the build (2026-11-27):
+
+- Place screen (R4.4, owner decision): Edit and Delete sit behind a "⋯" button at the top right, opposite the back button. This button is not in the Figma frame.
+- Editing a place (R4.10): the label, address, notes, and tags can be changed. Changing the address changes the text only: the pin stays where it was shared, and only a place with no pin has its location looked up again. Moving a place to another person waits for the contact picker.
+- Deleting a place (R4.9): the app asks first. The place's visits go with it. Notes linked to the place are kept and lose only that link.
+- Editing a person (R3.12, owner decision): the Person screen's edit button changes the name and phone number kept in MindPin. The phone's own address book is never changed.
+- Map key (owner decision): the map on Android needs a Google Maps key, which the owner will supply later. A dummy key cannot draw a map, because Google sends map images only for a valid key. So the map is built and stays off until the key is set: the Place screen then shows its plain header, with the address below as before. The same happens offline and for a place with no pin. iOS uses Apple Maps and needs no key.
+
 ## v1 goals
 
 - Save a shared location in under 10 seconds without leaving the chat app.
@@ -125,6 +133,7 @@ As a user, I want to attach each place to a contact so that I can find places by
 9. WHEN a backup is restored on a new phone and contacts permission is granted, the app SHALL re-link people to device contacts by matching phone number; people with no match SHALL keep their saved name, phone, and places.
 10. WHEN a person has a saved phone number, the person screen SHALL offer Call, which opens the phone dialer, and Message, which opens WhatsApp if installed and SMS otherwise.
 11. A place SHALL be savable without a person; it then appears in the Places view and in search, but under no person.
+12. The user SHALL be able to edit a person's name and phone number from the person screen. The name SHALL be required, and a phone number, when given, SHALL be a valid number. The app SHALL NOT change the phone's address book.
 
 ### R4. Places, labels, and notes
 
@@ -138,6 +147,8 @@ As a user, I want to label places and keep practical notes so that I have what I
 6. WHEN the user taps Share, the app SHALL produce a maps link and the address as text for the system share menu.
 7. The user SHALL be able to add a place without a share, from the person screen or the Places view, by typing an address or pasting a link; the same save sheet SHALL open.
 8. WHEN the user taps Share places on a person screen, the app SHALL produce one text listing each of that person's places with its label, address, and maps link.
+9. WHEN a place is deleted, it SHALL disappear from every list, the map, and search, together with its visits. Notes linked to it SHALL be kept and SHALL lose only their link to the place.
+10. Editing a place SHALL allow changing its label, address, notes, and tags. WHEN the address of a place with a pin is changed, the pin SHALL stay where it is. WHEN the address of a place with no pin is changed, the app SHALL look up its location again. A place with no pin SHALL keep an address.
 
 ### R5. Visits
 

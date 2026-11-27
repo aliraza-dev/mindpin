@@ -35,7 +35,7 @@ foundation, one sub-phase per user story, then release. Later product phases are
 | Story | Title | Priority | Requirements |
 | --- | --- | --- | --- |
 | US1 | Save a shared location to a person | P1 (MVP) | R1, R2, R3.1 to R3.8 |
-| US2 | Browse and find | P1 | R3.10, R4, R6 |
+| US2 | Browse and find | P1 | R3.10, R3.12, R4, R6 |
 | US3 | Notes | P2 | R10 |
 | US4 | Visits | P2 | R5 |
 | US5 | Account and sign-in | P3 | R7 |
@@ -154,7 +154,8 @@ Navigate and Share.
 - [X] T051 [P] [US2] External link tests in `src/features/links/externalLinks.test.ts`: Navigate opens the preferred maps app; Call opens the dialer; Message opens WhatsApp when installed and SMS otherwise (R3.10, R4.5)
 - [X] T052 [P] [US2] Home screen tests in `src/features/home/HomeScreen.test.tsx`: People, Places, and Notes views; recently saved items; the search bar has no microphone; Ask MindPin does not appear (R6.3, R6.5)
 - [X] T053 [P] [US2] Person screen tests in `src/features/people/PersonScreen.test.tsx`: lists all of the person's places; Call and Message only when a phone number is saved; Share places; Add place opens the save sheet with a typed address or pasted link (R3.10, R4.3, R4.7, R4.8)
-- [ ] T054 [P] [US2] Place screen tests in `src/features/places/PlaceScreen.test.tsx`: map, notes, tags, edit, delete with confirmation, Navigate, Share (R4.2, R4.4, R4.5, R4.6)
+- [ ] T054 [P] [US2] Place screen tests in `src/features/places/PlaceScreen.test.tsx`, `EditPlaceScreen.test.tsx`, `placeForm.test.ts`, and `editPlace.test.ts`: map shown only with a key, a connection, and a pin; notes, tags; the "⋯" menu; edit of label, address, notes, and tags within the limits in `design.md`; delete with confirmation, keeping linked notes; Navigate, Share (R4.2, R4.4, R4.5, R4.6, R4.9, R4.10)
+- [ ] T141 [P] [US2] Edit person tests in `src/features/people/personForm.test.ts` and `src/features/people/EditPersonScreen.test.tsx`: the name is required; a phone number must be valid or empty; saving changes only MindPin's copy; search finds the new name (R3.12)
 - [ ] T055 [US2] End-to-end flows `e2e/r4-places.yaml` and `e2e/r6-find.yaml`, including the map view showing every saved pin (R6.3)
 
 ### Implementation for User Story 2
@@ -165,7 +166,9 @@ Navigate and Share.
 - [X] T059 [US2] Home screen with search bar, People, Places, and Notes views, and recently saved items, strings in `src/i18n/en/home.json`, in `src/features/home/HomeScreen.tsx`, rendered by `app/(tabs)/index.tsx` (R6.3, R6.5)
 - [X] T060 [US2] Results as you type in `src/features/search/SearchResults.tsx`, shown from the home screen (depends on T056) (R6.2)
 - [X] T061 [US2] Person screen in `src/features/people/PersonScreen.tsx`, route `app/person/[id].tsx` (depends on T057, T058) (R3.10, R4.3, R4.8)
-- [ ] T062 [US2] Place screen and edit form in `src/features/places/PlaceScreen.tsx` and `src/features/places/EditPlace.tsx`, route `app/place/[id].tsx` (R4.2, R4.4, R4.5, R4.6)
+- [ ] T062 [US2] Place screen with the "⋯" menu, and the edit form, in `src/features/places/PlaceScreen.tsx`, `src/features/places/EditPlaceScreen.tsx`, and `src/features/places/editPlace.ts`, routes `app/place/[id]/index.tsx` and `app/place/[id]/edit.tsx` (R4.2, R4.4, R4.5, R4.6, R4.9, R4.10)
+- [ ] T140 [US2] Map header on the place screen with `react-native-maps` in `src/features/map/PlaceMap.tsx`, the key read from `GOOGLE_MAPS_ANDROID_KEY` in `app.config.js`; needs the owner's Google Maps key, and must be seen working on an Android and an iOS device before this is ticked (design.md: Maps)
+- [ ] T142 [US2] Edit person form in `src/features/people/EditPersonScreen.tsx` and `src/features/people/personForm.ts`, opened by the edit button on the person screen, route `app/person/[id]/edit.tsx` (depends on T061) (R3.12)
 - [ ] T063 [US2] Add a place by hand from a typed address or pasted link, opening the save sheet, route `app/place/new.tsx` (R4.7)
 - [ ] T064 [US2] Map of all pins in `src/features/map/MapScreen.tsx`, rendered by `app/(tabs)/map.tsx` (R6.3)
 
@@ -436,7 +439,8 @@ Each later phase gets its own spec once v1 shows that people use the save flow.
 - Tick a task's box only when its tests pass.
 - UI tasks: build from the matching frame in the Figma file linked in `design.md`. If the frame is
   missing or contradicts the spec, stop and ask (constitution VI). Missing as of 2026-11-25:
-  Settings, unlock, recovery code and restore, map, search results, edit place, the Undo bar
+  Settings, unlock, recovery code and restore, map, search results, edit place, edit person, the
+  "⋯" menu on a place, the Undo bar
   after deleting a note, "Did you visit?", name prompt, contacts permission, and the save sheet's
   no-location and duplicate states. Out of date: Welcome, Home, Email, Verify, and Notes (its
   "Recently deleted" link is removed, 2026-11-27).

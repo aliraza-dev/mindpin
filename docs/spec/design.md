@@ -11,7 +11,7 @@ MindPin is local-first: the phone's database is the source of truth, and the bac
 | Link parser | Turns shared content into coordinates and an address | Pure TypeScript module, fully unit tested |
 | Local database | Stores people, memories, visits | SQLite with full-text search (FTS5) |
 | Contacts bridge | Reads contacts on request, never uploads them | expo-contacts |
-| Maps | Map preview, pin map | react-native-maps |
+| Maps | Map preview, pin map | react-native-maps: Google Maps on Android (needs the key `GOOGLE_MAPS_ANDROID_KEY` when the app is built), Apple Maps on iOS (no key). Shown only when the key is set, the phone is online, and the place has a pin; otherwise the address stands in |
 | Address lookup | Turns coordinates into an address and an address into coordinates, without asking for the location permission | Local native module `modules/place-geocoder`: Android `Geocoder`, iOS `CLGeocoder` |
 | Auth | Phone (SMS code with auto-fill), Google, email sign-in link, Sign in with Apple on iOS | Supabase Auth |
 | Backup | Encrypts the database and uploads it | AES-256 on device, Supabase Storage |
@@ -84,6 +84,23 @@ A full-text index covers person name, title, address, notes, and tags.
 
 The note editor is a rich-text component that reads and writes Markdown.
 
+### Limits on typed text
+
+Every typed field is trimmed and has a limit, enforced in the form and again before it is written.
+
+| Field | Limit |
+| --- | --- |
+| Place label | 1 to 40 characters |
+| Address | 300 characters; required when the place has no pin |
+| Place notes | 2,000 characters |
+| Tags | up to 10, each 1 to 40 characters, no duplicates (ignoring case); typed separated by commas |
+| Person name | 1 to 100 characters |
+| Phone number | up to 20 characters, holding 3 to 15 digits; only digits, spaces, `+`, `-`, and brackets |
+
+### Deleting a place
+
+Deleting a place sets `deleted_at` on it (kept for backup merge) and, in the same transaction, clears `place_id` on the notes linked to it. Its visits stay in the table and are never shown again.
+
 ## Link parser rules
 
 | Input | Example pattern | How coordinates are found |
@@ -136,6 +153,19 @@ More values read from the Home, Person, and Place frames on 2026-11-27:
 | Radii | buttons 14, large action buttons 16, cards 18, filter chips 18, tags 10, badges 8, sheet top 24 |
 | Sizes | buttons 44 high, large action buttons 64, filter chips 36 (touch area still 44), avatars 44 and 84, back button 46 |
 
+Values read from the Save sheet and Person frames on 2026-11-27, used by the edit forms:
+
+| Token | Value |
+| --- | --- |
+| Form title | Space Grotesk 700, 22 px |
+| Text link (Cancel) | Inter 400, 15 px, accent |
+| Field label | Inter 700, 13 px, text color |
+| Field | 46 px high, radius 14, white, 1 px control border; 2 px accent border while typing; text Inter 400, 15 px |
+| Main form button | 54 px high, radius 16, accent, label Inter 700, 16 px, white |
+| Round icon button (edit) | 44 px, white, 1 px border |
+
+The edit forms and the "⋯" menu have no frame of their own; they are built from these values. The "⋯" icon is not in Figma: it is drawn to match the edit button.
+
 Icons are the SVG files exported from the frames, kept in `assets/icons/`. A label without an icon in Figma (Office, custom) shows its first letter until one is drawn.
 
 ## Security rules
@@ -152,7 +182,9 @@ These apply to every task. They sit beside the privacy rules in the constitution
 | Personal data never reaches logs | Only the logger may print, and it accepts event names and an allow-list of fields |
 | Data leaves the phone only through MindPin's encrypted backup | Android's own app backup is turned off (`allowBackup: false`), so the database is not copied to Google Drive outside that encryption |
 | Sharing shows only what the user would expect | Shared text holds a label, address, and maps link, never notes or tags |
-| Permissions are the minimum | A new package's permissions are checked before it is installed; unused ones are blocked in `app.json` |
+| Permissions are the minimum | A new package's permissions are checked before it is installed; unused ones are blocked in `app.json`. The location permissions are blocked outright, so no package can add them |
+| Typed text is bounded | Every form field is trimmed and checked against the limits in "Limits on typed text" before it is written |
+| The maps key is locked to this app | A Google Maps key ships inside every Android app that uses it, so it cannot be kept secret. It is restricted in the Google Cloud console to MindPin's package name and signing certificate, and to the Maps SDK for Android only. It is read from `.env` when the app is built and is never committed |
 | Secrets stay out of the repo and the app | `.env` files are not committed. Only public client keys may use the `EXPO_PUBLIC_` prefix, because those are bundled into the app |
 | Dependencies are checked | `npm audit` is run when dependencies change; high or critical findings in shipped code block a release |
 | No dynamic code | `eval` and similar are lint errors; the app has no web views |
