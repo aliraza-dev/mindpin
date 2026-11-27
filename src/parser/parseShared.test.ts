@@ -272,6 +272,16 @@ describe('parseShared', () => {
       });
     });
 
+    it('reads only the first 10,000 characters of shared text, and stays fast on huge input', () => {
+      const junk = 'lorem ipsum 12.5 '.repeat(100_000);
+      const started = performance.now();
+      expectCoordinates(`31.5204, 74.3587 ${junk}`, 31.5204, 74.3587, 'plain_coordinates');
+      const tooFar = parseShared(`${'x'.repeat(10_000)} https://maps.google.com/?q=31.5204,74.3587`);
+      expect(performance.now() - started).toBeLessThan(500);
+      expect(tooFar.kind).toBe('text');
+      expect(tooFar.kind === 'text' && tooFar.text.length).toBeLessThanOrEqual(10_000);
+    });
+
     it('returns synchronously, with no network work', () => {
       const result = parseShared('31.5204, 74.3587');
       expect(result).not.toBeInstanceOf(Promise);

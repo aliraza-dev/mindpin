@@ -9,6 +9,7 @@ type LinkResult =
   | { kind: 'text'; text: string }
   | null;
 
+const MAX_SHARED_LENGTH = 10_000;
 const NUMBER = '(-?\\d{1,3}(?:\\.\\d+)?)';
 const PAIR = new RegExp(`^(?:loc:)?\\s*${NUMBER}\\s*,\\s*${NUMBER}\\s*$`);
 const PAIR_WITH_LABEL = new RegExp(`^${NUMBER}\\s*,\\s*${NUMBER}\\s*(?:\\(.*\\))?\\s*$`);
@@ -152,7 +153,10 @@ function parsePlain(text: string): Coordinates | null {
 
 // Order of preference: coordinates in a map link, a short link to resolve, plain coordinates
 // in the text, an address inside a map link, then any remaining text.
-export function parseShared(text: string): ParsedLocation {
+export function parseShared(shared: string): ParsedLocation {
+  // Shared text comes from other apps and is untrusted; a location share is short, so only the
+  // start is read. This bounds the work a huge share can cause.
+  const text = shared.slice(0, MAX_SHARED_LENGTH);
   const links = (text.match(LINK) ?? []).map(trimLink);
   const results = links.map((link) =>
     link.toLowerCase().startsWith('geo:') ? parseGeo(link) : parseHttp(link),

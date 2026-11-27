@@ -24,4 +24,14 @@ module.exports = defineConfig([
       'no-console': 'error',
     },
   },
+  {
+    // No dynamic code (design.md, Security rules).
+    files: ['**/*.{ts,tsx,js}'],
+    rules: {
+      'no-eval': 'error',
+      'no-implied-eval': 'error',
+      'no-new-func': 'error',
+      'no-script-url': 'error',
+    },
+  },
 ]);

@@ -115,7 +115,44 @@ Taken from the app designs in Figma: https://www.figma.com/design/XSdu6UPBCstIuQ
 | Border | `#E6E8E2` |
 | Accent | `#0F766E` |
 | Heading font | Space Grotesk (600, 700) |
-| Body font | Inter (400, 500, 600) |
+| Body font | Inter (400, 500, 600, 700) |
 | Corner radius | 14 to 18 px for cards and fields, 16 px for main buttons |
 | Screen padding | 20 px sides |
 | Minimum touch target | 44 px |
+
+More values read from the Home, Person, and Place frames on 2026-11-27:
+
+| Token | Value |
+| --- | --- |
+| Secondary text | `#4A5060` |
+| Control border (fields, chips, outline buttons) | `#DCDFD8` |
+| Divider and neutral tag | `#EEF0EB` |
+| Teal tint, with its text | `#D7EDE9` (avatars), `#E3F2EF` (badges, tiles); text `#0B5A54` |
+| Amber tint, with its text | `#F6E3CF`; text `#8A4B0F`, and `#6E3B0B` on a tag |
+| Indigo tint, with its text | `#E2E4F3`; text `#3A3F86` |
+| Dark card | background `#14171F`, text `#FFFFFF`, muted text `#C9CCD4`, action `#F2B66D` |
+| Inactive dot | `#C9CCC4` |
+| Map placeholder | `#E3E8DD` |
+| Radii | buttons 14, large action buttons 16, cards 18, filter chips 18, tags 10, badges 8, sheet top 24 |
+| Sizes | buttons 44 high, large action buttons 64, filter chips 36 (touch area still 44), avatars 44 and 84, back button 46 |
+
+Icons are the SVG files exported from the frames, kept in `assets/icons/`. A label without an icon in Figma (Office, custom) shows its first letter until one is drawn.
+
+## Security rules
+
+These apply to every task. They sit beside the privacy rules in the constitution (Principle II).
+
+| Rule | How it is met |
+| --- | --- |
+| Treat everything from outside the app as untrusted | Shared text, links, screen addresses (deep links), and contact fields are validated before use. Shared text is read up to a fixed length. Screen addresses must carry a well-formed id, and an unknown id shows "not found" |
+| A link opened from outside never changes data | Opening a `mindpin://` link can only show a screen. Deleting, saving, sharing, calling, and messaging always need a tap inside the app |
+| Links the app opens are built, never passed through | Maps, phone, SMS, and WhatsApp links are assembled from sanitized values: phone numbers keep digits and a leading + only (so a contact cannot carry dial codes), and text is URL-encoded |
+| The network is used only for known hosts over https | Short links are requested only when they belong to a known map service; anything else is never fetched |
+| Database queries never contain user text | Every query passes values as parameters |
+| Personal data never reaches logs | Only the logger may print, and it accepts event names and an allow-list of fields |
+| Data leaves the phone only through MindPin's encrypted backup | Android's own app backup is turned off (`allowBackup: false`), so the database is not copied to Google Drive outside that encryption |
+| Sharing shows only what the user would expect | Shared text holds a label, address, and maps link, never notes or tags |
+| Permissions are the minimum | A new package's permissions are checked before it is installed; unused ones are blocked in `app.json` |
+| Secrets stay out of the repo and the app | `.env` files are not committed. Only public client keys may use the `EXPO_PUBLIC_` prefix, because those are bundled into the app |
+| Dependencies are checked | `npm audit` is run when dependencies change; high or critical findings in shipped code block a release |
+| No dynamic code | `eval` and similar are lint errors; the app has no web views |
