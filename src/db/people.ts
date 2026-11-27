@@ -1,4 +1,5 @@
 import { newId } from '../lib/id';
+import { inTransaction } from './transaction';
 import type { SqlDatabase } from './types';
 
 export type Person = {
@@ -130,4 +131,20 @@ export async function updatePerson(
     [updated.name, updated.phone, updated.contactRef, updated.photoUri, updated.updatedAt, id],
   );
   return updated;
+}
+
+// Deletes a person for good (R3.13), so the name, phone number, and contact link are no longer
+// stored. Their places and notes are kept: only the link to the person is cleared, on deleted
+// items too, since nothing may point at a person who is gone. Returns false when there was no
+// such person.
+export async function deletePerson(db: SqlDatabase, id: string): Promise<boolean> {
+  return inTransaction(db, async () => {
+    if (!(await getPerson(db, id))) return false;
+    await db.runAsync(
+      'UPDATE memory SET person_id = NULL, updated_at = max(updated_at, ?) WHERE person_id = ?',
+      [Date.now(), id],
+    );
+    await db.runAsync('DELETE FROM person WHERE id = ?', [id]);
+    return true;
+  });
 }

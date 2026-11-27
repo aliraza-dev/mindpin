@@ -35,6 +35,13 @@
     "phone": "Phone number",
     "contactsNote": "Changes stay in MindPin. Your phone's contacts are not changed.",
     "saveFailed": "The changes could not be saved. Try again.",
+    "delete": "Delete person",
+    "deleteA11y": "Delete {{name}} from MindPin",
+    "deleteTitle": "Delete {{name}}?",
+    "deleteMessage": "Their places and notes are kept, under no person. Your phone's contacts are not changed.",
+    "deleteConfirm": "Delete",
+    "deleteCancel": "Cancel",
+    "deleteFailed": "The person could not be deleted. Try again.",
     "errors": {
       "nameRequired": "Type a name.",
       "nameTooLong": "Use 100 characters or fewer.",

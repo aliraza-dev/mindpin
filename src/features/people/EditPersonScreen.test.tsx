@@ -1,14 +1,15 @@
-// T141: the edit form for a person (R3.12).
+// T141, T143: the edit form for a person, and deleting from it (R3.12, R3.13).
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 
 import { getDatabase } from '../../db/database';
+import { createPlace, getMemory } from '../../db/memories';
 import { createPerson, getPerson } from '../../db/people';
 import { freshDb } from '../../db/testing/freshDb';
 import { initI18n } from '../../i18n';
 import { EditPersonScreen } from './EditPersonScreen';
 
-const mockRouter = { back: jest.fn(), push: jest.fn() };
+const mockRouter = { back: jest.fn(), push: jest.fn(), dismissTo: jest.fn() };
 jest.mock('expo-router', () => ({
   useRouter: () => mockRouter,
   useFocusEffect: (effect: () => void) => jest.requireActual('react').useEffect(effect, [effect]),
@@ -26,6 +27,13 @@ async function seeded(overrides: Partial<Parameters<typeof createPerson>[1]> = {
 }
 
 const save = () => screen.getByRole('button', { name: 'Save the changes to this person' });
+
+type AlertButton = { text?: string; style?: string; onPress?: () => void | Promise<void> };
+// The buttons of the confirmation that was last shown.
+function confirmationButtons(): AlertButton[] {
+  const calls = (Alert.alert as jest.Mock).mock.calls;
+  return (calls[calls.length - 1]?.[2] ?? []) as AlertButton[];
+}
 
 describe('EditPersonScreen', () => {
   beforeAll(async () => {
@@ -122,5 +130,59 @@ describe('EditPersonScreen', () => {
       expect(await screen.findByText('This person is no longer in MindPin.')).toBeTruthy();
       await unmount();
     }
+  });
+
+  it('asks before deleting, and keeps the person on Cancel (R3.13)', async () => {
+    const { db, person } = await seeded();
+    await render(<EditPersonScreen personId={person.id} />);
+    await fireEvent.press(
+      await screen.findByRole('button', { name: 'Delete Sample Person from MindPin' }),
+    );
+
+    expect(Alert.alert).toHaveBeenCalledWith(
+      'Delete Sample Person?',
+      "Their places and notes are kept, under no person. Your phone's contacts are not changed.",
+      expect.any(Array),
+    );
+    const buttons = confirmationButtons();
+    expect(buttons.map((b) => [b.text, b.style])).toEqual([
+      ['Cancel', 'cancel'],
+      ['Delete', 'destructive'],
+    ]);
+    // Cancel has nothing to run: the person stays.
+    expect(buttons[0].onPress).toBeUndefined();
+    expect(await getPerson(db, person.id)).toEqual(person);
+    expect(mockRouter.dismissTo).not.toHaveBeenCalled();
+  });
+
+  it('deletes the person once confirmed, keeps their places, and returns to Home (R3.13)', async () => {
+    const { db, person } = await seeded();
+    const place = await createPlace(db, { personId: person.id, title: 'Home', address: 'Canal Road' });
+    await render(<EditPersonScreen personId={person.id} />);
+    await fireEvent.press(
+      await screen.findByRole('button', { name: 'Delete Sample Person from MindPin' }),
+    );
+    await confirmationButtons()[1].onPress?.();
+
+    await waitFor(() => expect(mockRouter.dismissTo).toHaveBeenCalledWith('/'));
+    expect(await getPerson(db, person.id)).toBeNull();
+    expect(await getMemory(db, place.id)).toMatchObject({ personId: null, deletedAt: null });
+    expect(mockRouter.back).not.toHaveBeenCalled();
+  });
+
+  it('says so and stays open when the person cannot be deleted', async () => {
+    const { db, person } = await seeded();
+    await render(<EditPersonScreen personId={person.id} />);
+    await fireEvent.press(
+      await screen.findByRole('button', { name: 'Delete Sample Person from MindPin' }),
+    );
+    (getDatabase as jest.Mock).mockRejectedValueOnce(new Error('closed'));
+    await confirmationButtons()[1].onPress?.();
+
+    await waitFor(() =>
+      expect(Alert.alert).toHaveBeenCalledWith('The person could not be deleted. Try again.'),
+    );
+    expect(mockRouter.dismissTo).not.toHaveBeenCalled();
+    expect(await getPerson(db, person.id)).toEqual(person);
   });
 });

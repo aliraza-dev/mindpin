@@ -1,4 +1,5 @@
-// The form that edits a person (R3.12): the name and phone number kept in MindPin.
+// The form that edits a person (R3.12): the name and phone number kept in MindPin. The person
+// can also be deleted from here (R3.13).
 // It has no Figma frame; the fields follow the Save sheet frame (design.md).
 // The id comes from the screen address, so it has already been checked by the route.
 import { useRouter } from 'expo-router';
@@ -8,8 +9,9 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getDatabase } from '../../db/database';
-import { getPerson, type Person } from '../../db/people';
+import { deletePerson, getPerson, type Person } from '../../db/people';
 import { useDbQuery } from '../../lib/useDbQuery';
+import { Button } from '../../ui/Button';
 import { FormScreen } from '../../ui/FormScreen';
 import { ScreenMessage } from '../../ui/ScreenMessage';
 import { TextField } from '../../ui/TextField';
@@ -50,28 +52,37 @@ export function EditPersonScreen({ personId }: Props) {
       topInset={insets.top}
       bottomInset={insets.bottom}
       onDone={() => router.back()}
+      // The person's own screen is behind this form and has nothing left to show, so both
+      // are left for Home.
+      onDeleted={() => router.dismissTo('/')}
     />
   );
 }
 
-type FormProps = { person: Person; topInset: number; bottomInset: number; onDone: () => void };
+type FormProps = {
+  person: Person;
+  topInset: number;
+  bottomInset: number;
+  onDone: () => void;
+  onDeleted: () => void;
+};
 
 // Holds what is being typed. It starts from the person as saved and is not reset when the
 // screen's data loads again, so nothing typed is lost.
-function EditPersonForm({ person, topInset, bottomInset, onDone }: FormProps) {
+function EditPersonForm({ person, topInset, bottomInset, onDone, onDeleted }: FormProps) {
   const { t } = useTranslation();
   const [name, setName] = useState(person.name);
   const [phone, setPhone] = useState(person.phone ?? '');
   const [errors, setErrors] = useState<PersonFormErrors>({});
-  // Stops a double tap on Save from writing twice.
-  const saving = useRef(false);
+  // Stops a double tap on Save or Delete from writing twice.
+  const busy = useRef(false);
 
   const errorText = (field: keyof PersonFormErrors) =>
     errors[field] ? t(`people:editForm.errors.${errors[field]}`) : undefined;
 
   const save = async () => {
-    if (saving.current) return;
-    saving.current = true;
+    if (busy.current) return;
+    busy.current = true;
     try {
       const result = await saveEditedPerson(await getDatabase(), person.id, { name, phone });
       if (!result.ok) {
@@ -82,8 +93,33 @@ function EditPersonForm({ person, topInset, bottomInset, onDone }: FormProps) {
     } catch {
       Alert.alert(t('people:editForm.saveFailed'));
     } finally {
-      saving.current = false;
+      busy.current = false;
     }
+  };
+
+  const remove = async () => {
+    if (busy.current) return;
+    busy.current = true;
+    try {
+      await deletePerson(await getDatabase(), person.id);
+      onDeleted();
+    } catch {
+      Alert.alert(t('people:editForm.deleteFailed'));
+    } finally {
+      busy.current = false;
+    }
+  };
+
+  // Deleting always asks first (R3.13). Only the Delete button of this question deletes.
+  const confirmDelete = () => {
+    Alert.alert(
+      t('people:editForm.deleteTitle', { name: person.name }),
+      t('people:editForm.deleteMessage'),
+      [
+        { text: t('people:editForm.deleteCancel'), style: 'cancel' },
+        { text: t('people:editForm.deleteConfirm'), style: 'destructive', onPress: remove },
+      ],
+    );
   };
 
   return (
@@ -97,6 +133,15 @@ function EditPersonForm({ person, topInset, bottomInset, onDone }: FormProps) {
       onSave={save}
       topInset={topInset}
       bottomInset={bottomInset}
+      footer={
+        <Button
+          variant="secondary"
+          size="large"
+          label={t('people:editForm.delete')}
+          accessibilityLabel={t('people:editForm.deleteA11y', { name: person.name })}
+          onPress={confirmDelete}
+        />
+      }
     >
       <TextField
         label={t('people:editForm.name')}

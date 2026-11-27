@@ -25,6 +25,8 @@ type Props = {
   topInset?: number;
   bottomInset?: number;
   children: ReactNode;
+  // Shown under the Save button, set apart from it: for an action such as Delete.
+  footer?: ReactNode;
 };
 
 // The frame of an edit form: a title with Cancel beside it, the fields, and one Save button.
@@ -64,6 +66,7 @@ export function FormScreen(props: Props) {
           accessibilityLabel={props.saveAccessibilityLabel}
           onPress={props.onSave}
         />
+        {props.footer ? <View style={styles.footer}>{props.footer}</View> : null}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -76,4 +79,5 @@ const styles = StyleSheet.create({
   title: { fontFamily: tokens.font.headingBold, fontSize: 22, color: tokens.color.text },
   cancel: { fontFamily: tokens.font.body, fontSize: 15, color: tokens.color.accent },
   fields: { marginTop: 23, marginBottom: 24, gap: 16 },
+  footer: { marginTop: 32 },
 });
