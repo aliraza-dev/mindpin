@@ -1,0 +1,22 @@
+{
+  "back": "Go back",
+  "navigate": "Navigate",
+  "navigateA11y": "Open {{label}} in your maps app",
+  "imHere": "I'm here",
+  "imHereA11y": "Record a visit to {{label}} now",
+  "share": "Share",
+  "shareA11y": "Share {{label}}",
+  "notes": "Notes",
+  "visits": "Visits",
+  "visitsTotal": "{{count}} total",
+  "firstSaved": "first saved",
+  "linkedNotes": "Notes about this place · {{count}}",
+  "openNoteA11y": "Open note {{title}}",
+  "untitledNote": "New note",
+  "today": "Today",
+  "notFound": "This place is no longer in MindPin.",
+  "loadFailed": "This screen could not be loaded. Go back and try again.",
+  "cannotNavigate": "No maps app could open this place.",
+  "nothingToShare": "This place has no address or location to share yet.",
+  "visitFailed": "The visit could not be saved. Try again."
+}
