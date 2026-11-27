@@ -1,5 +1,14 @@
 {
   "back": "Go back",
+  "moreA11y": "More options for {{label}}",
+  "closeMenuA11y": "Close the menu",
+  "edit": "Edit place",
+  "delete": "Delete place",
+  "deleteTitle": "Delete {{label}}?",
+  "deleteMessage": "Its visits are deleted too. Notes linked to it are kept.",
+  "deleteConfirm": "Delete",
+  "deleteCancel": "Cancel",
+  "deleteFailed": "The place could not be deleted. Try again.",
   "navigate": "Navigate",
   "navigateA11y": "Open {{label}} in your maps app",
   "imHere": "I'm here",
@@ -18,5 +27,34 @@
   "loadFailed": "This screen could not be loaded. Go back and try again.",
   "cannotNavigate": "No maps app could open this place.",
   "nothingToShare": "This place has no address or location to share yet.",
-  "visitFailed": "The visit could not be saved. Try again."
+  "visitFailed": "The visit could not be saved. Try again.",
+  "editForm": {
+    "title": "Edit place",
+    "cancel": "Cancel",
+    "cancelA11y": "Close without saving",
+    "save": "Save",
+    "saveA11y": "Save the changes to this place",
+    "label": "Label",
+    "labelHome": "Home",
+    "labelShop": "Shop",
+    "labelOffice": "Office",
+    "labelCustom": "+ Custom",
+    "labelChipA11y": "Label this place {{label}}",
+    "labelCustomA11y": "Type your own label",
+    "customLabel": "Your label",
+    "address": "Address",
+    "notes": "Notes for next time",
+    "tags": "Tags",
+    "tagsHint": "Separate tags with commas, for example: Gate code 4471, 2nd floor",
+    "saveFailed": "The changes could not be saved. Try again.",
+    "errors": {
+      "labelRequired": "Choose or type a label.",
+      "labelTooLong": "Use 40 characters or fewer.",
+      "addressRequired": "This place has no pin, so it needs an address.",
+      "addressTooLong": "Use 300 characters or fewer.",
+      "notesTooLong": "Use 2,000 characters or fewer.",
+      "tooManyTags": "Use 10 tags or fewer.",
+      "tagTooLong": "Keep each tag to 40 characters or fewer."
+    }
+  }
 }

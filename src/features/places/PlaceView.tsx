@@ -8,8 +8,10 @@ import type { Visit } from '../../db/visits';
 import { isSameDay, shortDate } from '../../lib/dates';
 import { ActionButton } from '../../ui/ActionButton';
 import { BackButton } from '../../ui/BackButton';
+import { IconButton } from '../../ui/IconButton';
 import { SectionHeader } from '../../ui/SectionHeader';
 import { tokens } from '../../ui/tokens';
+import { PlaceMap } from '../map/PlaceMap';
 import { notePreview } from '../notes/noteText';
 import { agoText } from '../visits/lastVisited';
 
@@ -27,9 +29,14 @@ type Props = {
   visits: Visit[];
   linkedNotes: Memory[];
   now: number;
+  // Whether a map can be drawn right now: the build has a maps key and the phone is online.
+  // A place with no pin never gets a map.
+  showMap: boolean;
   // Space for the status bar, supplied by the screen.
   topInset?: number;
   onBack: () => void;
+  // Opens the menu that holds Edit and Delete (R4.4).
+  onOpenMenu: () => void;
   onNavigate: () => void;
   onImHere: () => void;
   onShare: () => void;
@@ -40,7 +47,7 @@ type Props = {
 const MAP_HEIGHT = 300;
 
 export function PlaceView(props: Props) {
-  const { place, personName, visits, linkedNotes, now, topInset = 0 } = props;
+  const { place, personName, visits, linkedNotes, now, showMap, topInset = 0 } = props;
   const { t, i18n } = useTranslation();
   const date = (time: number) => shortDate(time, now, i18n.language);
   const hasNotes = place.tags.length > 0 || !!place.notes;
@@ -57,9 +64,19 @@ export function PlaceView(props: Props) {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content} bounces={false}>
-      {/* The map is not built yet (it needs a maps key); the address below stands in for it. */}
-      <View style={[styles.map, { paddingTop: topInset + 8 }]}>
-        <BackButton onPress={props.onBack} accessibilityLabel={t('places:back')} />
+      {/* Without a map (no maps key, offline, or no pin) the address below stands in for it. */}
+      <View style={styles.map}>
+        {showMap && place.lat !== null && place.lng !== null ? (
+          <PlaceMap lat={place.lat} lng={place.lng} bottomInset={tokens.radius.sheet} />
+        ) : null}
+        <View style={[styles.topRow, { paddingTop: topInset + 8 }]}>
+          <BackButton onPress={props.onBack} accessibilityLabel={t('places:back')} />
+          <IconButton
+            icon="more"
+            accessibilityLabel={t('places:moreA11y', { label: place.title })}
+            onPress={props.onOpenMenu}
+          />
+        </View>
       </View>
 
       <View style={styles.sheet}>
@@ -177,9 +194,11 @@ export function PlaceView(props: Props) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: tokens.color.background },
   content: { flexGrow: 1 },
-  map: {
-    height: MAP_HEIGHT,
-    backgroundColor: tokens.color.mapPlaceholder,
+  map: { height: MAP_HEIGHT, backgroundColor: tokens.color.mapPlaceholder },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: tokens.screenPadding,
   },
   sheet: {

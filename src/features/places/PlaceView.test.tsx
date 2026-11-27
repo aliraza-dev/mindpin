@@ -8,6 +8,9 @@ import { initI18n } from '../../i18n';
 import { tokens } from '../../ui/tokens';
 import { isCodeTag, PlaceView } from './PlaceView';
 
+// The map is hidden from screen readers, so tests must ask for hidden elements to see it.
+const MAP = { includeHiddenElements: true };
+
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = new Date(2026, 10, 26, 12).getTime();
 const on = (month: number, day: number) => new Date(2026, month - 1, day, 12).getTime();
@@ -51,6 +54,7 @@ const linkedNote: Memory = {
 function setup(overrides: Partial<Parameters<typeof PlaceView>[0]> = {}) {
   const handlers = {
     onBack: jest.fn(),
+    onOpenMenu: jest.fn(),
     onNavigate: jest.fn(),
     onImHere: jest.fn(),
     onShare: jest.fn(),
@@ -63,6 +67,7 @@ function setup(overrides: Partial<Parameters<typeof PlaceView>[0]> = {}) {
       visits={visits}
       linkedNotes={[linkedNote]}
       now={NOW}
+      showMap={false}
       {...handlers}
       {...overrides}
     />,
@@ -136,6 +141,31 @@ describe('PlaceView', () => {
     expect(screen.getByText('Notes about this place · 1')).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Open note Wi-Fi' }));
     expect(handlers.onOpenNote).toHaveBeenCalledWith('n1');
+  });
+
+  it('offers more options, where Edit and Delete are (R4.4)', async () => {
+    const { handlers, view } = setup();
+    await view;
+    await fireEvent.press(screen.getByRole('button', { name: 'More options for Home' }));
+    expect(handlers.onOpenMenu).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows the map with the pin when told it can', async () => {
+    await setup({ showMap: true }).view;
+    expect(screen.getByTestId('place-map', MAP).props.region).toMatchObject({
+      latitude: 31.5,
+      longitude: 74.3,
+    });
+    expect(screen.getAllByTestId('map-pin', MAP)).toHaveLength(1);
+  });
+
+  it('shows no map when told it cannot, or when the place has no pin', async () => {
+    const first = await setup({ showMap: false }).view;
+    expect(screen.queryByTestId('place-map', MAP)).toBeNull();
+    await first.unmount();
+    await setup({ showMap: true, place: { ...place, lat: null, lng: null } }).view;
+    expect(screen.queryByTestId('place-map', MAP)).toBeNull();
+    expect(screen.getByText('House 22, Sample Street')).toBeTruthy();
   });
 
   it('leaves out what a place does not have', async () => {
