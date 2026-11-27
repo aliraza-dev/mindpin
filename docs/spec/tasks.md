@@ -441,10 +441,13 @@ Each later phase gets its own spec once v1 shows that people use the save flow.
 - Tick a task's box only when its tests pass.
 - UI tasks: build from the matching frame in the Figma file linked in `design.md`. If the frame is
   missing or contradicts the spec, stop and ask (constitution VI). Missing as of 2026-11-25:
-  Settings, unlock, recovery code and restore, map, search results, edit place, edit person, the
+  Settings, unlock, recovery code and restore, map, search results, edit place, edit person, add
+  place by hand, the contacts permission line, the
   "⋯" menu on a place, the Undo bar
   after deleting a note, "Did you visit?", name prompt, contacts permission, and the save sheet's
   no-location and duplicate states. Out of date: Welcome, Home, Email, Verify, and Notes (its
   "Recently deleted" link is removed, 2026-11-27).
+- Owner decision, 2026-11-27: a screen with no frame is built from the styles of the existing
+  frames instead of waiting; it stays on the list above so a frame can replace it later.
 - If a task reveals a gap or conflict in the spec, stop and update `requirements.md` or
   `design.md` first (constitution I).

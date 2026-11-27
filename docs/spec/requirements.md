@@ -57,6 +57,16 @@ Decisions during the build (2026-11-27):
 - Editing a person (R3.12, owner decision): the Person screen's edit button changes the name and phone number kept in MindPin. The phone's own address book is never changed.
 - Deleting a person (R3.13, owner decision): only the person is removed, after a confirmation. Their places and notes are kept, under no person. The Delete button sits at the bottom of the edit form; it is not in a Figma frame. The phone's own address book is never changed.
 - Map key (owner decision): the map on Android needs a Google Maps key, which the owner will supply later. A dummy key cannot draw a map, because Google sends map images only for a valid key. So the map is built and stays off until the key is set: the Place screen then shows its plain header, with the address below as before. The same happens offline and for a place with no pin. iOS uses Apple Maps and needs no key.
+- Screens with no Figma frame (owner decision): they are built now from the styles of the existing frames instead of waiting for a frame, and listed in `tasks.md` so a frame can replace them later.
+- Save sheet (R1.2 to R1.4, R3.1 to R3.5, R4.1, R4.2):
+  - Save never waits for a lookup. The sheet shows the address as soon as it is found; a short link or address that is still being looked up is saved as it is and finished afterwards (R1.5).
+  - The label starts on Home, so a save needs no extra tap; the user can change it.
+  - Tags are typed in one field, separated by commas, as in the edit form. The Figma frame has no tags field.
+  - Contacts permission (R3.1) is asked from inside the "Whose place is this?" field: a one-line reason with an Allow button, shown once the user uses the field. The system prompt appears only after Allow. A typed name always works without it (R3.4).
+  - A typed name that is not picked from the list becomes a new person (R3.8).
+  - Duplicate (R3.5): when the chosen person has a place within 100 m, the sheet offers "Update" or "Save as new"; it saves as new unless Update is chosen.
+  - No location (R1.4): the sheet says so and offers Save as note and Enter address.
+  - Add place by hand (R4.7): one field for a pasted link or a typed address, then the same sheet.
 
 ## v1 goals
 

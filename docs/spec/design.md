@@ -168,6 +168,15 @@ Values read from the Save sheet and Person frames on 2026-11-27, used by the edi
 | Main form button | 54 px high, radius 16, accent, label Inter 700, 16 px, white |
 | Round icon button (edit) | 44 px, white, 1 px border |
 
+Values read from the Save sheet frame for the sheet itself:
+
+| Token | Value |
+| --- | --- |
+| Backdrop behind the sheet | `#3B3F47`; text on it `#D5D8DE`; shared-text bubble `#5A5F69` with text `#F1F2F4`, radius 14 |
+| Sheet | background color, top corners 28; handle 40 by 5, `#C9CCC4` |
+| Location card | white, 1 px border, radius 16; map thumbnail 88 by 72, radius 12 |
+| Suggestion list | white, 1 px border, radius 14; rows 52 high; picked row `#E3F2EF` with a check; photo or initials 32 px |
+
 The edit forms and the "⋯" menu have no frame of their own; they are built from these values. The "⋯" icon is not in Figma: it is drawn to match the edit button.
 
 Icons are the SVG files exported from the frames, kept in `assets/icons/`. A label without an icon in Figma (Office, custom) shows its first letter until one is drawn.
