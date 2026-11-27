@@ -55,6 +55,7 @@ Decisions during the build (2026-11-27):
 - Editing a place (R4.10): the label, address, notes, and tags can be changed. Changing the address changes the text only: the pin stays where it was shared, and only a place with no pin has its location looked up again. Moving a place to another person waits for the contact picker.
 - Deleting a place (R4.9): the app asks first. The place's visits go with it. Notes linked to the place are kept and lose only that link.
 - Editing a person (R3.12, owner decision): the Person screen's edit button changes the name and phone number kept in MindPin. The phone's own address book is never changed.
+- Deleting a person (R3.13, owner decision): only the person is removed, after a confirmation. Their places and notes are kept, under no person. The Delete button sits at the bottom of the edit form; it is not in a Figma frame. The phone's own address book is never changed.
 - Map key (owner decision): the map on Android needs a Google Maps key, which the owner will supply later. A dummy key cannot draw a map, because Google sends map images only for a valid key. So the map is built and stays off until the key is set: the Place screen then shows its plain header, with the address below as before. The same happens offline and for a place with no pin. iOS uses Apple Maps and needs no key.
 
 ## v1 goals
@@ -134,6 +135,7 @@ As a user, I want to attach each place to a contact so that I can find places by
 10. WHEN a person has a saved phone number, the person screen SHALL offer Call, which opens the phone dialer, and Message, which opens WhatsApp if installed and SMS otherwise.
 11. A place SHALL be savable without a person; it then appears in the Places view and in search, but under no person.
 12. The user SHALL be able to edit a person's name and phone number from the person screen. The name SHALL be required, and a phone number, when given, SHALL be a valid number. The app SHALL NOT change the phone's address book.
+13. The user SHALL be able to delete a person, with a confirmation before deleting. The person's places and notes SHALL be kept and SHALL lose only their link to the person. The app SHALL NOT change the phone's address book.
 
 ### R4. Places, labels, and notes
 

@@ -101,6 +101,10 @@ Every typed field is trimmed and has a limit, enforced in the form and again bef
 
 Deleting a place sets `deleted_at` on it (kept for backup merge) and, in the same transaction, clears `place_id` on the notes linked to it. Its visits stay in the table and are never shown again.
 
+### Deleting a person
+
+Deleting a person removes the `person` row for good, so the name, phone number, and contact link are no longer stored. In the same transaction `person_id` is cleared on every memory that pointed to the person, deleted ones included. The places and notes themselves are untouched. Nothing is kept to tell another phone about the deletion; merging backups from several phones (open finding U1) will have to cover it.
+
 ## Link parser rules
 
 | Input | Example pattern | How coordinates are found |
