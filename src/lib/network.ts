@@ -4,7 +4,7 @@ type NetworkState = { isConnected?: boolean; isInternetReachable?: boolean | nul
 type Subscription = { remove: () => void };
 type Subscribe = (listener: (state: NetworkState) => void) => Subscription;
 
-function isOnline(state: NetworkState): boolean {
+export function isOnline(state: NetworkState): boolean {
   // isInternetReachable is null while unknown; trust isConnected until it is known.
   return state.isConnected === true && state.isInternetReachable !== false;
 }
