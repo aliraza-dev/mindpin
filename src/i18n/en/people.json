@@ -25,6 +25,17 @@
   "cannotMessage": "No app on this phone can send the message.",
   "nothingToShare": "There is nothing to share yet.",
   "loadFailed": "This screen could not be loaded. Go back and try again.",
+  "picker": {
+    "label": "Whose place is this?",
+    "chooseA11y": "Choose {{name}}",
+    "fromContacts": "From contacts",
+    "inMindPin": "In MindPin",
+    "alreadyHas": "already has {{labels}} saved",
+    "reason": "MindPin can suggest people from your contacts. Your address book is never uploaded.",
+    "allow": "Allow contacts",
+    "allowA11y": "Allow MindPin to read your contacts",
+    "denied": "Contacts are off. A typed name is saved as a new person."
+  },
   "editForm": {
     "title": "Edit person",
     "cancel": "Cancel",
