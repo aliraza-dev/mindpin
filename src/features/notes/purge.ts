@@ -1,19 +1,18 @@
-// Recently Deleted keeps a deleted note for 30 days, then it is removed for good (R10.10).
+// A deleted note is removed when its Undo time ends (deleteNote.ts). If the app is closed while
+// Undo is still showing, the note is left marked deleted; this finishes the job at the next
+// start (R10.10).
 import { getDatabase } from '../../db/database';
-import { purgeNotesDeletedBefore } from '../../db/memories';
+import { removeDeletedNotes } from '../../db/memories';
 import type { SqlDatabase } from '../../db/types';
 import { logEvent } from '../../lib/log';
 
-const RECENTLY_DELETED_DAYS = 30;
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-// Removes notes that have been in Recently Deleted for 30 days or more. Returns how many.
-export function purgeDeletedNotes(db: SqlDatabase, now: number = Date.now()): Promise<number> {
-  return purgeNotesDeletedBefore(db, now - RECENTLY_DELETED_DAYS * DAY_MS);
+// Removes every note that was left marked deleted. Returns how many. Places are not touched.
+export function purgeDeletedNotes(db: SqlDatabase): Promise<number> {
+  return removeDeletedNotes(db);
 }
 
-// Called once when the app opens. A failure is logged by event name only and never crashes
-// the app; the purge simply runs again at the next start.
+// Called once when the app opens, before any Undo button can be showing. A failure is logged by
+// event name only and never crashes the app; the purge runs again at the next start.
 export async function purgeDeletedNotesAtStart(
   openDatabase: () => Promise<SqlDatabase> = getDatabase,
 ): Promise<void> {

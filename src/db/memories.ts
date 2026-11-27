@@ -231,11 +231,6 @@ export function listNotes(db: SqlDatabase): Promise<Memory[]> {
   return selectNotes(db, 'deleted_at IS NULL', [], 'updated_at DESC');
 }
 
-// Recently Deleted: deleted notes, most recently deleted first (R10.10).
-export function listDeletedNotes(db: SqlDatabase): Promise<Memory[]> {
-  return selectNotes(db, 'deleted_at IS NOT NULL', [], 'deleted_at DESC');
-}
-
 // Notes linked to a person or to a place, for their screens (R10.8).
 export function listNotesForPerson(db: SqlDatabase, personId: string): Promise<Memory[]> {
   return selectNotes(db, 'deleted_at IS NULL AND person_id = ?', [personId], 'updated_at DESC');
@@ -245,12 +240,32 @@ export function listNotesForPlace(db: SqlDatabase, placeId: string): Promise<Mem
   return selectNotes(db, 'deleted_at IS NULL AND place_id = ?', [placeId], 'updated_at DESC');
 }
 
-// Removes for good the notes deleted at or before the given time. Returns how many.
-export async function purgeNotesDeletedBefore(db: SqlDatabase, cutoff: number): Promise<number> {
+// A note is only marked deleted while its Undo button is showing (R10.10). These two finish
+// that state one way or the other.
+
+// Undo: brings the note back with its last-edited time as it was. False if it is already gone.
+export async function restoreDeletedNote(
+  db: SqlDatabase,
+  id: string,
+  updatedAt: number,
+): Promise<boolean> {
   const result = await db.runAsync(
-    "DELETE FROM memory WHERE type = 'note' AND deleted_at IS NOT NULL AND deleted_at <= ?",
-    [cutoff],
+    `UPDATE memory SET deleted_at = NULL, updated_at = ?
+     WHERE id = ? AND type = 'note' AND deleted_at IS NOT NULL`,
+    [updatedAt, id],
   );
+  return result.changes > 0;
+}
+
+// Removes deleted notes for good: the one given, or every deleted note. Returns how many.
+export async function removeDeletedNotes(db: SqlDatabase, id?: string): Promise<number> {
+  const result =
+    id === undefined
+      ? await db.runAsync("DELETE FROM memory WHERE type = 'note' AND deleted_at IS NOT NULL")
+      : await db.runAsync(
+          "DELETE FROM memory WHERE type = 'note' AND deleted_at IS NOT NULL AND id = ?",
+          [id],
+        );
   return result.changes;
 }
 

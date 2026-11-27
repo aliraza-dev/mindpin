@@ -46,6 +46,7 @@ Decisions during the build (2026-11-26):
 - Checklists (R10.5): unticking an item moves it back above the ticked items, as in Apple Notes. An item's indented sub-items move with it.
 - Notes list (R10.7): groups use calendar days in the phone's time zone. Today is the current day, Previous 7 days is 1 to 7 days ago, Previous 30 days is 8 to 30 days ago, and older notes are grouped by month and year.
 - Visits: a visit note is kept as one line (R5.4). The home card (R5.5) uses 6 calendar months and also counts a place that was saved over 6 months ago and never visited.
+- Deleting a note (R10.10, owner decision 2026-11-27): a deleted note is gone for good. Recently Deleted and the 30-day wait are removed; an Undo button for 5 seconds on the same screen replaces them. If the app is closed while Undo is showing, the note is removed at the next start.
 - After Navigate (R5.2): only the latest Navigate is remembered. The question appears the first time the app is opened at least 15 minutes later, so going back to check a gate code does not trigger it. Yes records the visit at the time of Navigate; No drops it.
 
 ## v1 goals
@@ -209,7 +210,7 @@ The behavior is modeled on Apple Notes; the look stays MindPin's own.
 7. The Notes list SHALL sort by last edited and group notes under Today, Previous 7 days, Previous 30 days, then by month.
 8. The user SHALL be able to link a note to a person, a place, or both, and linked notes SHALL appear on that person's and that place's screens.
 9. WHEN text with no location is shared into MindPin from another app, the save sheet SHALL offer "Save as note" (the same choice as R1.4).
-10. WHEN a note is deleted, it SHALL move to Recently Deleted and SHALL be removed permanently after 30 days.
+10. WHEN a note is deleted, it SHALL disappear at once and an Undo button SHALL be shown for 5 seconds while the user stays on the same screen. WHEN the user taps Undo, the note SHALL return unchanged. WHEN the 5 seconds pass or the user leaves the screen, the note SHALL be removed permanently. There SHALL be no Recently Deleted list.
 11. Swiping a note in the list SHALL offer pin, link, and delete, and the same actions SHALL be available from a long-press menu.
 12. Standalone notes SHALL NOT count toward the 25-place free limit.
 

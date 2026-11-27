@@ -185,7 +185,7 @@ Notes list under Today with its first line as title, and search finds a word fro
 
 - [X] T065 [P] [US3] Note text tests in `src/features/notes/noteText.test.ts`: first line becomes `memory.title`, the rest is the preview; ticking a checklist item moves it to the bottom of its checklist (R10.2, R10.5)
 - [X] T066 [P] [US3] Grouping tests in `src/features/notes/groupNotes.test.ts`: pinned notes first; sorted by last edited; groups Today, Previous 7 days, Previous 30 days, then by month (R10.6, R10.7)
-- [X] T067 [P] [US3] Purge tests in `src/features/notes/purge.test.ts`: a deleted note moves to Recently Deleted and is removed permanently 30 days after `memory.deleted_at` (R10.10)
+- [X] T067 [P] [US3] Delete tests in `src/features/notes/deleteNote.test.ts` and `src/features/notes/purge.test.ts`: a deleted note disappears at once; Undo within 5 seconds brings it back unchanged; after 5 seconds, on leaving the screen, or at the next app start it is removed permanently (R10.10)
 - [ ] T068 [P] [US3] Editor tests in `src/features/notes/NoteEditor.test.tsx`: opens blank with the keyboard up; saves as the user types with no Save button; headings, bold, italic, bulleted and numbered lists, and checklists (R10.1, R10.3, R10.4)
 - [ ] T069 [P] [US3] Notes list tests in `src/features/notes/NotesList.test.tsx`: swipe and long-press both offer pin, link, and delete (R10.11)
 - [X] T070 [P] [US3] Linking tests in `src/features/notes/linkNote.test.ts`: a note links to a person, a place, or both, and appears on their screens (R10.8)
@@ -197,10 +197,10 @@ Notes list under Today with its first line as title, and search finds a word fro
 
 - [X] T074 [P] [US3] Title, preview, and checklist sinking in `src/features/notes/noteText.ts` (R10.2, R10.5)
 - [X] T075 [P] [US3] Pinned section and date grouping in `src/features/notes/groupNotes.ts` (R10.6, R10.7)
-- [X] T076 [P] [US3] Recently Deleted purge, run at app start from `app/_layout.tsx`, in `src/features/notes/purge.ts` (R10.10)
+- [X] T076 [P] [US3] Deleting a note with a 5-second Undo in `src/features/notes/deleteNote.ts`, and the clean-up of interrupted deletions, run at app start from `app/_layout.tsx`, in `src/features/notes/purge.ts` (R10.10)
 - [ ] T077 [US3] Rich-text note editor that reads and writes Markdown, opens before the database row exists and creates it on the first keystroke, strings in `src/i18n/en/notes.json`, in `src/features/notes/NoteEditor.tsx`, route `app/note/[id].tsx` (R10.1 to R10.5)
 - [ ] T078 [US3] Notes list with swipe and long-press actions in `src/features/notes/NotesList.tsx`, route `app/notes/index.tsx` (depends on T075) (R10.6, R10.7, R10.11)
-- [ ] T079 [US3] Recently Deleted screen in `src/features/notes/RecentlyDeleted.tsx`, route `app/notes/deleted.tsx` (R10.10)
+- [ ] T079 [US3] Undo bar shown for 5 seconds after a note is deleted, in `src/features/notes/UndoDeleteBar.tsx`, used by the Notes list; leaving the screen finishes the deletion (depends on T076, T078) (R10.10)
 - [ ] T080 [US3] Link picker and linked notes on the person and place screens, in `src/features/notes/linkNote.ts` and `src/features/notes/LinkPicker.tsx` (depends on T061, T062) (R10.8)
 - [X] T081 [US3] "Save as note" option in the save sheet, in `src/features/save/saveAsNote.ts` (depends on T046) (R10.9, R10.12)
 
@@ -436,8 +436,9 @@ Each later phase gets its own spec once v1 shows that people use the save flow.
 - Tick a task's box only when its tests pass.
 - UI tasks: build from the matching frame in the Figma file linked in `design.md`. If the frame is
   missing or contradicts the spec, stop and ask (constitution VI). Missing as of 2026-11-25:
-  Settings, unlock, recovery code and restore, map, search results, edit place, Recently Deleted,
-  "Did you visit?", name prompt, contacts permission, and the save sheet's no-location and
-  duplicate states. Out of date: Welcome, Home, Email, Verify.
+  Settings, unlock, recovery code and restore, map, search results, edit place, the Undo bar
+  after deleting a note, "Did you visit?", name prompt, contacts permission, and the save sheet's
+  no-location and duplicate states. Out of date: Welcome, Home, Email, Verify, and Notes (its
+  "Recently deleted" link is removed, 2026-11-27).
 - If a task reveals a gap or conflict in the spec, stop and update `requirements.md` or
   `design.md` first (constitution I).

@@ -61,7 +61,7 @@ Places and notes are stored as a generic memory item so receipts, voice notes, a
 | source_raw | text | Original shared text, kept for re-parsing |
 | status | text | `resolved`, `pending_resolve` (short link waiting for a connection), or `pending_geocode` (waiting for a connection to look up the address for known coordinates, or the coordinates for a known address) |
 | payload | text (JSON) | Type-specific data for later types |
-| created_at, updated_at, deleted_at | integer | Soft delete supports backup merge; deleted notes are purged 30 days after `deleted_at` |
+| created_at, updated_at, deleted_at | integer | Soft delete supports backup merge. For a note, `deleted_at` is set only while its Undo button is showing: Undo clears it, and otherwise the row is removed when the 5 seconds end, when the user leaves the screen, or at the next app start |
 
 ### visit
 
