@@ -33,10 +33,15 @@ export function lastVisitedLabel(
   t: Translate = translate,
 ): string {
   if (lastVisitedAt === null) return t('visits:notVisitedYet');
-  const ago = relativeTime(lastVisitedAt, now);
-  const when =
-    ago.unit === 'now' ? t('visits:ago.now') : t(`visits:ago.${ago.unit}`, { count: ago.count });
-  return t('visits:lastVisited', { when });
+  return t('visits:lastVisited', { when: agoText(lastVisitedAt, now, t) });
+}
+
+// "2 months ago", or "just now". Text comes from the translations.
+export function agoText(then: number, now: number, t: Translate = translate): string {
+  const ago = relativeTime(then, now);
+  return ago.unit === 'now'
+    ? t('visits:ago.now')
+    : t(`visits:ago.${ago.unit}`, { count: ago.count });
 }
 
 export async function getLastVisit(db: SqlDatabase, placeId: string): Promise<Visit | null> {

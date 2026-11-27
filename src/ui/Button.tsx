@@ -32,10 +32,10 @@ export function Button({ label, accessibilityLabel, onPress, variant = 'primary'
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: tokens.minTouchTarget,
+    minHeight: tokens.size.button,
     minWidth: tokens.minTouchTarget,
     borderRadius: tokens.radius.button,
-    paddingHorizontal: tokens.screenPadding,
+    paddingHorizontal: 17,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -43,10 +43,10 @@ const styles = StyleSheet.create({
   secondary: {
     backgroundColor: tokens.color.surface,
     borderWidth: 1,
-    borderColor: tokens.color.border,
+    borderColor: tokens.color.controlBorder,
   },
   disabled: { opacity: 0.5 },
-  label: { fontFamily: tokens.font.bodySemiBold, fontSize: 16 },
+  label: { fontFamily: tokens.font.bodyBold, fontSize: 14 },
   primaryLabel: { color: tokens.color.surface },
   secondaryLabel: { color: tokens.color.text },
 });

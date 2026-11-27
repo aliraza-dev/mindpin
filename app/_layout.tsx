@@ -1,4 +1,9 @@
-import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from '@expo-google-fonts/inter';
 import {
   SpaceGrotesk_600SemiBold,
   SpaceGrotesk_700Bold,
@@ -23,6 +28,7 @@ export default function RootLayout() {
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
+    Inter_700Bold,
     SpaceGrotesk_600SemiBold,
     SpaceGrotesk_700Bold,
   });

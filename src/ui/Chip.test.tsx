@@ -15,9 +15,10 @@ describe('Chip', () => {
     const onPress = jest.fn();
     await render(<Chip label="Home" accessibilityLabel="Home" onPress={onPress} />);
     const chip = screen.getByRole('button');
-    expect(StyleSheet.flatten(chip.props.style).minHeight).toBeGreaterThanOrEqual(
-      tokens.minTouchTarget,
-    );
+    // The chip is drawn 36 px high; its touch area is extended above and below.
+    const { height } = StyleSheet.flatten(chip.props.style);
+    const { top, bottom } = chip.props.hitSlop;
+    expect(height + top + bottom).toBeGreaterThanOrEqual(tokens.minTouchTarget);
     await fireEvent.press(chip);
     expect(onPress).toHaveBeenCalled();
   });
