@@ -4,34 +4,26 @@
 import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getDatabase } from '../../db/database';
 import { getMemory, type Memory } from '../../db/memories';
 import { useDbQuery } from '../../lib/useDbQuery';
-import { Chip } from '../../ui/Chip';
 import { FormScreen } from '../../ui/FormScreen';
 import { ScreenMessage } from '../../ui/ScreenMessage';
 import { TextField } from '../../ui/TextField';
 import { tokens } from '../../ui/tokens';
 import { deviceLookups } from '../save/lookups';
 import { saveEditedPlace } from './editPlace';
+import { chosenLabel, LabelPicker } from './LabelPicker';
 import {
   PLACE_LIMITS,
-  PRESET_LABELS,
   labelChoice,
   tagsToText,
   type LabelChoice,
   type PlaceFormErrors,
-  type PresetLabel,
 } from './placeForm';
-
-const PRESET_TEXT: Record<PresetLabel, string> = {
-  Home: 'places:editForm.labelHome',
-  Shop: 'places:editForm.labelShop',
-  Office: 'places:editForm.labelOffice',
-};
 
 // Room for ten tags of full length with their commas.
 const TAGS_TEXT_LIMIT = PLACE_LIMITS.tags * (PLACE_LIMITS.tag + 2);
@@ -86,8 +78,6 @@ function EditPlaceForm({ place, topInset, bottomInset, onDone }: FormProps) {
   const savedChoice = labelChoice(place.title);
   const [choice, setChoice] = useState<LabelChoice>(savedChoice);
   const [customLabel, setCustomLabel] = useState(savedChoice === 'custom' ? place.title : '');
-  // Only when the user has just chosen Custom does its field take the keyboard.
-  const [focusCustom, setFocusCustom] = useState(false);
   const [address, setAddress] = useState(place.address ?? '');
   const [notes, setNotes] = useState(place.notes ?? '');
   const [tagsText, setTagsText] = useState(tagsToText(place.tags));
@@ -105,7 +95,7 @@ function EditPlaceForm({ place, topInset, bottomInset, onDone }: FormProps) {
       const result = await saveEditedPlace(
         await getDatabase(),
         place.id,
-        { label: choice === 'custom' ? customLabel : choice, address, notes, tagsText },
+        { label: chosenLabel(choice, customLabel), address, notes, tagsText },
         deviceLookups,
       );
       if (!result.ok) {
@@ -132,43 +122,13 @@ function EditPlaceForm({ place, topInset, bottomInset, onDone }: FormProps) {
       topInset={topInset}
       bottomInset={bottomInset}
     >
-      <View style={styles.group}>
-        <Text style={styles.groupLabel}>{t('places:editForm.label')}</Text>
-        <View style={styles.chips}>
-          {PRESET_LABELS.map((preset) => {
-            const text = t(PRESET_TEXT[preset]);
-            return (
-              <Chip
-                key={preset}
-                label={text}
-                accessibilityLabel={t('places:editForm.labelChipA11y', { label: text })}
-                selected={choice === preset}
-                onPress={() => setChoice(preset)}
-              />
-            );
-          })}
-          <Chip
-            label={t('places:editForm.labelCustom')}
-            accessibilityLabel={t('places:editForm.labelCustomA11y')}
-            selected={choice === 'custom'}
-            onPress={() => {
-              setChoice('custom');
-              setFocusCustom(true);
-            }}
-          />
-        </View>
-        {choice === 'custom' ? (
-          <TextField
-            label={t('places:editForm.customLabel')}
-            value={customLabel}
-            onChangeText={setCustomLabel}
-            maxLength={PLACE_LIMITS.label}
-            autoFocus={focusCustom}
-            autoCapitalize="words"
-            error={errorText('label')}
-          />
-        ) : null}
-      </View>
+      <LabelPicker
+        choice={choice}
+        customLabel={customLabel}
+        onChoice={setChoice}
+        onCustomLabel={setCustomLabel}
+        error={errorText('label')}
+      />
 
       <TextField
         label={t('places:editForm.address')}
@@ -201,7 +161,4 @@ function EditPlaceForm({ place, topInset, bottomInset, onDone }: FormProps) {
 
 const styles = StyleSheet.create({
   blank: { flex: 1, backgroundColor: tokens.color.background },
-  group: { gap: 9 },
-  groupLabel: { fontFamily: tokens.font.bodyBold, fontSize: 13, color: tokens.color.text },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 9 },
 });

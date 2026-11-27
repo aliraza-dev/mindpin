@@ -25,6 +25,11 @@ export const tokens = {
     darkAction: '#F2B66D',
     inactiveDot: '#C9CCC4',
     mapPlaceholder: '#E3E8DD',
+    // Behind the save sheet, over the app the share came from.
+    scrim: '#3B3F47',
+    scrimText: '#D5D8DE',
+    bubble: '#5A5F69',
+    bubbleText: '#F1F2F4',
   },
   font: {
     headingSemiBold: 'SpaceGrotesk_600SemiBold',
@@ -45,6 +50,8 @@ export const tokens = {
     tag: 10,
     badge: 8,
     sheet: 24,
+    saveSheet: 28,
+    thumb: 12,
   },
   size: {
     button: 44,

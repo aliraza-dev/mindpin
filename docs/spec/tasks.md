@@ -114,7 +114,7 @@ address, and the whole flow takes under 10 seconds.
 - [X] T031 [P] [US1] Duplicate detection tests in `src/features/places/findNearby.test.ts`: a place for the same person within 100 m is offered for update; 101 m or a different person is not (R3.5)
 - [X] T032 [P] [US1] Save service tests in `src/features/save/savePlace.test.ts`: person and place are written in one transaction; closing mid-save leaves no partial rows; the search index is updated; no network call happens before the write (R1.3, R1.5, non-functional: reliability)
 - [X] T033 [P] [US1] Contact picker tests in `src/features/people/ContactPicker.test.tsx`: the first use asks for permission with a one-line reason; matches show name and photo within 300 ms with 1,000 contacts; with permission denied a typed name still saves; only name, phone, and photo reference are stored (R3.1, R3.2, R3.4, R3.6)
-- [ ] T034 [P] [US1] Save sheet tests in `src/features/save/SaveSheet.test.tsx`: shows the address and map preview; label chips Home, Office, Shop, and custom; notes and quick tags; Save stores and closes, with or without a person; the no-location state offers Save as note and Enter address (R1.3, R1.4, R2.3, R3.11, R4.1, R4.2)
+- [X] T034 [P] [US1] Save sheet tests in `src/features/save/SaveSheet.test.tsx`: shows the address and map preview; label chips Home, Office, Shop, and custom; notes and quick tags; Save stores and closes, with or without a person; the no-location state offers Save as note and Enter address (R1.3, R1.4, R2.3, R3.11, R4.1, R4.2)
 - [ ] T035 [US1] End-to-end flows `e2e/r1-save-from-share.yaml`, `e2e/r2-read-locations.yaml`, `e2e/r3-link-person.yaml`, run on the Android emulator and the iOS simulator: MindPin appears in the share menu, the sheet opens within 2 seconds, Save returns to the source app, and the full flow is timed under 10 seconds (R1.1, R1.2, R1.3, constitution IV)
 
 ### Implementation for User Story 1
@@ -130,7 +130,7 @@ address, and the whole flow takes under 10 seconds.
 - [X] T043 [P] [US1] Nearby place lookup by distance in `src/features/places/findNearby.ts` (R3.5)
 - [X] T044 [US1] Save service that writes first and resolves or geocodes afterwards, in `src/features/save/savePlace.ts` (depends on T016, T017, T039, T040, T042) (R1.3, R1.5, R3.11)
 - [X] T045 [US1] Contact picker with strings in `src/i18n/en/people.json`, in `src/features/people/ContactPicker.tsx` (depends on T041, T042) (R3.1 to R3.4)
-- [ ] T046 [US1] Save sheet with map preview (`react-native-maps`), address, source line, label chips, notes, tags, duplicate prompt, and no-location state, strings in `src/i18n/en/save.json`, in `src/features/save/SaveSheet.tsx` (depends on T037, T043, T044, T045) (R1.2 to R1.4, R4.1, R4.2)
+- [X] T046 [US1] Save sheet with map preview (`react-native-maps`), address, source line, label chips, notes, tags, duplicate prompt, and no-location state, strings in `src/i18n/en/save.json`, in `src/features/save/SaveSheet.tsx` (depends on T037, T043, T044, T045) (R1.2 to R1.4, R4.1, R4.2)
 - [ ] T047 [US1] Android share target: `ACTION_SEND` `text/plain` intent filter through a config plugin in `app.json`, a translucent route `app/share.tsx` that shows the save sheet over the source app and returns to it after Save (depends on T046) (R1.1, R1.2, R1.3)
 - [ ] T048 [US1] iOS Share Extension that shows the same save sheet and writes to the same database through an App Group, configured in `app.json` with extension code under `targets/share-extension/`; before first sign-in it stores the share and asks the user to open MindPin (depends on T046) (R1.1, R7.6)
 - [ ] T138 [US1] Detect live-location shares and flag them as snapshots in `src/parser/parseShared.ts`, with tests in `src/parser/parseShared.test.ts`, once a sample live-location share is recorded in the parser table in `design.md` (blocked: finding U4) (R2.5)
@@ -171,7 +171,7 @@ Navigate and Share.
 - [ ] T140 [US2] Map header on the place screen with `react-native-maps` in `src/features/map/PlaceMap.tsx`, the key read from `GOOGLE_MAPS_ANDROID_KEY` in `app.config.js`; needs the owner's Google Maps key, and must be seen working on an Android and an iOS device before this is ticked (design.md: Maps)
 - [X] T144 [US2] Delete a person in `src/db/people.ts`, from a button at the bottom of the edit form in `src/features/people/EditPersonScreen.tsx` (depends on T142) (R3.13)
 - [X] T142 [US2] Edit person form in `src/features/people/EditPersonScreen.tsx` and `src/features/people/personForm.ts`, opened by the edit button on the person screen, route `app/person/[id]/edit.tsx` (depends on T061) (R3.12)
-- [ ] T063 [US2] Add a place by hand from a typed address or pasted link, opening the save sheet, route `app/place/new.tsx` (R4.7)
+- [X] T063 [US2] Add a place by hand from a typed address or pasted link, opening the save sheet, route `app/place/new.tsx` (R4.7)
 - [ ] T064 [US2] Map of all pins in `src/features/map/MapScreen.tsx`, rendered by `app/(tabs)/map.tsx` (R6.3)
 
 **Checkpoint**: the testable core is done. Ship an internal build with `SKIP_SIGN_IN` on to 10 to
