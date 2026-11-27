@@ -1,0 +1,83 @@
+# Handover notes
+
+Written 2026-11-27. Branch `feat/v1-foundation`, last code commit `45e736b`.
+
+Read `CLAUDE.md` and `docs/spec/` first. The spec is the source of truth and `docs/spec/tasks.md` is the work queue. These notes only cover what those files do not say: where the build stands, what has never been checked, and what is waiting on the owner.
+
+## Where the build stands
+
+80 of 144 tasks are ticked. On this machine `npm test` passes (502 tests in 62 suites), and `npx tsc --noEmit` and `npm run lint` are clean.
+
+Built and tested in Jest:
+
+- The link parser, the database with migrations and search, and the retry queue for lookups.
+- Home, Person and Place screens, with their data.
+- Editing and deleting a place, editing and deleting a person (the "⋯" menu on the Place screen, the pencil on the Person screen).
+- The contact picker ("Whose place is this?").
+- The save sheet, and adding a place by hand (paste a link or type an address, then the same sheet).
+
+Not built yet, in the order `tasks.md` gives them:
+
+- Sharing into MindPin: the Android share target (T047) and the iOS share extension (T048). Until these exist, the only way into the save sheet is adding a place by hand.
+- The map of all pins (T064).
+- Notes: editor, list, undo, linking (T068 to T080).
+- Visits (T085 to T090).
+- Sign-in (T092 to T105), backup and export (T106 to T122), the purchase limit (T123 to T128).
+- The release passes (T129 to T137).
+
+## The app has never run on a device
+
+This is the biggest gap. Everything above is verified by tests and by exporting the Android JavaScript bundle. Nothing has been compiled natively or opened on a phone or emulator.
+
+- This Windows laptop has no Android SDK and no Xcode, and too little free memory for a local Android build.
+- The native address lookup module (`modules/place-geocoder`) and the map (`react-native-maps`) have never been compiled. Expect the first build to need fixes. T139 and T140 stay open until both are seen working on an Android and an iOS device.
+- The end-to-end flows in `e2e/` (T035, T055, T073, T085) have not been run for the same reason.
+
+The plan discussed with the owner is to build in the cloud with EAS Build and install on their Android phone. The owner asked whether Expo is safe and has not yet said yes. Do not set it up until they do, because it sends the source code to Expo. When they agree:
+
+1. Add `expo-dev-client` with `npx expo install` and create `eas.json` with a development profile (this overlaps with T137).
+2. The owner runs `npx eas login`, then `npx eas build --profile development --platform android`, and installs from the link.
+3. Fix whatever the first build log shows, then run `npx expo start` on the laptop and open the app on the phone.
+
+Advise the owner to turn on two-factor sign-in for the Expo account, download a copy of the Android signing key, and keep the install link private.
+
+## Waiting on the owner
+
+- **Go-ahead for EAS Build**, as above.
+- **Google Maps key.** It goes in `.env` as `GOOGLE_MAPS_ANDROID_KEY`, and later as an EAS secret. Until it is set, the build uses a stand-in value and the app shows the address instead of the map. The owner also needs to add the line `GOOGLE_MAPS_ANDROID_KEY=` to `.env.example` by hand, because the assistant is not allowed to read or write `.env` files. The key must be locked to the app in the Google console.
+- **A sample live-location share** for T138 (finding U4 in the spec).
+- **Figma frames** for the screens that have none. See the next section.
+
+## Decisions the owner has made
+
+All of these are recorded in `docs/spec/requirements.md` under "Decisions during the build (2026-11-27)". The ones most likely to be asked about again:
+
+- Deleting a person keeps their places and notes, with no person attached.
+- Deleting a place keeps its linked notes, unlinked.
+- Editing a place never moves its pin.
+- Screens with no Figma frame are built from the styles of the existing frames instead of waiting. So far: the edit forms, the add-a-place screen, the menus. `tasks.md` lists them in its notes. Say so in any report that includes one.
+- Security best practice applies to every task: typed text has length limits, unused Android permissions are blocked, the maps key is locked to the app.
+
+## Open design points raised but not settled
+
+These work today, but the owner has not confirmed them:
+
+- The save sheet's label starts on Home.
+- When a place is saved near an existing one, it is saved as new unless the user taps Update.
+- Tags are typed as a comma-separated list.
+- The map pin is the standard one, tinted teal.
+- The edit form cannot move a place to another person.
+- A deleted person leaves no marker behind, which will matter when backups from two devices are merged (finding U1).
+
+## Working on this machine
+
+- Long Bash heredocs fail to parse here. Write files with the editor tool and run scripts from a temporary folder.
+- Jest is capped at half the cores with a 20-second timeout (`jest.config.js`). With more workers the machine runs out of memory and heavy screen tests time out.
+- `StyleSheet.absoluteFillObject` is gone in this React Native version. Use `StyleSheet.absoluteFill`.
+- In tests, elements hidden from screen readers (the map, contact photos) need `{ includeHiddenElements: true }`.
+- `.claude/settings.json` has a local change that is left uncommitted on purpose.
+- `npm audit` shows no high or critical findings, and 22 moderate ones in build tools.
+
+## Suggested next step
+
+Get the app onto the owner's phone with EAS Build, then build the Android share target (T047). Sharing from WhatsApp is the core of the product and cannot be judged without both.
