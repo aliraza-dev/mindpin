@@ -9,11 +9,21 @@ type Props = {
   accessibilityLabel: string;
   onPress: () => void;
   variant?: 'primary' | 'secondary';
+  // "large" is the full-width button that ends a form, as in the Save sheet frame.
+  size?: 'regular' | 'large';
   disabled?: boolean;
 };
 
-export function Button({ label, accessibilityLabel, onPress, variant = 'primary', disabled }: Props) {
+export function Button({
+  label,
+  accessibilityLabel,
+  onPress,
+  variant = 'primary',
+  size = 'regular',
+  disabled,
+}: Props) {
   const primary = variant === 'primary';
+  const large = size === 'large';
   return (
     <Pressable
       accessibilityRole="button"
@@ -21,9 +31,20 @@ export function Button({ label, accessibilityLabel, onPress, variant = 'primary'
       accessibilityState={{ disabled: !!disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={[styles.base, primary ? styles.primary : styles.secondary, disabled && styles.disabled]}
+      style={[
+        styles.base,
+        large && styles.large,
+        primary ? styles.primary : styles.secondary,
+        disabled && styles.disabled,
+      ]}
     >
-      <Text style={[styles.label, primary ? styles.primaryLabel : styles.secondaryLabel]}>
+      <Text
+        style={[
+          styles.label,
+          large && styles.largeLabel,
+          primary ? styles.primaryLabel : styles.secondaryLabel,
+        ]}
+      >
         {label}
       </Text>
     </Pressable>
@@ -39,6 +60,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  large: { minHeight: tokens.size.mainButton, borderRadius: tokens.radius.actionButton },
   primary: { backgroundColor: tokens.color.accent },
   secondary: {
     backgroundColor: tokens.color.surface,
@@ -47,6 +69,7 @@ const styles = StyleSheet.create({
   },
   disabled: { opacity: 0.5 },
   label: { fontFamily: tokens.font.bodyBold, fontSize: 14 },
+  largeLabel: { fontSize: 16 },
   primaryLabel: { color: tokens.color.surface },
   secondaryLabel: { color: tokens.color.text },
 });

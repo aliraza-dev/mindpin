@@ -5,6 +5,8 @@ import { Image } from 'expo-image';
 import back from '../../assets/icons/back.svg';
 import check from '../../assets/icons/check.svg';
 import clock from '../../assets/icons/clock.svg';
+import edit from '../../assets/icons/edit.svg';
+import more from '../../assets/icons/more.svg';
 import navHome from '../../assets/icons/nav-home.svg';
 import navMap from '../../assets/icons/nav-map.svg';
 import navPlus from '../../assets/icons/nav-plus.svg';
@@ -20,6 +22,9 @@ const ICONS = {
   back: { source: back, width: 46, height: 46 },
   check: { source: check, width: 13.33, height: 10 },
   clock: { source: clock, width: 20, height: 20 },
+  edit: { source: edit, width: 44, height: 44 },
+  // Not in Figma: drawn to match the edit button (design.md).
+  more: { source: more, width: 44, height: 44 },
   navHome: { source: navHome, width: 18, height: 18 },
   navMap: { source: navMap, width: 20, height: 18 },
   navPlus: { source: navPlus, width: 56, height: 56 },
