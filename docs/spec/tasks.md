@@ -153,7 +153,7 @@ Navigate and Share.
 - [X] T050 [P] [US2] Share text tests in `src/features/share/shareText.test.ts`: one place gives a maps link and address; Share places gives every place of a person with label, address, and maps link (R4.6, R4.8)
 - [X] T051 [P] [US2] External link tests in `src/features/links/externalLinks.test.ts`: Navigate opens the preferred maps app; Call opens the dialer; Message opens WhatsApp when installed and SMS otherwise (R3.10, R4.5)
 - [ ] T052 [P] [US2] Home screen tests in `src/features/home/HomeScreen.test.tsx`: People, Places, and Notes views; recently saved items; the search bar has no microphone; Ask MindPin does not appear (R6.3, R6.5)
-- [ ] T053 [P] [US2] Person screen tests in `src/features/people/PersonScreen.test.tsx`: lists all of the person's places; Call and Message only when a phone number is saved; Share places; Add place opens the save sheet with a typed address or pasted link (R3.10, R4.3, R4.7, R4.8)
+- [X] T053 [P] [US2] Person screen tests in `src/features/people/PersonScreen.test.tsx`: lists all of the person's places; Call and Message only when a phone number is saved; Share places; Add place opens the save sheet with a typed address or pasted link (R3.10, R4.3, R4.7, R4.8)
 - [ ] T054 [P] [US2] Place screen tests in `src/features/places/PlaceScreen.test.tsx`: map, notes, tags, edit, delete with confirmation, Navigate, Share (R4.2, R4.4, R4.5, R4.6)
 - [ ] T055 [US2] End-to-end flows `e2e/r4-places.yaml` and `e2e/r6-find.yaml`, including the map view showing every saved pin (R6.3)
 
@@ -164,7 +164,7 @@ Navigate and Share.
 - [X] T058 [P] [US2] External links for maps, dialer, WhatsApp, and SMS in `src/features/links/externalLinks.ts` (R3.10, R4.5)
 - [ ] T059 [US2] Home screen with search bar, People, Places, and Notes views, and recently saved items, strings in `src/i18n/en/home.json`, in `src/features/home/HomeScreen.tsx`, rendered by `app/(tabs)/index.tsx` (R6.3, R6.5)
 - [ ] T060 [US2] Results as you type in `src/features/search/SearchResults.tsx`, shown from the home screen (depends on T056) (R6.2)
-- [ ] T061 [US2] Person screen in `src/features/people/PersonScreen.tsx`, route `app/person/[id].tsx` (depends on T057, T058) (R3.10, R4.3, R4.8)
+- [X] T061 [US2] Person screen in `src/features/people/PersonScreen.tsx`, route `app/person/[id].tsx` (depends on T057, T058) (R3.10, R4.3, R4.8)
 - [ ] T062 [US2] Place screen and edit form in `src/features/places/PlaceScreen.tsx` and `src/features/places/EditPlace.tsx`, route `app/place/[id].tsx` (R4.2, R4.4, R4.5, R4.6)
 - [ ] T063 [US2] Add a place by hand from a typed address or pasted link, opening the save sheet, route `app/place/new.tsx` (R4.7)
 - [ ] T064 [US2] Map of all pins in `src/features/map/MapScreen.tsx`, rendered by `app/(tabs)/map.tsx` (R6.3)
