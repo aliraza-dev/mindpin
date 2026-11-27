@@ -21,6 +21,10 @@ describe('bottom bar (R6.5)', () => {
     }
   });
 
+  it('gives every tab an icon, since the bar shows no text', () => {
+    for (const tab of tabs) expect(tab.icon).toBeTruthy();
+  });
+
   it('makes New note an action that opens a new note, not a screen', () => {
     const newNote = tabs.find((t) => t.name === 'new-note');
     expect(newNote?.opensRoute).toBe('/note/new');

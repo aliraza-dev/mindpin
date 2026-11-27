@@ -1,6 +1,6 @@
-import { PlaceholderScreen } from '../../src/ui/PlaceholderScreen';
+import { HomeScreen } from '../../src/features/home/HomeScreen';
 
-// Placeholder until the home screen task (T059). Expo Router requires a default export.
+// Expo Router requires a default export for route files.
 export default function HomeRoute() {
-  return <PlaceholderScreen titleKey="common:tabs.home" />;
+  return <HomeScreen />;
 }

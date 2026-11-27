@@ -2,6 +2,7 @@ import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import enCommon from './en/common.json';
+import enHome from './en/home.json';
 import enPeople from './en/people.json';
 import enPlaces from './en/places.json';
 import enVisits from './en/visits.json';
@@ -9,7 +10,7 @@ import enVisits from './en/visits.json';
 // All user-facing text lives in translation files, one per feature: src/i18n/en/<feature>.json.
 // Add each new feature file to `resources` below.
 export const resources = {
-  en: { common: enCommon, people: enPeople, places: enPlaces, visits: enVisits },
+  en: { common: enCommon, home: enHome, people: enPeople, places: enPlaces, visits: enVisits },
 } as const;
 
 const RTL_LANGUAGES = new Set(['ar', 'fa', 'he', 'ur']);
