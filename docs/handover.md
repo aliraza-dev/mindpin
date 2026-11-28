@@ -33,11 +33,10 @@ This is the biggest gap. Everything above is verified by tests and by exporting 
 - The native address lookup module (`modules/place-geocoder`) and the map (`react-native-maps`) have never been compiled. Expect the first build to need fixes. T139 and T140 stay open until both are seen working on an Android and an iOS device.
 - The end-to-end flows in `e2e/` (T035, T055, T073, T085) have not been run for the same reason.
 
-The plan discussed with the owner is to build in the cloud with EAS Build and install on their Android phone. The owner asked whether Expo is safe and has not yet said yes. Do not set it up until they do, because it sends the source code to Expo. When they agree:
+The owner agreed on 2026-11-28 to build in the cloud with EAS Build and install on their Android phone. The setup is in the repository: `expo-dev-client`, and `eas.json` with one development profile that skips sign-in (the store profiles are still T137). The module's Kotlin and Swift files were being ignored by git and are now committed, so the build can see them. What is left:
 
-1. Add `expo-dev-client` with `npx expo install` and create `eas.json` with a development profile (this overlaps with T137).
-2. The owner runs `npx eas login`, then `npx eas build --profile development --platform android`, and installs from the link.
-3. Fix whatever the first build log shows, then run `npx expo start` on the laptop and open the app on the phone.
+1. The owner runs `npx eas-cli login`, `npx eas-cli init`, then `npx eas-cli build --profile development --platform android`, and installs from the link. `eas init` cannot write to `app.config.js`; the project id it prints goes in `app.json` under `expo.extra.eas.projectId`.
+2. Fix whatever the first build log shows, then run `npx expo start --dev-client` on the laptop and open the app on the phone.
 
 Advise the owner to turn on two-factor sign-in for the Expo account, download a copy of the Android signing key, and keep the install link private.
 

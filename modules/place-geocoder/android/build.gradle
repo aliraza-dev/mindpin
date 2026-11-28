@@ -1,0 +1,15 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'expo.modules.placegeocoder'
+version = '1.0.0'
+
+android {
+  namespace "expo.modules.placegeocoder"
+  defaultConfig {
+    versionCode 1
+    versionName '1.0.0'
+  }
+}
