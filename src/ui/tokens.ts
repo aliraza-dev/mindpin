@@ -1,36 +1,78 @@
 // Design tokens from docs/spec/design.md ("Visual design tokens"). Do not invent colors or sizes.
+// The colors of the light theme, as designed in Figma.
+export const lightColors = {
+  background: '#F6F7F4',
+  surface: '#FFFFFF',
+  text: '#14171F',
+  mutedText: '#5B6170',
+  secondaryText: '#4A5060',
+  border: '#E6E8E2',
+  controlBorder: '#DCDFD8',
+  divider: '#EEF0EB',
+  accent: '#0F766E',
+  // Tints, each with the text color used on it.
+  tealTint: '#D7EDE9',
+  tealSoft: '#E3F2EF',
+  tealText: '#0B5A54',
+  amberTint: '#F6E3CF',
+  amberText: '#8A4B0F',
+  amberTagText: '#6E3B0B',
+  indigoTint: '#E2E4F3',
+  indigoText: '#3A3F86',
+  // The dark card on the home screen.
+  darkSurface: '#14171F',
+  darkMutedText: '#C9CCD4',
+  darkAction: '#F2B66D',
+  inactiveDot: '#C9CCC4',
+  mapPlaceholder: '#E3E8DD',
+  // Behind the save sheet, over the app the share came from.
+  scrim: '#3B3F47',
+  scrimText: '#D5D8DE',
+  bubble: '#5A5F69',
+  bubbleText: '#F1F2F4',
+  // Text on the accent color and on the dark card.
+  onAccent: '#FFFFFF',
+  onDark: '#FFFFFF',
+};
+
+export type Colors = typeof lightColors;
+
+// The dark theme (R11, design.md: Dark theme): warm dark backgrounds with an orange accent.
+export const darkColors: Colors = {
+  background: '#1F1E1D',
+  surface: '#2B2A27',
+  text: '#F5F4EF',
+  mutedText: '#A8A69D',
+  secondaryText: '#C2C0B6',
+  border: '#3A3936',
+  controlBorder: '#4A4945',
+  divider: '#353431',
+  accent: '#D97757',
+  tealTint: '#4A2E22',
+  tealSoft: '#3A2A22',
+  tealText: '#F0A98C',
+  amberTint: '#4A3A1E',
+  amberText: '#F2C078',
+  amberTagText: '#F2C078',
+  indigoTint: '#2F3150',
+  indigoText: '#B9BDF2',
+  darkSurface: '#3A3936',
+  darkMutedText: '#C2C0B6',
+  darkAction: '#F2B66D',
+  inactiveDot: '#5A5954',
+  mapPlaceholder: '#2F3A2C',
+  scrim: '#121211',
+  scrimText: '#C2C0B6',
+  bubble: '#3A3936',
+  bubbleText: '#F5F4EF',
+  onAccent: '#1F1E1D',
+  onDark: '#F5F4EF',
+};
+
+// Sizes, fonts, and radii are the same in both themes. `color` here is the light theme, for
+// code that cannot follow the phone's setting; components read colors through theme.ts.
 export const tokens = {
-  color: {
-    background: '#F6F7F4',
-    surface: '#FFFFFF',
-    text: '#14171F',
-    mutedText: '#5B6170',
-    secondaryText: '#4A5060',
-    border: '#E6E8E2',
-    controlBorder: '#DCDFD8',
-    divider: '#EEF0EB',
-    accent: '#0F766E',
-    // Tints, each with the text color used on it.
-    tealTint: '#D7EDE9',
-    tealSoft: '#E3F2EF',
-    tealText: '#0B5A54',
-    amberTint: '#F6E3CF',
-    amberText: '#8A4B0F',
-    amberTagText: '#6E3B0B',
-    indigoTint: '#E2E4F3',
-    indigoText: '#3A3F86',
-    // The dark card on the home screen.
-    darkSurface: '#14171F',
-    darkMutedText: '#C9CCD4',
-    darkAction: '#F2B66D',
-    inactiveDot: '#C9CCC4',
-    mapPlaceholder: '#E3E8DD',
-    // Behind the save sheet, over the app the share came from.
-    scrim: '#3B3F47',
-    scrimText: '#D5D8DE',
-    bubble: '#5A5F69',
-    bubbleText: '#F1F2F4',
-  },
+  color: lightColors,
   font: {
     headingSemiBold: 'SpaceGrotesk_600SemiBold',
     headingBold: 'SpaceGrotesk_700Bold',

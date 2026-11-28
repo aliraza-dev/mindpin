@@ -12,6 +12,7 @@ import { Button } from '../../ui/Button';
 import { IconButton } from '../../ui/IconButton';
 import { PlaceTile } from '../../ui/PlaceTile';
 import { SectionHeader } from '../../ui/SectionHeader';
+import { themed } from '../../ui/theme';
 import { tokens } from '../../ui/tokens';
 import { notePreview } from '../notes/noteText';
 import { agoText, lastVisitedLabel } from '../visits/lastVisited';
@@ -38,6 +39,7 @@ type Props = {
 };
 
 export function PersonView(props: Props) {
+  const styles = useStyles();
   const { person, places, notes, now, topInset = 0 } = props;
   const { t, i18n } = useTranslation();
   const firstName = person.name.trim().split(/\s+/)[0] ?? person.name;
@@ -173,59 +175,61 @@ export function PersonView(props: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: tokens.color.background },
-  content: { paddingHorizontal: tokens.screenPadding, paddingBottom: 32 },
-  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  identity: { alignItems: 'center', marginTop: 18, marginBottom: 25 },
-  name: {
-    marginTop: 8,
-    fontFamily: tokens.font.headingBold,
-    fontSize: 26,
-    color: tokens.color.text,
-    textAlign: 'center',
-  },
-  subtitle: {
-    marginTop: 8,
-    fontFamily: tokens.font.body,
-    fontSize: 14,
-    color: tokens.color.mutedText,
-    textAlign: 'center',
-  },
-  actions: {
-    marginTop: 13,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 10,
-  },
-  placeList: { marginTop: 18, marginBottom: 25, gap: 11 },
-  placeCard: {
-    minHeight: 79,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: tokens.radius.cardMax,
-    borderWidth: 1,
-    borderColor: tokens.color.controlBorder,
-    backgroundColor: tokens.color.surface,
-  },
-  placeText: { flex: 1, gap: 2 },
-  rowTitle: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: tokens.color.text },
-  rowDetail: { fontFamily: tokens.font.body, fontSize: 13, color: tokens.color.mutedText },
-  notVisited: { fontFamily: tokens.font.bodyBold, fontSize: 12, color: tokens.color.amberText },
-  visited: { fontFamily: tokens.font.body, fontSize: 12, color: tokens.color.secondaryText },
-  empty: { fontFamily: tokens.font.body, fontSize: 14, color: tokens.color.mutedText },
-  noteCard: {
-    marginTop: 18,
-    borderRadius: tokens.radius.cardMax,
-    borderWidth: 1,
-    borderColor: tokens.color.controlBorder,
-    backgroundColor: tokens.color.surface,
-    overflow: 'hidden',
-  },
-  noteRow: { minHeight: 62, justifyContent: 'center', paddingHorizontal: 14, gap: 3 },
-  noteDivider: { borderTopWidth: 1, borderTopColor: tokens.color.divider },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.background },
+    content: { paddingHorizontal: tokens.screenPadding, paddingBottom: 32 },
+    topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    identity: { alignItems: 'center', marginTop: 18, marginBottom: 25 },
+    name: {
+      marginTop: 8,
+      fontFamily: tokens.font.headingBold,
+      fontSize: 26,
+      color: colors.text,
+      textAlign: 'center',
+    },
+    subtitle: {
+      marginTop: 8,
+      fontFamily: tokens.font.body,
+      fontSize: 14,
+      color: colors.mutedText,
+      textAlign: 'center',
+    },
+    actions: {
+      marginTop: 13,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: 10,
+    },
+    placeList: { marginTop: 18, marginBottom: 25, gap: 11 },
+    placeCard: {
+      minHeight: 79,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 12,
+      borderRadius: tokens.radius.cardMax,
+      borderWidth: 1,
+      borderColor: colors.controlBorder,
+      backgroundColor: colors.surface,
+    },
+    placeText: { flex: 1, gap: 2 },
+    rowTitle: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: colors.text },
+    rowDetail: { fontFamily: tokens.font.body, fontSize: 13, color: colors.mutedText },
+    notVisited: { fontFamily: tokens.font.bodyBold, fontSize: 12, color: colors.amberText },
+    visited: { fontFamily: tokens.font.body, fontSize: 12, color: colors.secondaryText },
+    empty: { fontFamily: tokens.font.body, fontSize: 14, color: colors.mutedText },
+    noteCard: {
+      marginTop: 18,
+      borderRadius: tokens.radius.cardMax,
+      borderWidth: 1,
+      borderColor: colors.controlBorder,
+      backgroundColor: colors.surface,
+      overflow: 'hidden',
+    },
+    noteRow: { minHeight: 62, justifyContent: 'center', paddingHorizontal: 14, gap: 3 },
+    noteDivider: { borderTopWidth: 1, borderTopColor: colors.divider },
+  }),
+);

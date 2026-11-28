@@ -21,7 +21,7 @@ import { listPlaceSummaries, type PlaceSummary } from '../../db/placeSummaries';
 import { logEvent } from '../../lib/log';
 import { useDbQuery } from '../../lib/useDbQuery';
 import { ScreenMessage } from '../../ui/ScreenMessage';
-import { tokens } from '../../ui/tokens';
+import { themed } from '../../ui/theme';
 import { LinkPicker } from './LinkPicker';
 import { NoteEditor } from './NoteEditor';
 import { noteTitle } from './noteText';
@@ -45,6 +45,7 @@ type Loaded = {
 };
 
 export function NoteScreen({ noteId, validId, personId, placeId }: Props) {
+  const styles = useStyles();
   const router = useRouter();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -199,6 +200,8 @@ function OpenNote({ loaded, topInset, bottomInset, onClose }: OpenProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  blank: { flex: 1, backgroundColor: tokens.color.background },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    blank: { flex: 1, backgroundColor: colors.background },
+  }),
+);

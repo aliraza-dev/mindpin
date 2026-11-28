@@ -1,5 +1,6 @@
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { themed } from './theme';
 import { tokens } from './tokens';
 
 export type MenuItem = {
@@ -22,6 +23,7 @@ type Props = {
 // A short list of actions that opens under a "more" button at the end of the top row.
 // It has no Figma frame; it is built from the tokens (design.md).
 export function Menu({ visible, items, onClose, closeLabel, top }: Props) {
+  const styles = useStyles();
   return (
     <Modal
       visible={visible}
@@ -56,18 +58,20 @@ export function Menu({ visible, items, onClose, closeLabel, top }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  menu: {
-    position: 'absolute',
-    end: tokens.screenPadding,
-    minWidth: 180,
-    borderRadius: tokens.radius.cardMin,
-    borderWidth: 1,
-    borderColor: tokens.color.controlBorder,
-    backgroundColor: tokens.color.surface,
-    overflow: 'hidden',
-  },
-  row: { minHeight: tokens.size.menuRow, justifyContent: 'center', paddingHorizontal: 16 },
-  divider: { borderTopWidth: 1, borderTopColor: tokens.color.divider },
-  label: { fontFamily: tokens.font.body, fontSize: 15, color: tokens.color.text },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    menu: {
+      position: 'absolute',
+      end: tokens.screenPadding,
+      minWidth: 180,
+      borderRadius: tokens.radius.cardMin,
+      borderWidth: 1,
+      borderColor: colors.controlBorder,
+      backgroundColor: colors.surface,
+      overflow: 'hidden',
+    },
+    row: { minHeight: tokens.size.menuRow, justifyContent: 'center', paddingHorizontal: 16 },
+    divider: { borderTopWidth: 1, borderTopColor: colors.divider },
+    label: { fontFamily: tokens.font.body, fontSize: 15, color: colors.text },
+  }),
+);

@@ -1,10 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { themed } from './theme';
 import { tokens } from './tokens';
 
 // Stand-in for screens that later tasks build. Title is a translation key.
 export function PlaceholderScreen({ titleKey }: { titleKey: string }) {
+  const styles = useStyles();
   const { t } = useTranslation();
   return (
     <View style={styles.screen}>
@@ -16,14 +18,16 @@ export function PlaceholderScreen({ titleKey }: { titleKey: string }) {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: tokens.color.background,
-    padding: tokens.screenPadding,
-    justifyContent: 'center',
-    gap: 8,
-  },
-  title: { fontFamily: tokens.font.headingBold, fontSize: 28, color: tokens.color.text },
-  body: { fontFamily: tokens.font.body, fontSize: 16, color: tokens.color.mutedText },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.background,
+      padding: tokens.screenPadding,
+      justifyContent: 'center',
+      gap: 8,
+    },
+    title: { fontFamily: tokens.font.headingBold, fontSize: 28, color: colors.text },
+    body: { fontFamily: tokens.font.body, fontSize: 16, color: colors.mutedText },
+  }),
+);

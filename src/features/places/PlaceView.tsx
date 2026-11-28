@@ -10,6 +10,7 @@ import { ActionButton } from '../../ui/ActionButton';
 import { BackButton } from '../../ui/BackButton';
 import { IconButton } from '../../ui/IconButton';
 import { SectionHeader } from '../../ui/SectionHeader';
+import { themed } from '../../ui/theme';
 import { tokens } from '../../ui/tokens';
 import { PlaceMap } from '../map/PlaceMap';
 import { notePreview } from '../notes/noteText';
@@ -47,6 +48,7 @@ type Props = {
 const MAP_HEIGHT = 300;
 
 export function PlaceView(props: Props) {
+  const styles = useStyles();
   const { place, personName, visits, linkedNotes, now, showMap, topInset = 0 } = props;
   const { t, i18n } = useTranslation();
   const date = (time: number) => shortDate(time, now, i18n.language);
@@ -59,7 +61,11 @@ export function PlaceView(props: Props) {
       time: visit.visitedAt,
     })),
     // The day the place was saved closes the list, as in the design.
-    { key: 'saved', text: `${date(place.createdAt)} · ${t('places:firstSaved')}`, time: place.createdAt },
+    {
+      key: 'saved',
+      text: `${date(place.createdAt)} · ${t('places:firstSaved')}`,
+      time: place.createdAt,
+    },
   ];
 
   return (
@@ -164,7 +170,9 @@ export function PlaceView(props: Props) {
             <View style={styles.noteCard}>
               {linkedNotes.map((note, index) => {
                 const title = note.title || t('places:untitledNote');
-                const when = isSameDay(note.updatedAt, now) ? t('places:today') : date(note.updatedAt);
+                const when = isSameDay(note.updatedAt, now)
+                  ? t('places:today')
+                  : date(note.updatedAt);
                 const preview = notePreview(note.notes ?? '');
                 return (
                   <Pressable
@@ -191,85 +199,87 @@ export function PlaceView(props: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: tokens.color.background },
-  content: { flexGrow: 1 },
-  map: { height: MAP_HEIGHT, backgroundColor: tokens.color.mapPlaceholder },
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: tokens.screenPadding,
-  },
-  sheet: {
-    flexGrow: 1,
-    marginTop: -tokens.radius.sheet,
-    borderTopLeftRadius: tokens.radius.sheet,
-    borderTopRightRadius: tokens.radius.sheet,
-    backgroundColor: tokens.color.background,
-    paddingHorizontal: tokens.screenPadding,
-    paddingTop: 21,
-    paddingBottom: 32,
-  },
-  person: { fontFamily: tokens.font.body, fontSize: 13, color: tokens.color.mutedText },
-  label: {
-    marginTop: 4,
-    fontFamily: tokens.font.headingBold,
-    fontSize: 26,
-    color: tokens.color.text,
-  },
-  address: {
-    marginTop: 4,
-    fontFamily: tokens.font.body,
-    fontSize: 14,
-    color: tokens.color.secondaryText,
-  },
-  actions: { marginTop: 17, flexDirection: 'row', gap: 8 },
-  card: {
-    marginTop: 16,
-    padding: 14,
-    borderRadius: tokens.radius.cardMax,
-    borderWidth: 1,
-    borderColor: tokens.color.border,
-    backgroundColor: tokens.color.surface,
-  },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  cardTitle: { fontFamily: tokens.font.bodyBold, fontSize: 14, color: tokens.color.text },
-  total: { fontFamily: tokens.font.body, fontSize: 12, color: tokens.color.secondaryText },
-  tags: { marginTop: 11, flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  tag: {
-    height: tokens.size.tag,
-    paddingHorizontal: 10,
-    borderRadius: tokens.radius.tag,
-    backgroundColor: tokens.color.divider,
-    justifyContent: 'center',
-  },
-  codeTag: { backgroundColor: tokens.color.amberTint },
-  tagText: { fontFamily: tokens.font.body, fontSize: 13, color: tokens.color.text },
-  codeTagText: { fontFamily: tokens.font.bodyBold, fontSize: 13, color: tokens.color.amberTagText },
-  notes: {
-    marginTop: 9,
-    fontFamily: tokens.font.body,
-    fontSize: 14,
-    lineHeight: 17,
-    color: tokens.color.secondaryText,
-  },
-  visitRow: { marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 10 },
-  dot: { width: 10, height: 10, borderRadius: 5, backgroundColor: tokens.color.inactiveDot },
-  dotOn: { backgroundColor: tokens.color.accent },
-  visitText: { flex: 1, fontFamily: tokens.font.body, fontSize: 14, color: tokens.color.text },
-  visitAgo: { fontFamily: tokens.font.body, fontSize: 12, color: tokens.color.mutedText },
-  linkedHeader: { marginTop: 25 },
-  noteCard: {
-    marginTop: 18,
-    borderRadius: tokens.radius.cardMax,
-    borderWidth: 1,
-    borderColor: tokens.color.controlBorder,
-    backgroundColor: tokens.color.surface,
-    overflow: 'hidden',
-  },
-  noteRow: { minHeight: 62, justifyContent: 'center', paddingHorizontal: 14, gap: 3 },
-  noteDivider: { borderTopWidth: 1, borderTopColor: tokens.color.divider },
-  noteTitle: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: tokens.color.text },
-  noteDetail: { fontFamily: tokens.font.body, fontSize: 13, color: tokens.color.mutedText },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.background },
+    content: { flexGrow: 1 },
+    map: { height: MAP_HEIGHT, backgroundColor: colors.mapPlaceholder },
+    topRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: tokens.screenPadding,
+    },
+    sheet: {
+      flexGrow: 1,
+      marginTop: -tokens.radius.sheet,
+      borderTopLeftRadius: tokens.radius.sheet,
+      borderTopRightRadius: tokens.radius.sheet,
+      backgroundColor: colors.background,
+      paddingHorizontal: tokens.screenPadding,
+      paddingTop: 21,
+      paddingBottom: 32,
+    },
+    person: { fontFamily: tokens.font.body, fontSize: 13, color: colors.mutedText },
+    label: {
+      marginTop: 4,
+      fontFamily: tokens.font.headingBold,
+      fontSize: 26,
+      color: colors.text,
+    },
+    address: {
+      marginTop: 4,
+      fontFamily: tokens.font.body,
+      fontSize: 14,
+      color: colors.secondaryText,
+    },
+    actions: { marginTop: 17, flexDirection: 'row', gap: 8 },
+    card: {
+      marginTop: 16,
+      padding: 14,
+      borderRadius: tokens.radius.cardMax,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+    },
+    cardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    cardTitle: { fontFamily: tokens.font.bodyBold, fontSize: 14, color: colors.text },
+    total: { fontFamily: tokens.font.body, fontSize: 12, color: colors.secondaryText },
+    tags: { marginTop: 11, flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    tag: {
+      height: tokens.size.tag,
+      paddingHorizontal: 10,
+      borderRadius: tokens.radius.tag,
+      backgroundColor: colors.divider,
+      justifyContent: 'center',
+    },
+    codeTag: { backgroundColor: colors.amberTint },
+    tagText: { fontFamily: tokens.font.body, fontSize: 13, color: colors.text },
+    codeTagText: { fontFamily: tokens.font.bodyBold, fontSize: 13, color: colors.amberTagText },
+    notes: {
+      marginTop: 9,
+      fontFamily: tokens.font.body,
+      fontSize: 14,
+      lineHeight: 17,
+      color: colors.secondaryText,
+    },
+    visitRow: { marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 10 },
+    dot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.inactiveDot },
+    dotOn: { backgroundColor: colors.accent },
+    visitText: { flex: 1, fontFamily: tokens.font.body, fontSize: 14, color: colors.text },
+    visitAgo: { fontFamily: tokens.font.body, fontSize: 12, color: colors.mutedText },
+    linkedHeader: { marginTop: 25 },
+    noteCard: {
+      marginTop: 18,
+      borderRadius: tokens.radius.cardMax,
+      borderWidth: 1,
+      borderColor: colors.controlBorder,
+      backgroundColor: colors.surface,
+      overflow: 'hidden',
+    },
+    noteRow: { minHeight: 62, justifyContent: 'center', paddingHorizontal: 14, gap: 3 },
+    noteDivider: { borderTopWidth: 1, borderTopColor: colors.divider },
+    noteTitle: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: colors.text },
+    noteDetail: { fontFamily: tokens.font.body, fontSize: 13, color: colors.mutedText },
+  }),
+);

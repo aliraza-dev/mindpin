@@ -20,7 +20,9 @@ import type { Memory } from '../../db/memories';
 import { shortDate } from '../../lib/dates';
 import { BackButton } from '../../ui/BackButton';
 import { Button } from '../../ui/Button';
+import { EmptyIllustration } from '../../ui/EmptyIllustration';
 import { Menu } from '../../ui/Menu';
+import { themed } from '../../ui/theme';
 import { tokens } from '../../ui/tokens';
 import { groupNotes, type NoteSection } from './groupNotes';
 import { notePreview } from './noteText';
@@ -51,6 +53,7 @@ function sectionTitle(section: NoteSection<Memory>, t: (key: string) => string):
 }
 
 export function NotesList(props: Props) {
+  const styles = useStyles();
   const { notes, now, topInset = 0, bottomInset = 0 } = props;
   const { t } = useTranslation();
   const [menuFor, setMenuFor] = useState<Memory | null>(null);
@@ -84,7 +87,12 @@ export function NotesList(props: Props) {
           {t('notes:title')}
         </Text>
 
-        {sections.length === 0 ? <Text style={styles.message}>{t('notes:empty')}</Text> : null}
+        {sections.length === 0 ? (
+          <>
+            <EmptyIllustration kind="notes" />
+            <Text style={styles.message}>{t('notes:empty')}</Text>
+          </>
+        ) : null}
 
         {sections.map((section) => (
           <View key={section.kind === 'month' ? `${section.year}-${section.month}` : section.kind}>
@@ -159,6 +167,7 @@ type SwipeAction = {
 // A row that slides aside to show its actions. The actions are real buttons underneath, so a
 // screen reader reaches them without the gesture.
 function SwipeRow({ actions, children }: { actions: SwipeAction[]; children: React.ReactNode }) {
+  const styles = useStyles();
   // In a right-to-left layout the actions sit at the left, so the row slides the other way.
   const side = I18nManager.isRTL ? 1 : -1;
 
@@ -220,55 +229,57 @@ function SwipeRow({ actions, children }: { actions: SwipeAction[]; children: Rea
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: tokens.color.background },
-  content: { paddingHorizontal: tokens.screenPadding },
-  top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  title: {
-    marginTop: 14,
-    fontFamily: tokens.font.headingBold,
-    fontSize: 28,
-    color: tokens.color.text,
-  },
-  message: {
-    marginTop: 18,
-    fontFamily: tokens.font.body,
-    fontSize: 14,
-    lineHeight: 20,
-    color: tokens.color.mutedText,
-  },
-  heading: {
-    marginTop: 18,
-    fontFamily: tokens.font.bodyBold,
-    fontSize: 15,
-    color: tokens.color.text,
-  },
-  card: {
-    marginTop: 11,
-    borderRadius: tokens.radius.cardMax,
-    borderWidth: 1,
-    borderColor: tokens.color.controlBorder,
-    backgroundColor: tokens.color.surface,
-    overflow: 'hidden',
-  },
-  divider: { borderTopWidth: 1, borderTopColor: tokens.color.divider },
-  slider: { backgroundColor: tokens.color.surface },
-  row: { minHeight: 64, justifyContent: 'center', paddingHorizontal: 14, paddingVertical: 12 },
-  rowText: { gap: 2 },
-  rowTitle: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: tokens.color.text },
-  rowDetail: { fontFamily: tokens.font.body, fontSize: 13, color: tokens.color.mutedText },
-  actions: {
-    ...StyleSheet.absoluteFill,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  action: {
-    width: ACTION_WIDTH,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: tokens.color.tealSoft,
-  },
-  actionText: { fontFamily: tokens.font.bodyBold, fontSize: 13, color: tokens.color.tealText },
-  actionDanger: { backgroundColor: tokens.color.amberTint },
-  actionDangerText: { color: tokens.color.amberText },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.background },
+    content: { paddingHorizontal: tokens.screenPadding },
+    top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    title: {
+      marginTop: 14,
+      fontFamily: tokens.font.headingBold,
+      fontSize: 28,
+      color: colors.text,
+    },
+    message: {
+      marginTop: 18,
+      fontFamily: tokens.font.body,
+      fontSize: 14,
+      lineHeight: 20,
+      color: colors.mutedText,
+    },
+    heading: {
+      marginTop: 18,
+      fontFamily: tokens.font.bodyBold,
+      fontSize: 15,
+      color: colors.text,
+    },
+    card: {
+      marginTop: 11,
+      borderRadius: tokens.radius.cardMax,
+      borderWidth: 1,
+      borderColor: colors.controlBorder,
+      backgroundColor: colors.surface,
+      overflow: 'hidden',
+    },
+    divider: { borderTopWidth: 1, borderTopColor: colors.divider },
+    slider: { backgroundColor: colors.surface },
+    row: { minHeight: 64, justifyContent: 'center', paddingHorizontal: 14, paddingVertical: 12 },
+    rowText: { gap: 2 },
+    rowTitle: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: colors.text },
+    rowDetail: { fontFamily: tokens.font.body, fontSize: 13, color: colors.mutedText },
+    actions: {
+      ...StyleSheet.absoluteFill,
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+    },
+    action: {
+      width: ACTION_WIDTH,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.tealSoft,
+    },
+    actionText: { fontFamily: tokens.font.bodyBold, fontSize: 13, color: colors.tealText },
+    actionDanger: { backgroundColor: colors.amberTint },
+    actionDangerText: { color: colors.amberText },
+  }),
+);

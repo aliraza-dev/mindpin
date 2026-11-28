@@ -15,6 +15,7 @@ import { Button } from '../../ui/Button';
 import { FormScreen } from '../../ui/FormScreen';
 import { ScreenMessage } from '../../ui/ScreenMessage';
 import { TextField } from '../../ui/TextField';
+import { themed } from '../../ui/theme';
 import { tokens } from '../../ui/tokens';
 import { PERSON_LIMITS, saveEditedPerson, type PersonFormErrors } from './personForm';
 
@@ -24,6 +25,7 @@ type Props = {
 };
 
 export function EditPersonScreen({ personId }: Props) {
+  const styles = useStyles();
   const router = useRouter();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -70,6 +72,7 @@ type FormProps = {
 // Holds what is being typed. It starts from the person as saved and is not reset when the
 // screen's data loads again, so nothing typed is lost.
 function EditPersonForm({ person, topInset, bottomInset, onDone, onDeleted }: FormProps) {
+  const styles = useStyles();
   const { t } = useTranslation();
   const [name, setName] = useState(person.name);
   const [phone, setPhone] = useState(person.phone ?? '');
@@ -168,7 +171,9 @@ function EditPersonForm({ person, topInset, bottomInset, onDone, onDeleted }: Fo
   );
 }
 
-const styles = StyleSheet.create({
-  blank: { flex: 1, backgroundColor: tokens.color.background },
-  note: { fontFamily: tokens.font.body, fontSize: 13, color: tokens.color.mutedText },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    blank: { flex: 1, backgroundColor: colors.background },
+    note: { fontFamily: tokens.font.body, fontSize: 13, color: colors.mutedText },
+  }),
+);

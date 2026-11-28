@@ -248,6 +248,16 @@ The behavior is modeled on Apple Notes; the look stays MindPin's own.
 
 Folders, locked notes, drawings, and attachments are left out of v1; people, places, pins, and search do the organizing.
 
+### R11. Appearance
+
+Added on 2026-11-28 at the owner's request.
+
+1. The app SHALL follow the phone's light or dark setting, and SHALL change with it while the app is open.
+2. The dark theme SHALL use warm dark backgrounds with an orange accent (`#D97757`); the light theme SHALL stay as designed in Figma.
+3. In both themes, text SHALL have a contrast of at least 4.5:1 against its background.
+4. A screen with nothing to show yet (Home on a new install, Notes with no notes, Map with no pins, a search with no results) SHALL show a small animated illustration above its message.
+5. WHEN the phone is set to reduce motion, the illustration SHALL be still.
+
 ## Non-functional requirements
 
 | Area | Requirement |

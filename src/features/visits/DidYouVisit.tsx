@@ -10,10 +10,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getDatabase } from '../../db/database';
 import { logEvent } from '../../lib/log';
 import { Button } from '../../ui/Button';
+import { themed } from '../../ui/theme';
 import { tokens } from '../../ui/tokens';
 import { answerNavigatePrompt, getNavigatePrompt, type NavigatePrompt } from './navigateConfirm';
 
 export function DidYouVisit() {
+  const styles = useStyles();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [prompt, setPrompt] = useState<NavigatePrompt | null>(null);
@@ -62,7 +64,13 @@ export function DidYouVisit() {
   });
 
   return (
-    <Modal visible transparent statusBarTranslucent animationType="slide" onRequestClose={() => answer(false)}>
+    <Modal
+      visible
+      transparent
+      statusBarTranslucent
+      animationType="slide"
+      onRequestClose={() => answer(false)}
+    >
       <View style={styles.backdrop}>
         <View style={[styles.sheet, { paddingBottom: insets.bottom + 28 }]}>
           <View style={styles.handle} />
@@ -91,29 +99,31 @@ export function DidYouVisit() {
   );
 }
 
-const styles = StyleSheet.create({
-  backdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(59, 63, 71, 0.6)' },
-  sheet: {
-    paddingHorizontal: tokens.screenPadding,
-    borderTopLeftRadius: tokens.radius.saveSheet,
-    borderTopRightRadius: tokens.radius.saveSheet,
-    backgroundColor: tokens.color.background,
-  },
-  handle: {
-    alignSelf: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-    width: 40,
-    height: 5,
-    borderRadius: 2.5,
-    backgroundColor: tokens.color.inactiveDot,
-  },
-  title: { fontFamily: tokens.font.headingBold, fontSize: 22, color: tokens.color.text },
-  detail: {
-    marginTop: 8,
-    fontFamily: tokens.font.body,
-    fontSize: 14,
-    color: tokens.color.secondaryText,
-  },
-  buttons: { marginTop: 23, gap: 12 },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    backdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(59, 63, 71, 0.6)' },
+    sheet: {
+      paddingHorizontal: tokens.screenPadding,
+      borderTopLeftRadius: tokens.radius.saveSheet,
+      borderTopRightRadius: tokens.radius.saveSheet,
+      backgroundColor: colors.background,
+    },
+    handle: {
+      alignSelf: 'center',
+      marginTop: 10,
+      marginBottom: 20,
+      width: 40,
+      height: 5,
+      borderRadius: 2.5,
+      backgroundColor: colors.inactiveDot,
+    },
+    title: { fontFamily: tokens.font.headingBold, fontSize: 22, color: colors.text },
+    detail: {
+      marginTop: 8,
+      fontFamily: tokens.font.body,
+      fontSize: 14,
+      color: colors.secondaryText,
+    },
+    buttons: { marginTop: 23, gap: 12 },
+  }),
+);

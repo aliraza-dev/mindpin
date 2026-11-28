@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
 
+import { themed, useColors } from './theme';
 import { tokens } from './tokens';
 
 type Props = Omit<TextInputProps, 'style' | 'accessibilityLabel' | 'accessibilityHint'> & {
@@ -16,7 +17,17 @@ type Props = Omit<TextInputProps, 'style' | 'accessibilityLabel' | 'accessibilit
 
 // A labelled text field, as drawn in the Save sheet frame: 46 px high, with an accent border
 // while it is being typed in.
-export function TextField({ label, hint, error, multiline, onFocus, onBlur, ...inputProps }: Props) {
+export function TextField({
+  label,
+  hint,
+  error,
+  multiline,
+  onFocus,
+  onBlur,
+  ...inputProps
+}: Props) {
+  const styles = useStyles();
+  const colors = useColors();
   const [focused, setFocused] = useState(false);
   return (
     <View style={styles.wrapper}>
@@ -24,7 +35,7 @@ export function TextField({ label, hint, error, multiline, onFocus, onBlur, ...i
       <TextInput
         accessibilityLabel={label}
         accessibilityHint={error ?? hint}
-        placeholderTextColor={tokens.color.mutedText}
+        placeholderTextColor={colors.mutedText}
         multiline={multiline}
         textAlignVertical={multiline ? 'top' : 'center'}
         onFocus={(event) => {
@@ -49,30 +60,32 @@ export function TextField({ label, hint, error, multiline, onFocus, onBlur, ...i
   );
 }
 
-const styles = StyleSheet.create({
-  wrapper: { gap: 9 },
-  label: { fontFamily: tokens.font.bodyBold, fontSize: 13, color: tokens.color.text },
-  input: {
-    minHeight: tokens.size.input,
-    borderRadius: tokens.radius.input,
-    borderWidth: 1,
-    borderColor: tokens.color.controlBorder,
-    backgroundColor: tokens.color.surface,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontFamily: tokens.font.body,
-    fontSize: 15,
-    color: tokens.color.text,
-  },
-  multiline: { minHeight: 63 },
-  // The border is 1 px thicker while typing; the padding gives that pixel back so the text
-  // does not move.
-  focused: {
-    borderWidth: 2,
-    borderColor: tokens.color.accent,
-    paddingHorizontal: 13,
-    paddingVertical: 11,
-  },
-  hint: { fontFamily: tokens.font.body, fontSize: 12, color: tokens.color.mutedText },
-  error: { fontFamily: tokens.font.bodyBold, fontSize: 12, color: tokens.color.amberText },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    wrapper: { gap: 9 },
+    label: { fontFamily: tokens.font.bodyBold, fontSize: 13, color: colors.text },
+    input: {
+      minHeight: tokens.size.input,
+      borderRadius: tokens.radius.input,
+      borderWidth: 1,
+      borderColor: colors.controlBorder,
+      backgroundColor: colors.surface,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      fontFamily: tokens.font.body,
+      fontSize: 15,
+      color: colors.text,
+    },
+    multiline: { minHeight: 63 },
+    // The border is 1 px thicker while typing; the padding gives that pixel back so the text
+    // does not move.
+    focused: {
+      borderWidth: 2,
+      borderColor: colors.accent,
+      paddingHorizontal: 13,
+      paddingVertical: 11,
+    },
+    hint: { fontFamily: tokens.font.body, fontSize: 12, color: colors.mutedText },
+    error: { fontFamily: tokens.font.bodyBold, fontSize: 12, color: colors.amberText },
+  }),
+);

@@ -1,5 +1,5 @@
 import { initialsOf, tintFor } from './Avatar';
-import { touchSlop } from './tokens';
+import { lightColors, touchSlop } from './tokens';
 
 describe('avatar helpers', () => {
   it('takes up to two initials', () => {
@@ -10,8 +10,8 @@ describe('avatar helpers', () => {
   });
 
   it('always gives the same person the same tint', () => {
-    expect(tintFor('person-1')).toBe(tintFor('person-1'));
-    expect(tintFor('')).toBeDefined();
+    expect(tintFor('person-1', lightColors)).toEqual(tintFor('person-1', lightColors));
+    expect(tintFor('', lightColors)).toBeDefined();
   });
 });
 

@@ -6,6 +6,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Chip } from '../../ui/Chip';
 import { TextField } from '../../ui/TextField';
+import { themed } from '../../ui/theme';
 import { tokens } from '../../ui/tokens';
 import { PLACE_LIMITS, PRESET_LABELS, type LabelChoice, type PresetLabel } from './placeForm';
 
@@ -30,6 +31,7 @@ export function chosenLabel(choice: LabelChoice, customLabel: string): string {
 }
 
 export function LabelPicker({ choice, customLabel, onChoice, onCustomLabel, error }: Props) {
+  const styles = useStyles();
   const { t } = useTranslation();
   // Only when the user has just chosen Custom does its field take the keyboard.
   const [focusCustom, setFocusCustom] = useState(false);
@@ -75,8 +77,10 @@ export function LabelPicker({ choice, customLabel, onChoice, onCustomLabel, erro
   );
 }
 
-const styles = StyleSheet.create({
-  group: { gap: 9 },
-  groupLabel: { fontFamily: tokens.font.bodyBold, fontSize: 13, color: tokens.color.text },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 9 },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    group: { gap: 9 },
+    groupLabel: { fontFamily: tokens.font.bodyBold, fontSize: 13, color: colors.text },
+    chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 9 },
+  }),
+);

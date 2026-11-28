@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { BackButton } from './BackButton';
+import { themed } from './theme';
 import { tokens } from './tokens';
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
 
 // A whole-screen message with a way back, for "not found" and "could not load".
 export function ScreenMessage({ message, backLabel, onBack, topInset = 0 }: Props) {
+  const styles = useStyles();
   return (
     <View style={[styles.screen, { paddingTop: topInset + 8 }]}>
       <BackButton onPress={onBack} accessibilityLabel={backLabel} />
@@ -23,17 +25,19 @@ export function ScreenMessage({ message, backLabel, onBack, topInset = 0 }: Prop
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: tokens.color.background,
-    paddingHorizontal: tokens.screenPadding,
-  },
-  center: { flex: 1, justifyContent: 'center' },
-  message: {
-    fontFamily: tokens.font.body,
-    fontSize: 16,
-    color: tokens.color.mutedText,
-    textAlign: 'center',
-  },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: tokens.screenPadding,
+    },
+    center: { flex: 1, justifyContent: 'center' },
+    message: {
+      fontFamily: tokens.font.body,
+      fontSize: 16,
+      color: colors.mutedText,
+      textAlign: 'center',
+    },
+  }),
+);

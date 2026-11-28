@@ -3,11 +3,13 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { themed } from '../../ui/theme';
 import { tokens } from '../../ui/tokens';
 
 type Props = { onUndo: () => void; bottomInset?: number };
 
 export function UndoDeleteBar({ onUndo, bottomInset = 0 }: Props) {
+  const styles = useStyles();
   const { t } = useTranslation();
   return (
     <View accessibilityRole="alert" style={[styles.bar, { bottom: bottomInset + 16 }]}>
@@ -24,27 +26,29 @@ export function UndoDeleteBar({ onUndo, bottomInset = 0 }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  bar: {
-    position: 'absolute',
-    start: tokens.screenPadding,
-    end: tokens.screenPadding,
-    minHeight: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingStart: 19,
-    paddingEnd: 5,
-    borderRadius: tokens.radius.cardMax,
-    backgroundColor: tokens.color.darkSurface,
-  },
-  message: { fontFamily: tokens.font.bodyBold, fontSize: 14, color: tokens.color.surface },
-  action: {
-    minWidth: 64,
-    minHeight: tokens.minTouchTarget,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 14,
-  },
-  actionText: { fontFamily: tokens.font.bodyBold, fontSize: 14, color: tokens.color.darkAction },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    bar: {
+      position: 'absolute',
+      start: tokens.screenPadding,
+      end: tokens.screenPadding,
+      minHeight: 56,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingStart: 19,
+      paddingEnd: 5,
+      borderRadius: tokens.radius.cardMax,
+      backgroundColor: colors.darkSurface,
+    },
+    message: { fontFamily: tokens.font.bodyBold, fontSize: 14, color: colors.onDark },
+    action: {
+      minWidth: 64,
+      minHeight: tokens.minTouchTarget,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 14,
+    },
+    actionText: { fontFamily: tokens.font.bodyBold, fontSize: 14, color: colors.darkAction },
+  }),
+);

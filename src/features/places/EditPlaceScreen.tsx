@@ -13,7 +13,7 @@ import { useDbQuery } from '../../lib/useDbQuery';
 import { FormScreen } from '../../ui/FormScreen';
 import { ScreenMessage } from '../../ui/ScreenMessage';
 import { TextField } from '../../ui/TextField';
-import { tokens } from '../../ui/tokens';
+import { themed } from '../../ui/theme';
 import { deviceLookups } from '../save/lookups';
 import { saveEditedPlace } from './editPlace';
 import { chosenLabel, LabelPicker } from './LabelPicker';
@@ -34,6 +34,7 @@ type Props = {
 };
 
 export function EditPlaceScreen({ placeId }: Props) {
+  const styles = useStyles();
   const router = useRouter();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -159,6 +160,8 @@ function EditPlaceForm({ place, topInset, bottomInset, onDone }: FormProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  blank: { flex: 1, backgroundColor: tokens.color.background },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    blank: { flex: 1, backgroundColor: colors.background },
+  }),
+);

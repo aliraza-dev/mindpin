@@ -28,6 +28,7 @@ import { Button } from '../../ui/Button';
 import { Chip } from '../../ui/Chip';
 import { Icon } from '../../ui/Icon';
 import { TextField } from '../../ui/TextField';
+import { themed } from '../../ui/theme';
 import { tokens, touchSlop } from '../../ui/tokens';
 import { PlaceMap } from '../map/PlaceMap';
 import { ContactPicker } from '../people/ContactPicker';
@@ -68,7 +69,14 @@ type Props = {
 
 type Loaded = { people: Person[]; recent: Person[]; savedLabels: Record<string, string[]> };
 
-export function SaveSheet({ sharedText, sourceApp = null, initialPersonId, manual, onClose }: Props) {
+export function SaveSheet({
+  sharedText,
+  sourceApp = null,
+  initialPersonId,
+  manual,
+  onClose,
+}: Props) {
+  const styles = useStyles();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const online = useOnline();
@@ -93,7 +101,10 @@ export function SaveSheet({ sharedText, sourceApp = null, initialPersonId, manua
   const [errors, setErrors] = useState<PlaceFormErrors>({});
   // The answer to "has this person a place here already?", and the choice to update it, each
   // kept with the person and pin they were for, so a change of either drops them.
-  const [nearbyFound, setNearbyFound] = useState<{ key: string; nearby: NearbyPlace | null } | null>(null);
+  const [nearbyFound, setNearbyFound] = useState<{
+    key: string;
+    nearby: NearbyPlace | null;
+  } | null>(null);
   const [updateFor, setUpdateFor] = useState<string | null>(null);
   // Stops a double tap from saving twice.
   const busy = useRef(false);
@@ -133,7 +144,8 @@ export function SaveSheet({ sharedText, sourceApp = null, initialPersonId, manua
         setChoice({ kind: 'existing', personId: opener.id });
       }
       const current = await deviceContacts.getAccess();
-      const list = current === 'all' || current === 'limited' ? await deviceContacts.loadContacts() : [];
+      const list =
+        current === 'all' || current === 'limited' ? await deviceContacts.loadContacts() : [];
       if (!active) return;
       setAccess(current);
       setContacts(list);
@@ -180,7 +192,8 @@ export function SaveSheet({ sharedText, sourceApp = null, initialPersonId, manua
     try {
       const granted = await deviceContacts.requestAccess();
       setAccess(granted);
-      if (granted === 'all' || granted === 'limited') setContacts(await deviceContacts.loadContacts());
+      if (granted === 'all' || granted === 'limited')
+        setContacts(await deviceContacts.loadContacts());
     } catch {
       setAccess('denied');
     }
@@ -196,15 +209,26 @@ export function SaveSheet({ sharedText, sourceApp = null, initialPersonId, manua
           : null;
 
   const foundAddress =
-    location.kind === 'text' ? location.text.slice(0, PLACE_LIMITS.address) : (preview?.address ?? null);
+    location.kind === 'text'
+      ? location.text.slice(0, PLACE_LIMITS.address)
+      : (preview?.address ?? null);
   const errorText = (field: keyof PlaceFormErrors) =>
     errors[field] ? t(`places:editForm.errors.${errors[field]}`) : undefined;
 
   const save = async () => {
     if (busy.current) return;
     const checked = validatePlaceForm(
-      { label: chosenLabel(label, customLabel), address: typedAddress ?? foundAddress ?? '', notes, tagsText },
-      { hasPin: typedAddress === null && (location.kind === 'coordinates' || location.kind === 'needs_resolve') },
+      {
+        label: chosenLabel(label, customLabel),
+        address: typedAddress ?? foundAddress ?? '',
+        notes,
+        tagsText,
+      },
+      {
+        hasPin:
+          typedAddress === null &&
+          (location.kind === 'coordinates' || location.kind === 'needs_resolve'),
+      },
     );
     if (!checked.ok) {
       setErrors(checked.errors);
@@ -318,7 +342,9 @@ export function SaveSheet({ sharedText, sourceApp = null, initialPersonId, manua
                 label={t('save:enterAddress')}
                 accessibilityLabel={t('save:enterAddressA11y')}
                 onPress={() => {
-                  setTypedAddress(parsed.kind === 'text' ? parsed.text.slice(0, PLACE_LIMITS.address) : '');
+                  setTypedAddress(
+                    parsed.kind === 'text' ? parsed.text.slice(0, PLACE_LIMITS.address) : '',
+                  );
                   setAsking(false);
                 }}
               />
@@ -439,67 +465,69 @@ export function SaveSheet({ sharedText, sourceApp = null, initialPersonId, manua
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: tokens.color.scrim },
-  screenPlain: { backgroundColor: tokens.color.background },
-  shared: { paddingHorizontal: tokens.screenPadding, paddingBottom: 18, gap: 8 },
-  sharedFrom: { fontFamily: tokens.font.body, fontSize: 12, color: tokens.color.scrimText },
-  bubble: {
-    alignSelf: 'flex-start',
-    maxWidth: 284,
-    borderRadius: tokens.radius.input,
-    backgroundColor: tokens.color.bubble,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-  },
-  bubbleText: { fontFamily: tokens.font.body, fontSize: 13, color: tokens.color.bubbleText },
-  sheet: {
-    flex: 1,
-    borderTopLeftRadius: tokens.radius.saveSheet,
-    borderTopRightRadius: tokens.radius.saveSheet,
-    backgroundColor: tokens.color.background,
-  },
-  handle: {
-    alignSelf: 'center',
-    marginTop: 10,
-    width: 40,
-    height: 5,
-    borderRadius: 2.5,
-    backgroundColor: tokens.color.inactiveDot,
-  },
-  content: { flexGrow: 1, paddingHorizontal: tokens.screenPadding, paddingTop: 20 },
-  titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  title: { fontFamily: tokens.font.headingBold, fontSize: 22, color: tokens.color.text },
-  cancel: { fontFamily: tokens.font.body, fontSize: 15, color: tokens.color.accent },
-  fields: { marginTop: 23, marginBottom: 16, gap: 16 },
-  card: {
-    minHeight: 93,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    padding: 10,
-    borderRadius: tokens.radius.actionButton,
-    borderWidth: 1,
-    borderColor: tokens.color.border,
-    backgroundColor: tokens.color.surface,
-  },
-  thumb: {
-    width: 88,
-    height: 72,
-    borderRadius: tokens.radius.thumb,
-    backgroundColor: tokens.color.mapPlaceholder,
-    overflow: 'hidden',
-  },
-  cardText: { flex: 1, gap: 3 },
-  address: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: tokens.color.text },
-  status: { fontFamily: tokens.font.body, fontSize: 13, color: tokens.color.mutedText },
-  source: { fontFamily: tokens.font.bodyBold, fontSize: 12, color: tokens.color.tealText },
-  message: { fontFamily: tokens.font.body, fontSize: 14, color: tokens.color.secondaryText },
-  duplicate: {
-    gap: 9,
-    padding: 12,
-    borderRadius: tokens.radius.input,
-    backgroundColor: tokens.color.amberTint,
-  },
-  choices: { flexDirection: 'row', flexWrap: 'wrap', gap: 9 },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.scrim },
+    screenPlain: { backgroundColor: colors.background },
+    shared: { paddingHorizontal: tokens.screenPadding, paddingBottom: 18, gap: 8 },
+    sharedFrom: { fontFamily: tokens.font.body, fontSize: 12, color: colors.scrimText },
+    bubble: {
+      alignSelf: 'flex-start',
+      maxWidth: 284,
+      borderRadius: tokens.radius.input,
+      backgroundColor: colors.bubble,
+      paddingHorizontal: 12,
+      paddingVertical: 9,
+    },
+    bubbleText: { fontFamily: tokens.font.body, fontSize: 13, color: colors.bubbleText },
+    sheet: {
+      flex: 1,
+      borderTopLeftRadius: tokens.radius.saveSheet,
+      borderTopRightRadius: tokens.radius.saveSheet,
+      backgroundColor: colors.background,
+    },
+    handle: {
+      alignSelf: 'center',
+      marginTop: 10,
+      width: 40,
+      height: 5,
+      borderRadius: 2.5,
+      backgroundColor: colors.inactiveDot,
+    },
+    content: { flexGrow: 1, paddingHorizontal: tokens.screenPadding, paddingTop: 20 },
+    titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    title: { fontFamily: tokens.font.headingBold, fontSize: 22, color: colors.text },
+    cancel: { fontFamily: tokens.font.body, fontSize: 15, color: colors.accent },
+    fields: { marginTop: 23, marginBottom: 16, gap: 16 },
+    card: {
+      minHeight: 93,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      padding: 10,
+      borderRadius: tokens.radius.actionButton,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+    },
+    thumb: {
+      width: 88,
+      height: 72,
+      borderRadius: tokens.radius.thumb,
+      backgroundColor: colors.mapPlaceholder,
+      overflow: 'hidden',
+    },
+    cardText: { flex: 1, gap: 3 },
+    address: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: colors.text },
+    status: { fontFamily: tokens.font.body, fontSize: 13, color: colors.mutedText },
+    source: { fontFamily: tokens.font.bodyBold, fontSize: 12, color: colors.tealText },
+    message: { fontFamily: tokens.font.body, fontSize: 14, color: colors.secondaryText },
+    duplicate: {
+      gap: 9,
+      padding: 12,
+      borderRadius: tokens.radius.input,
+      backgroundColor: colors.amberTint,
+    },
+    choices: { flexDirection: 'row', flexWrap: 'wrap', gap: 9 },
+  }),
+);

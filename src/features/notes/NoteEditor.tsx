@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 
 import { BackButton } from '../../ui/BackButton';
+import { themed, useColors } from '../../ui/theme';
 import { tokens, touchSlop } from '../../ui/tokens';
 import {
   editLine,
@@ -46,6 +47,8 @@ type Props = {
 };
 
 export function NoteEditor(props: Props) {
+  const styles = useStyles();
+  const colors = useColors();
   const { topInset = 0, bottomInset = 0 } = props;
   const { t } = useTranslation();
   const [body, setBody] = useState(props.initialBody);
@@ -164,8 +167,10 @@ export function NoteEditor(props: Props) {
                     ? t('notes:editor.firstLineA11y')
                     : t('notes:editor.lineA11y', { number: index + 1 })
                 }
-                placeholder={first && lines.length === 1 ? t('notes:editor.placeholder') : undefined}
-                placeholderTextColor={tokens.color.mutedText}
+                placeholder={
+                  first && lines.length === 1 ? t('notes:editor.placeholder') : undefined
+                }
+                placeholderTextColor={colors.mutedText}
                 multiline
                 scrollEnabled={false}
                 autoFocus={first && props.autoFocus}
@@ -211,7 +216,11 @@ export function NoteEditor(props: Props) {
       </ScrollView>
 
       <View style={[styles.toolbar, { paddingBottom: bottomInset }]}>
-        <ScrollView horizontal keyboardShouldPersistTaps="always" showsHorizontalScrollIndicator={false}>
+        <ScrollView
+          horizontal
+          keyboardShouldPersistTaps="always"
+          showsHorizontalScrollIndicator={false}
+        >
           {TOOLS.map((tool) => (
             <Pressable
               key={tool}
@@ -231,72 +240,79 @@ export function NoteEditor(props: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: tokens.color.background },
-  top: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: tokens.screenPadding,
-    paddingBottom: 8,
-  },
-  link: { fontFamily: tokens.font.body, fontSize: 15, color: tokens.color.accent },
-  content: { paddingHorizontal: tokens.screenPadding, paddingBottom: 32 },
-  line: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
-  prefix: {
-    minWidth: 18,
-    paddingTop: 7,
-    fontFamily: tokens.font.body,
-    fontSize: 16,
-    lineHeight: 24,
-    color: tokens.color.secondaryText,
-  },
-  circle: {
-    marginTop: 8,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 2,
-    borderColor: tokens.color.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  circleOn: { backgroundColor: tokens.color.accent },
-  tick: { fontFamily: tokens.font.bodyBold, fontSize: 12, lineHeight: 14, color: tokens.color.surface },
-  input: {
-    flex: 1,
-    minHeight: 38,
-    paddingVertical: 7,
-    paddingHorizontal: 0,
-    fontFamily: tokens.font.body,
-    fontSize: 16,
-    lineHeight: 24,
-    color: tokens.color.text,
-    textAlignVertical: 'top',
-  },
-  title: { fontFamily: tokens.font.headingBold, fontSize: 22, lineHeight: 30 },
-  heading: { fontFamily: tokens.font.bodyBold, fontSize: 18, lineHeight: 26 },
-  done: { color: tokens.color.mutedText, textDecorationLine: 'line-through' },
-  bold: { fontFamily: tokens.font.bodyBold },
-  italic: { fontStyle: 'italic' },
-  mark: { color: tokens.color.inactiveDot },
-  full: {
-    marginTop: 12,
-    fontFamily: tokens.font.bodyBold,
-    fontSize: 12,
-    color: tokens.color.amberText,
-  },
-  toolbar: {
-    borderTopWidth: 1,
-    borderTopColor: tokens.color.border,
-    backgroundColor: tokens.color.surface,
-    paddingHorizontal: 8,
-  },
-  tool: {
-    minWidth: 48,
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  toolText: { fontFamily: tokens.font.bodyBold, fontSize: 16, color: tokens.color.text },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.background },
+    top: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: tokens.screenPadding,
+      paddingBottom: 8,
+    },
+    link: { fontFamily: tokens.font.body, fontSize: 15, color: colors.accent },
+    content: { paddingHorizontal: tokens.screenPadding, paddingBottom: 32 },
+    line: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+    prefix: {
+      minWidth: 18,
+      paddingTop: 7,
+      fontFamily: tokens.font.body,
+      fontSize: 16,
+      lineHeight: 24,
+      color: colors.secondaryText,
+    },
+    circle: {
+      marginTop: 8,
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      borderWidth: 2,
+      borderColor: colors.accent,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    circleOn: { backgroundColor: colors.accent },
+    tick: {
+      fontFamily: tokens.font.bodyBold,
+      fontSize: 12,
+      lineHeight: 14,
+      color: colors.onAccent,
+    },
+    input: {
+      flex: 1,
+      minHeight: 38,
+      paddingVertical: 7,
+      paddingHorizontal: 0,
+      fontFamily: tokens.font.body,
+      fontSize: 16,
+      lineHeight: 24,
+      color: colors.text,
+      textAlignVertical: 'top',
+    },
+    title: { fontFamily: tokens.font.headingBold, fontSize: 22, lineHeight: 30 },
+    heading: { fontFamily: tokens.font.bodyBold, fontSize: 18, lineHeight: 26 },
+    done: { color: colors.mutedText, textDecorationLine: 'line-through' },
+    bold: { fontFamily: tokens.font.bodyBold },
+    italic: { fontStyle: 'italic' },
+    mark: { color: colors.inactiveDot },
+    full: {
+      marginTop: 12,
+      fontFamily: tokens.font.bodyBold,
+      fontSize: 12,
+      color: colors.amberText,
+    },
+    toolbar: {
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      backgroundColor: colors.surface,
+      paddingHorizontal: 8,
+    },
+    tool: {
+      minWidth: 48,
+      height: 48,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    toolText: { fontFamily: tokens.font.bodyBold, fontSize: 16, color: colors.text },
+  }),
+);

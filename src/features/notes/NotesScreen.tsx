@@ -12,6 +12,7 @@ import { listPeople } from '../../db/people';
 import { listPlaceSummaries } from '../../db/placeSummaries';
 import { logEvent } from '../../lib/log';
 import { useDbQuery } from '../../lib/useDbQuery';
+import { themed } from '../../ui/theme';
 import { tokens } from '../../ui/tokens';
 import { deleteNoteWithUndo, type PendingNoteDeletion } from './deleteNote';
 import { LinkPicker } from './LinkPicker';
@@ -20,6 +21,7 @@ import { NotesList, type NoteAction } from './NotesList';
 import { UndoDeleteBar } from './UndoDeleteBar';
 
 export function NotesScreen() {
+  const styles = useStyles();
   const router = useRouter();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -145,13 +147,15 @@ export function NotesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  blank: { flex: 1, backgroundColor: tokens.color.background },
-  center: { justifyContent: 'center', padding: tokens.screenPadding },
-  message: {
-    fontFamily: tokens.font.body,
-    fontSize: 16,
-    color: tokens.color.mutedText,
-    textAlign: 'center',
-  },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    blank: { flex: 1, backgroundColor: colors.background },
+    center: { justifyContent: 'center', padding: tokens.screenPadding },
+    message: {
+      fontFamily: tokens.font.body,
+      fontSize: 16,
+      color: colors.mutedText,
+      textAlign: 'center',
+    },
+  }),
+);

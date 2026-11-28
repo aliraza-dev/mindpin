@@ -182,6 +182,33 @@ The edit forms and the "⋯" menu were built from these values before they had f
 
 Icons are the SVG files exported from the frames, kept in `assets/icons/`. A label without an icon in Figma (Office, custom) shows its first letter until one is drawn.
 
+### Dark theme (R11)
+
+There is no Figma frame for the dark theme; these values were chosen on 2026-11-28 and need the owner's review. Every color token has a light and a dark value, and components read them through `src/ui/theme.ts`, never directly. The theme follows the phone's setting; a switch in Settings can be added with that screen.
+
+| Token | Dark value |
+| --- | --- |
+| Background | `#1F1E1D` |
+| Surface | `#2B2A27` |
+| Text | `#F5F4EF` |
+| Muted text | `#A8A69D` |
+| Secondary text | `#C2C0B6` |
+| Border, control border, divider | `#3A3936`, `#4A4945`, `#353431` |
+| Accent | `#D97757` (orange); text on it `#1F1E1D` |
+| Accent tint, with its text | `#4A2E22` (avatars), `#3A2A22` (badges, picked rows); text `#F0A98C` |
+| Amber tint, with its text | `#4A3A1E`; text `#F2C078` |
+| Indigo tint, with its text | `#2F3150`; text `#B9BDF2` |
+| Raised card (the dark card of the light theme) | `#3A3936`, text `#F5F4EF`, muted text `#C2C0B6`, action `#F2B66D` |
+| Inactive dot, map placeholder | `#5A5954`, `#2F3A2C` |
+
+Two tokens exist so the same component works in both themes: text on the accent color (white in light, `#1F1E1D` in dark, because white on orange fails the contrast rule) and text on the dark card.
+
+Not themed yet: the round back, edit, and more buttons and the place tiles are drawn whole in their icon files and keep their light look, and the map keeps the map maker's light style.
+
+### Empty screens (R11.4)
+
+The illustrations are drawn in code from the theme colors (`src/ui/EmptyIllustration.tsx`), with no image files and no animation package: a pin that bobs over its shadow (places, map), a sheet whose lines write themselves (notes), and a magnifying glass that sweeps (search). Each is 120 px high, decoration only, and hidden from screen readers; the message under it carries the meaning.
+
 ## Security rules
 
 These apply to every task. They sit beside the privacy rules in the constitution (Principle II).

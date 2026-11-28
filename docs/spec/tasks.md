@@ -336,7 +336,7 @@ pending place; buying the unlock saves it, and a restore on another phone keeps 
 **Purpose**: the non-functional checks and the store submission.
 
 - [ ] T129 [P] Permissions test in `src/lib/permissions.test.ts`: the built app config requests no background location on Android or iOS (R8.5)
-- [ ] T130 [P] Contrast test in `src/ui/tokens.test.ts`: every text and background token pair is at least 4.5:1 (non-functional: accessibility)
+- [X] T130 [P] Contrast test in `src/ui/tokens.test.ts`: every text and background token pair is at least 4.5:1 (non-functional: accessibility)
 - [ ] T131 [P] Accessibility pass with TalkBack and VoiceOver on every screen, results recorded in `docs/release/accessibility.md`
 - [ ] T132 [P] Right-to-left layout pass with a forced RTL locale, results in `docs/release/rtl.md` (non-functional: languages)
 - [ ] T133 [P] Offline pass of every feature except short-link resolution, address lookup, sign-in, and backup, in `e2e/offline.yaml` (non-functional: offline)
@@ -344,6 +344,10 @@ pending place; buying the unlock saves it, and a restore on another phone keeps 
 - [ ] T135 [P] Privacy audit: no address, coordinate, contact name, phone number, or note text in logs or network calls other than encrypted backup, results in `docs/release/privacy-audit.md` (constitution II)
 - [ ] T136 [P] Privacy policy and store listings in `docs/release/privacy-policy.md` and `docs/release/store-listing.md`
 - [ ] T137 Build profiles in `eas.json`; submit to Google Play closed testing, then the App Store
+- [X] T145 [P] Theme tests in `src/ui/theme.test.tsx` and contrast tests in `src/ui/tokens.test.ts`: components get dark colors when the phone is dark; every text and background pair is at least 4.5:1 in both themes (R11.1, R11.3)
+- [X] T146 Light and dark color tokens in `src/ui/tokens.ts`, the theme hooks in `src/ui/theme.ts`, and every component reading colors through them; `userInterfaceStyle` set to automatic in `app.json` (R11.1, R11.2)
+- [X] T147 [P] Empty illustration tests in `src/ui/EmptyIllustration.test.tsx`: each kind draws, is hidden from screen readers, and stays still with reduce motion (R11.4, R11.5)
+- [X] T148 Animated empty illustrations in `src/ui/EmptyIllustration.tsx`, used on Home, Notes, Map, and search with no results (R11.4, R11.5)
 
 ---
 

@@ -6,6 +6,7 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 
 import type { Person } from '../../db/people';
 import type { PlaceSummary } from '../../db/placeSummaries';
+import { themed } from '../../ui/theme';
 import { tokens, touchSlop } from '../../ui/tokens';
 import type { NoteLinks } from './linkNote';
 
@@ -28,6 +29,7 @@ export function LinkPicker(props: Props) {
 }
 
 function OpenLinkPicker(props: Props) {
+  const styles = useStyles();
   const { topInset = 0, bottomInset = 0 } = props;
   const { t } = useTranslation();
   const [personId, setPersonId] = useState(props.personId);
@@ -68,8 +70,12 @@ function OpenLinkPicker(props: Props) {
         <ScrollView contentContainerStyle={styles.content}>
           <Text style={styles.label}>{t('notes:link.person')}</Text>
           <View accessibilityRole="radiogroup" style={styles.list}>
-            {row('none', t('notes:link.none'), t('notes:link.noPersonA11y'), personId === null, () =>
-              setPersonId(null),
+            {row(
+              'none',
+              t('notes:link.none'),
+              t('notes:link.noPersonA11y'),
+              personId === null,
+              () => setPersonId(null),
             )}
             {props.people.map((person) =>
               row(
@@ -113,36 +119,38 @@ function OpenLinkPicker(props: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: tokens.color.background,
-    paddingHorizontal: tokens.screenPadding,
-  },
-  titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  title: { fontFamily: tokens.font.headingBold, fontSize: 22, color: tokens.color.text },
-  cancel: { fontFamily: tokens.font.body, fontSize: 15, color: tokens.color.accent },
-  content: { paddingTop: 23, paddingBottom: 24 },
-  label: { fontFamily: tokens.font.bodyBold, fontSize: 13, color: tokens.color.text },
-  second: { marginTop: 20 },
-  list: {
-    marginTop: 9,
-    borderRadius: tokens.radius.cardMin,
-    borderWidth: 1,
-    borderColor: tokens.color.border,
-    backgroundColor: tokens.color.surface,
-    overflow: 'hidden',
-  },
-  row: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 14 },
-  rowOn: { backgroundColor: tokens.color.tealSoft },
-  rowText: { fontFamily: tokens.font.body, fontSize: 15, color: tokens.color.text },
-  rowTextOn: { fontFamily: tokens.font.bodyBold, color: tokens.color.tealText },
-  done: {
-    minHeight: tokens.size.mainButton,
-    borderRadius: tokens.radius.actionButton,
-    backgroundColor: tokens.color.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  doneText: { fontFamily: tokens.font.bodyBold, fontSize: 16, color: tokens.color.surface },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: tokens.screenPadding,
+    },
+    titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    title: { fontFamily: tokens.font.headingBold, fontSize: 22, color: colors.text },
+    cancel: { fontFamily: tokens.font.body, fontSize: 15, color: colors.accent },
+    content: { paddingTop: 23, paddingBottom: 24 },
+    label: { fontFamily: tokens.font.bodyBold, fontSize: 13, color: colors.text },
+    second: { marginTop: 20 },
+    list: {
+      marginTop: 9,
+      borderRadius: tokens.radius.cardMin,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+      overflow: 'hidden',
+    },
+    row: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 14 },
+    rowOn: { backgroundColor: colors.tealSoft },
+    rowText: { fontFamily: tokens.font.body, fontSize: 15, color: colors.text },
+    rowTextOn: { fontFamily: tokens.font.bodyBold, color: colors.tealText },
+    done: {
+      minHeight: tokens.size.mainButton,
+      borderRadius: tokens.radius.actionButton,
+      backgroundColor: colors.accent,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    doneText: { fontFamily: tokens.font.bodyBold, fontSize: 16, color: colors.onAccent },
+  }),
+);

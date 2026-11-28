@@ -13,6 +13,8 @@ import { MAPS_AVAILABLE } from '../../lib/buildFlags';
 import { isValidCoordinates } from '../../lib/geo';
 import { useDbQuery } from '../../lib/useDbQuery';
 import { useOnline } from '../../lib/useOnline';
+import { themed, useColors } from '../../ui/theme';
+import { EmptyIllustration } from '../../ui/EmptyIllustration';
 import { tokens } from '../../ui/tokens';
 
 export type Pin = { id: string; label: string; lat: number; lng: number };
@@ -20,7 +22,9 @@ export type Pin = { id: string; label: string; lat: number; lng: number };
 // The saved places that have a location.
 export function pinsOf(places: PlaceSummary[]): Pin[] {
   return places.flatMap(({ place, personName }) =>
-    place.lat !== null && place.lng !== null && isValidCoordinates({ lat: place.lat, lng: place.lng })
+    place.lat !== null &&
+    place.lng !== null &&
+    isValidCoordinates({ lat: place.lat, lng: place.lng })
       ? [
           {
             id: place.id,
@@ -50,17 +54,20 @@ export function regionFor(pins: Pin[]) {
 }
 
 export function MapScreen() {
+  const styles = useStyles();
+  const colors = useColors();
   const router = useRouter();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const online = useOnline();
   const { state } = useDbQuery(async (db) => pinsOf(await listPlaceSummaries(db)), 'map', 'map');
 
-  const message = (text: string) => (
+  const message = (text: string, picture = false) => (
     <View style={[styles.screen, { paddingTop: insets.top + 11 }]}>
       <Text accessibilityRole="header" style={styles.title}>
         {t('map:title')}
       </Text>
+      {picture ? <EmptyIllustration kind="places" /> : null}
       <Text style={styles.message}>{text}</Text>
     </View>
   );
@@ -68,7 +75,7 @@ export function MapScreen() {
   if (state.status === 'loading') return <View style={styles.screen} />;
   if (state.status === 'error') return message(t('map:loadFailed'));
   const pins = state.data;
-  if (pins.length === 0) return message(t('map:empty'));
+  if (pins.length === 0) return message(t('map:empty'), true);
   if (!MAPS_AVAILABLE) return message(t('map:unavailable'));
   if (!online) return message(t('map:offline'));
 
@@ -87,7 +94,7 @@ export function MapScreen() {
           <Marker
             key={pin.id}
             coordinate={{ latitude: pin.lat, longitude: pin.lng }}
-            pinColor={tokens.color.accent}
+            pinColor={colors.accent}
             title={pin.label}
             accessibilityLabel={t('map:pinA11y', { label: pin.label })}
             tracksViewChanges={false}
@@ -105,31 +112,33 @@ export function MapScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: tokens.color.background,
-    paddingHorizontal: tokens.screenPadding,
-  },
-  title: { fontFamily: tokens.font.headingBold, fontSize: 28, color: tokens.color.text },
-  message: {
-    marginTop: 18,
-    fontFamily: tokens.font.body,
-    fontSize: 14,
-    lineHeight: 20,
-    color: tokens.color.mutedText,
-  },
-  map: { flex: 1, backgroundColor: tokens.color.mapPlaceholder },
-  badge: {
-    position: 'absolute',
-    start: tokens.screenPadding,
-    minHeight: 36,
-    justifyContent: 'center',
-    paddingHorizontal: 14,
-    borderRadius: tokens.radius.chip,
-    borderWidth: 1,
-    borderColor: tokens.color.controlBorder,
-    backgroundColor: tokens.color.surface,
-  },
-  badgeText: { fontFamily: tokens.font.bodyBold, fontSize: 14, color: tokens.color.text },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: tokens.screenPadding,
+    },
+    title: { fontFamily: tokens.font.headingBold, fontSize: 28, color: colors.text },
+    message: {
+      marginTop: 18,
+      fontFamily: tokens.font.body,
+      fontSize: 14,
+      lineHeight: 20,
+      color: colors.mutedText,
+    },
+    map: { flex: 1, backgroundColor: colors.mapPlaceholder },
+    badge: {
+      position: 'absolute',
+      start: tokens.screenPadding,
+      minHeight: 36,
+      justifyContent: 'center',
+      paddingHorizontal: 14,
+      borderRadius: tokens.radius.chip,
+      borderWidth: 1,
+      borderColor: colors.controlBorder,
+      backgroundColor: colors.surface,
+    },
+    badgeText: { fontFamily: tokens.font.bodyBold, fontSize: 14, color: colors.text },
+  }),
+);

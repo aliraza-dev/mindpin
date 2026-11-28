@@ -4,7 +4,7 @@
 import { StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
-import { tokens } from '../../ui/tokens';
+import { useColors } from '../../ui/theme';
 
 type Props = {
   lat: number;
@@ -18,6 +18,7 @@ type Props = {
 const SPAN = 0.005;
 
 export function PlaceMap({ lat, lng, bottomInset }: Props) {
+  const colors = useColors();
   const coordinate = { latitude: lat, longitude: lng };
   return (
     // A picture, not a control: touches pass through to the screen, and Navigate opens the
@@ -43,7 +44,7 @@ export function PlaceMap({ lat, lng, bottomInset }: Props) {
         showsUserLocation={false}
         showsMyLocationButton={false}
       >
-        <Marker coordinate={coordinate} pinColor={tokens.color.accent} tracksViewChanges={false} />
+        <Marker coordinate={coordinate} pinColor={colors.accent} tracksViewChanges={false} />
       </MapView>
     </View>
   );

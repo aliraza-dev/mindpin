@@ -77,6 +77,15 @@ These work today, but the owner has not confirmed them:
 - `.claude/settings.json` has a local change that is left uncommitted on purpose.
 - `npm audit` shows no high or critical findings, and 22 moderate ones in build tools.
 
+## Added on 2026-11-28
+
+- The app runs on the owner's Android phone from an EAS development build. Code changes reach it through `npx expo start --dev-client` with no rebuild, as long as no native package is added.
+- Built and tested in Jest: adding a place from Home, the Notes list, the note editor, linking a note, Undo after deleting a note, the map of all pins, the "Did you visit?" question, the dark theme (R11), and the animated pictures on empty screens.
+- Not yet seen on a phone, and the most likely to need fixes there: typing in the note editor (it uses one text field per line, with bold and italic drawn inside the field), the sideways swipe on a note, and the dark theme's colors. The dark colors were chosen without a Figma frame.
+- Still a placeholder: Settings, which waits for sign-in, backup, and export. Visit notes (part of T089) are shown but cannot be typed yet.
+- The Notes and Note editor screens were built without reading their Figma frames, because the Figma plan's tool-call limit was reached. Compare them with frames "06 Notes" and "07 Note editor" when the limit resets.
+- The findings from the owner's code review of 2026-11-27 are still open except the first (the module's native code is now committed).
+
 ## Suggested next step
 
 Get the app onto the owner's phone with EAS Build, then build the Android share target (T047). Sharing from WhatsApp is the core of the product and cannot be judged without both.

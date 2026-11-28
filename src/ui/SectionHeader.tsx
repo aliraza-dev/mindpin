@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { themed } from './theme';
 import { tokens, touchSlop } from './tokens';
 
 type Props = {
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export function SectionHeader({ title, action }: Props) {
+  const styles = useStyles();
   return (
     <View style={styles.row}>
       <Text accessibilityRole="header" style={styles.title}>
@@ -28,8 +30,10 @@ export function SectionHeader({ title, action }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  title: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: tokens.color.text },
-  action: { fontFamily: tokens.font.bodyBold, fontSize: 14, color: tokens.color.accent },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    title: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: colors.text },
+    action: { fontFamily: tokens.font.bodyBold, fontSize: 14, color: colors.accent },
+  }),
+);

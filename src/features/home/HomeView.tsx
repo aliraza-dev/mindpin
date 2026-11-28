@@ -10,8 +10,10 @@ import type { SearchResult } from '../../db/search';
 import { Avatar, initialsOf } from '../../ui/Avatar';
 import { Button } from '../../ui/Button';
 import { Chip } from '../../ui/Chip';
+import { EmptyIllustration } from '../../ui/EmptyIllustration';
 import { Icon } from '../../ui/Icon';
 import { PlaceTile } from '../../ui/PlaceTile';
+import { themed, useColors } from '../../ui/theme';
 import { tokens, touchSlop } from '../../ui/tokens';
 import { notePreview } from '../notes/noteText';
 import { agoText, lastVisitedLabel } from '../visits/lastVisited';
@@ -46,6 +48,8 @@ type Props = {
 const STALE_CARDS = 3;
 
 export function HomeView(props: Props) {
+  const styles = useStyles();
+  const colors = useColors();
   const { firstName, view, people, places, stale, results, now, topInset = 0 } = props;
   const { t } = useTranslation();
   const greeting = t(`home:greeting.${props.greeting}`);
@@ -130,7 +134,11 @@ export function HomeView(props: Props) {
           </Text>
         </View>
         {firstName ? (
-          <View accessible={false} importantForAccessibility="no-hide-descendants" style={styles.profile}>
+          <View
+            accessible={false}
+            importantForAccessibility="no-hide-descendants"
+            style={styles.profile}
+          >
             <Text style={styles.profileText}>{initialsOf(firstName).slice(0, 1)}</Text>
           </View>
         ) : null}
@@ -141,7 +149,7 @@ export function HomeView(props: Props) {
         <TextInput
           accessibilityLabel={t('home:searchA11y')}
           placeholder={t('home:searchPlaceholder')}
-          placeholderTextColor={tokens.color.mutedText}
+          placeholderTextColor={colors.mutedText}
           value={props.searchText}
           onChangeText={props.onSearchChange}
           autoCorrect={false}
@@ -158,7 +166,12 @@ export function HomeView(props: Props) {
             {t('home:results')}
           </Text>
           {results.length === 0 ? (
-            <Text style={styles.message}>{t('home:noResults', { text: props.searchText.trim() })}</Text>
+            <>
+              <EmptyIllustration kind="search" />
+              <Text style={styles.message}>
+                {t('home:noResults', { text: props.searchText.trim() })}
+              </Text>
+            </>
           ) : (
             card(
               results.map(({ memory, personName }) =>
@@ -182,11 +195,16 @@ export function HomeView(props: Props) {
               selected={view === 'places'}
               onPress={() => props.onChangeView('places')}
             />
-            <Chip label={t('home:notes')} accessibilityLabel={t('home:notesA11y')} onPress={props.onOpenNotes} />
+            <Chip
+              label={t('home:notes')}
+              accessibilityLabel={t('home:notesA11y')}
+              onPress={props.onOpenNotes}
+            />
           </View>
 
           {nothingSaved ? (
             <>
+              <EmptyIllustration kind="places" />
               <Text style={styles.message}>{t('home:empty')}</Text>
               <View style={styles.emptyAction}>
                 <Button
@@ -281,114 +299,116 @@ export function HomeView(props: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: tokens.color.background },
-  content: { paddingHorizontal: tokens.screenPadding, paddingBottom: 32 },
-  top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  greeting: { fontFamily: tokens.font.body, fontSize: 13, color: tokens.color.mutedText },
-  appName: {
-    marginTop: 2,
-    fontFamily: tokens.font.headingBold,
-    fontSize: 28,
-    color: tokens.color.text,
-  },
-  profile: {
-    width: tokens.size.avatar,
-    height: tokens.size.avatar,
-    borderRadius: tokens.size.avatar / 2,
-    backgroundColor: tokens.color.darkSurface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  profileText: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: tokens.color.surface },
-  search: {
-    marginTop: 19,
-    height: 54,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 18,
-    borderRadius: tokens.radius.field,
-    borderWidth: 1,
-    borderColor: tokens.color.controlBorder,
-    backgroundColor: tokens.color.surface,
-  },
-  searchInput: {
-    flex: 1,
-    height: '100%',
-    fontFamily: tokens.font.body,
-    fontSize: 15,
-    color: tokens.color.text,
-  },
-  chips: { marginTop: 17, flexDirection: 'row', gap: 9 },
-  heading: {
-    marginTop: 18,
-    fontFamily: tokens.font.bodyBold,
-    fontSize: 15,
-    color: tokens.color.text,
-  },
-  headingRow: {
-    marginTop: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  headingText: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: tokens.color.text },
-  link: { fontFamily: tokens.font.body, fontSize: 15, color: tokens.color.accent },
-  emptyAction: { marginTop: 16, alignItems: 'flex-start' },
-  message: {
-    marginTop: 18,
-    fontFamily: tokens.font.body,
-    fontSize: 14,
-    lineHeight: 20,
-    color: tokens.color.mutedText,
-  },
-  card: {
-    marginTop: 11,
-    borderRadius: tokens.radius.cardMax,
-    borderWidth: 1,
-    borderColor: tokens.color.controlBorder,
-    backgroundColor: tokens.color.surface,
-    overflow: 'hidden',
-  },
-  divider: { borderTopWidth: 1, borderTopColor: tokens.color.divider },
-  row: {
-    minHeight: 73,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  rowText: { flex: 1, gap: 2 },
-  rowTitle: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: tokens.color.text },
-  rowDetail: { fontFamily: tokens.font.body, fontSize: 13, color: tokens.color.mutedText },
-  rowStatus: { fontFamily: tokens.font.body, fontSize: 12, color: tokens.color.secondaryText },
-  badge: {
-    minWidth: 61,
-    height: 38,
-    paddingHorizontal: 8,
-    borderRadius: tokens.radius.badge,
-    backgroundColor: tokens.color.tealSoft,
-    justifyContent: 'center',
-  },
-  badgeText: {
-    fontFamily: tokens.font.bodyBold,
-    fontSize: 12,
-    lineHeight: 15,
-    color: tokens.color.tealText,
-  },
-  staleCard: {
-    marginTop: 18,
-    minHeight: 69,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 13,
-    paddingHorizontal: 19,
-    borderRadius: tokens.radius.cardMax,
-    backgroundColor: tokens.color.darkSurface,
-  },
-  staleTitle: { fontFamily: tokens.font.bodyBold, fontSize: 14, color: tokens.color.surface },
-  staleDetail: { fontFamily: tokens.font.body, fontSize: 13, color: tokens.color.darkMutedText },
-  staleAction: { fontFamily: tokens.font.bodyBold, fontSize: 14, color: tokens.color.darkAction },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.background },
+    content: { paddingHorizontal: tokens.screenPadding, paddingBottom: 32 },
+    top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    greeting: { fontFamily: tokens.font.body, fontSize: 13, color: colors.mutedText },
+    appName: {
+      marginTop: 2,
+      fontFamily: tokens.font.headingBold,
+      fontSize: 28,
+      color: colors.text,
+    },
+    profile: {
+      width: tokens.size.avatar,
+      height: tokens.size.avatar,
+      borderRadius: tokens.size.avatar / 2,
+      backgroundColor: colors.darkSurface,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    profileText: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: colors.onDark },
+    search: {
+      marginTop: 19,
+      height: 54,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      paddingHorizontal: 18,
+      borderRadius: tokens.radius.field,
+      borderWidth: 1,
+      borderColor: colors.controlBorder,
+      backgroundColor: colors.surface,
+    },
+    searchInput: {
+      flex: 1,
+      height: '100%',
+      fontFamily: tokens.font.body,
+      fontSize: 15,
+      color: colors.text,
+    },
+    chips: { marginTop: 17, flexDirection: 'row', gap: 9 },
+    heading: {
+      marginTop: 18,
+      fontFamily: tokens.font.bodyBold,
+      fontSize: 15,
+      color: colors.text,
+    },
+    headingRow: {
+      marginTop: 18,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    headingText: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: colors.text },
+    link: { fontFamily: tokens.font.body, fontSize: 15, color: colors.accent },
+    emptyAction: { marginTop: 16, alignItems: 'flex-start' },
+    message: {
+      marginTop: 18,
+      fontFamily: tokens.font.body,
+      fontSize: 14,
+      lineHeight: 20,
+      color: colors.mutedText,
+    },
+    card: {
+      marginTop: 11,
+      borderRadius: tokens.radius.cardMax,
+      borderWidth: 1,
+      borderColor: colors.controlBorder,
+      backgroundColor: colors.surface,
+      overflow: 'hidden',
+    },
+    divider: { borderTopWidth: 1, borderTopColor: colors.divider },
+    row: {
+      minHeight: 73,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+    },
+    rowText: { flex: 1, gap: 2 },
+    rowTitle: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: colors.text },
+    rowDetail: { fontFamily: tokens.font.body, fontSize: 13, color: colors.mutedText },
+    rowStatus: { fontFamily: tokens.font.body, fontSize: 12, color: colors.secondaryText },
+    badge: {
+      minWidth: 61,
+      height: 38,
+      paddingHorizontal: 8,
+      borderRadius: tokens.radius.badge,
+      backgroundColor: colors.tealSoft,
+      justifyContent: 'center',
+    },
+    badgeText: {
+      fontFamily: tokens.font.bodyBold,
+      fontSize: 12,
+      lineHeight: 15,
+      color: colors.tealText,
+    },
+    staleCard: {
+      marginTop: 18,
+      minHeight: 69,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 13,
+      paddingHorizontal: 19,
+      borderRadius: tokens.radius.cardMax,
+      backgroundColor: colors.darkSurface,
+    },
+    staleTitle: { fontFamily: tokens.font.bodyBold, fontSize: 14, color: colors.onDark },
+    staleDetail: { fontFamily: tokens.font.body, fontSize: 13, color: colors.darkMutedText },
+    staleAction: { fontFamily: tokens.font.bodyBold, fontSize: 14, color: colors.darkAction },
+  }),
+);

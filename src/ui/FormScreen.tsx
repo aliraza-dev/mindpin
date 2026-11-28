@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 
 import { Button } from './Button';
+import { themed } from './theme';
 import { tokens, touchSlop } from './tokens';
 
 type Props = {
@@ -33,6 +34,7 @@ type Props = {
 // The title row, fields, and button follow the Save sheet frame (design.md); the edit forms
 // have no frame of their own.
 export function FormScreen(props: Props) {
+  const styles = useStyles();
   const { topInset = 0, bottomInset = 0 } = props;
   return (
     <KeyboardAvoidingView
@@ -72,12 +74,14 @@ export function FormScreen(props: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: tokens.color.background },
-  content: { flexGrow: 1, paddingHorizontal: tokens.screenPadding },
-  titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  title: { fontFamily: tokens.font.headingBold, fontSize: 22, color: tokens.color.text },
-  cancel: { fontFamily: tokens.font.body, fontSize: 15, color: tokens.color.accent },
-  fields: { marginTop: 23, marginBottom: 24, gap: 16 },
-  footer: { marginTop: 32 },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.background },
+    content: { flexGrow: 1, paddingHorizontal: tokens.screenPadding },
+    titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    title: { fontFamily: tokens.font.headingBold, fontSize: 22, color: colors.text },
+    cancel: { fontFamily: tokens.font.body, fontSize: 15, color: colors.accent },
+    fields: { marginTop: 23, marginBottom: 24, gap: 16 },
+    footer: { marginTop: 32 },
+  }),
+);

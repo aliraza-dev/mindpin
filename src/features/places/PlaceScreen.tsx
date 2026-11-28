@@ -15,6 +15,7 @@ import { useDbQuery } from '../../lib/useDbQuery';
 import { useOnline } from '../../lib/useOnline';
 import { Menu } from '../../ui/Menu';
 import { ScreenMessage } from '../../ui/ScreenMessage';
+import { themed } from '../../ui/theme';
 import { tokens } from '../../ui/tokens';
 import { openInMaps } from '../links/externalLinks';
 import { placeShareText } from '../share/shareText';
@@ -29,6 +30,7 @@ type Props = {
 };
 
 export function PlaceScreen({ placeId }: Props) {
+  const styles = useStyles();
   const router = useRouter();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -159,6 +161,8 @@ export function PlaceScreen({ placeId }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  blank: { flex: 1, backgroundColor: tokens.color.background },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    blank: { flex: 1, backgroundColor: colors.background },
+  }),
+);

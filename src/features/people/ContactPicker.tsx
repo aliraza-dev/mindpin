@@ -11,6 +11,7 @@ import { initialsOf } from '../../ui/Avatar';
 import { Button } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { TextField } from '../../ui/TextField';
+import { themed } from '../../ui/theme';
 import { tokens } from '../../ui/tokens';
 import type { ContactsAccess } from './contacts';
 import { suggestPeople, type PersonChoice } from './matchPerson';
@@ -46,6 +47,7 @@ type Row = {
 const AVATAR = 32;
 
 export function ContactPicker(props: Props) {
+  const styles = useStyles();
   const { text, choice, recent, people, contacts, access, savedLabels } = props;
   const { t } = useTranslation();
   // The reason for contacts is shown only once the user starts using the field (R3.1).
@@ -160,33 +162,35 @@ export function ContactPicker(props: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  wrapper: { gap: 9 },
-  list: {
-    borderRadius: tokens.radius.input,
-    borderWidth: 1,
-    borderColor: tokens.color.border,
-    backgroundColor: tokens.color.surface,
-    overflow: 'hidden',
-  },
-  row: {
-    minHeight: 52,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 12,
-    paddingEnd: 16,
-  },
-  rowOn: { backgroundColor: tokens.color.tealSoft },
-  divider: { borderTopWidth: 1, borderTopColor: tokens.color.divider },
-  avatar: { width: AVATAR, height: AVATAR, borderRadius: AVATAR / 2 },
-  initials: { backgroundColor: tokens.color.divider, alignItems: 'center', justifyContent: 'center' },
-  initialsOn: { backgroundColor: tokens.color.tealTint },
-  initialsText: { fontFamily: tokens.font.bodyBold, fontSize: 12, color: tokens.color.secondaryText },
-  initialsTextOn: { color: tokens.color.tealText },
-  rowText: { flex: 1, gap: 1 },
-  name: { fontFamily: tokens.font.bodyBold, fontSize: 14, color: tokens.color.text },
-  detail: { fontFamily: tokens.font.body, fontSize: 12, color: tokens.color.secondaryText },
-  ask: { gap: 9, alignItems: 'flex-start' },
-  reason: { fontFamily: tokens.font.body, fontSize: 13, color: tokens.color.mutedText },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    wrapper: { gap: 9 },
+    list: {
+      borderRadius: tokens.radius.input,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+      overflow: 'hidden',
+    },
+    row: {
+      minHeight: 52,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      paddingHorizontal: 12,
+      paddingEnd: 16,
+    },
+    rowOn: { backgroundColor: colors.tealSoft },
+    divider: { borderTopWidth: 1, borderTopColor: colors.divider },
+    avatar: { width: AVATAR, height: AVATAR, borderRadius: AVATAR / 2 },
+    initials: { backgroundColor: colors.divider, alignItems: 'center', justifyContent: 'center' },
+    initialsOn: { backgroundColor: colors.tealTint },
+    initialsText: { fontFamily: tokens.font.bodyBold, fontSize: 12, color: colors.secondaryText },
+    initialsTextOn: { color: colors.tealText },
+    rowText: { flex: 1, gap: 1 },
+    name: { fontFamily: tokens.font.bodyBold, fontSize: 14, color: colors.text },
+    detail: { fontFamily: tokens.font.body, fontSize: 12, color: colors.secondaryText },
+    ask: { gap: 9, alignItems: 'flex-start' },
+    reason: { fontFamily: tokens.font.body, fontSize: 13, color: colors.mutedText },
+  }),
+);

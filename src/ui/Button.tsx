@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
 
+import { themed } from './theme';
 import { tokens } from './tokens';
 
 type Props = {
@@ -22,6 +23,7 @@ export function Button({
   size = 'regular',
   disabled,
 }: Props) {
+  const styles = useStyles();
   const primary = variant === 'primary';
   const large = size === 'large';
   return (
@@ -51,25 +53,27 @@ export function Button({
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    minHeight: tokens.size.button,
-    minWidth: tokens.minTouchTarget,
-    borderRadius: tokens.radius.button,
-    paddingHorizontal: 17,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  large: { minHeight: tokens.size.mainButton, borderRadius: tokens.radius.actionButton },
-  primary: { backgroundColor: tokens.color.accent },
-  secondary: {
-    backgroundColor: tokens.color.surface,
-    borderWidth: 1,
-    borderColor: tokens.color.controlBorder,
-  },
-  disabled: { opacity: 0.5 },
-  label: { fontFamily: tokens.font.bodyBold, fontSize: 14 },
-  largeLabel: { fontSize: 16 },
-  primaryLabel: { color: tokens.color.surface },
-  secondaryLabel: { color: tokens.color.text },
-});
+const useStyles = themed((colors) =>
+  StyleSheet.create({
+    base: {
+      minHeight: tokens.size.button,
+      minWidth: tokens.minTouchTarget,
+      borderRadius: tokens.radius.button,
+      paddingHorizontal: 17,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    large: { minHeight: tokens.size.mainButton, borderRadius: tokens.radius.actionButton },
+    primary: { backgroundColor: colors.accent },
+    secondary: {
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.controlBorder,
+    },
+    disabled: { opacity: 0.5 },
+    label: { fontFamily: tokens.font.bodyBold, fontSize: 14 },
+    largeLabel: { fontSize: 16 },
+    primaryLabel: { color: colors.onAccent },
+    secondaryLabel: { color: colors.text },
+  }),
+);
