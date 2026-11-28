@@ -104,6 +104,9 @@ export function NoteEditor(props: Props) {
   // Null when new writing simply follows the writing before it.
   const [typing, setTyping] = useState<number | null>(null);
   const inputs = useRef<(ComponentRef<typeof TextInput> | null)[]>([]);
+  // The last cursor each line's text field reported. A field says nothing when it is tapped
+  // and its cursor does not move, so this is where the cursor is on such a tap.
+  const cursors = useRef<({ start: number; end: number } | undefined)[]>([]);
   // Set when an edit moves the cursor to another line; that line takes the keyboard next.
   const moveTo = useRef<number | null>(null);
 
@@ -132,7 +135,10 @@ export function NoteEditor(props: Props) {
 
   const typed = (index: number, text: string) => {
     const edit = editLine(body, index, text, typing);
-    setCursor(null);
+    // After a new line the cursor is put where the edit says; while typing in one line the
+    // keyboard keeps it.
+    setCursor(edit.focus === index ? null : { line: edit.focus, at: edit.cursor });
+    cursors.current[edit.focus] = { start: edit.cursor, end: edit.cursor };
     setSelected({ line: edit.focus, start: edit.cursor, end: edit.cursor });
     apply(edit.body, edit.focus);
   };
@@ -145,14 +151,39 @@ export function NoteEditor(props: Props) {
       index !== selected.line ||
       Math.abs(next.start - selected.start) > 1;
     if (jumped) setTyping(null);
+    cursors.current[index] = next;
     setSelected({ line: index, ...next });
   };
 
+  const focused = (index: number) => {
+    setFocus(index);
+    if (selected.line !== index) {
+      setSelected({ line: index, ...(cursors.current[index] ?? { start: 0, end: 0 }) });
+    }
+  };
+
+  // Enter starts a new line at the cursor. It is taken from the keyboard's own Enter rather
+  // than from a line break arriving in the text, which some keyboards report twice.
+  const enter = (index: number) => {
+    const line = lines[index];
+    if (!line) return;
+    const at =
+      selected.line === index ? selected : { start: line.text.length, end: line.text.length };
+    const from = Math.min(at.start, at.end, line.text.length);
+    const to = Math.min(Math.max(at.start, at.end), line.text.length);
+    typed(index, `${line.text.slice(0, from)}\n${line.text.slice(to)}`);
+  };
+
   const backspace = (index: number) => {
-    if (selected.line !== index || selected.start !== 0 || selected.end !== 0) return;
+    // An empty line always goes. A line with writing joins the one above only when the
+    // cursor is known to be at its very start.
+    const empty = lines[index]?.text === '';
+    const atStart = selected.line === index && selected.start === 0 && selected.end === 0;
+    if (!empty && !atStart) return;
     const edit = joinWithPrevious(body, index);
     if (edit.cursor !== null) {
       setCursor({ line: edit.focus, at: edit.cursor });
+      cursors.current[edit.focus] = { start: edit.cursor, end: edit.cursor };
       setSelected({ line: edit.focus, start: edit.cursor, end: edit.cursor });
     }
     apply(edit.body, edit.focus);
@@ -261,7 +292,10 @@ export function NoteEditor(props: Props) {
                       ? { start: cursor.at, end: cursor.at }
                       : undefined
                   }
-                  onFocus={() => setFocus(index)}
+                  // Enter is handled here, so the field never holds a line break itself.
+                  submitBehavior="submit"
+                  onSubmitEditing={() => enter(index)}
+                  onFocus={() => focused(index)}
                   onChangeText={(text) => typed(index, text)}
                   onSelectionChange={(event) => moved(index, event.nativeEvent.selection)}
                   onKeyPress={(event) => {

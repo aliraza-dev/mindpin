@@ -214,4 +214,49 @@ describe('NoteEditor', () => {
       expect(StyleSheet.flatten(tool(name).props.style)).toMatchObject({ flex: 1, height: 48 });
     }
   });
+
+  it('starts one new line at the cursor on Enter (R10.4)', async () => {
+    const { view, onChange } = setup('Trip');
+    await view;
+    expect(first().props.submitBehavior).toBe('submit');
+    await fireEvent(first(), 'focus');
+    await fireEvent(first(), 'selectionChange', {
+      nativeEvent: { selection: { start: 4, end: 4 } },
+    });
+    await fireEvent(first(), 'submitEditing');
+    expect(onChange).toHaveBeenLastCalledWith('Trip\n');
+    expect(screen.getAllByLabelText(/^Line \d+$/)).toHaveLength(1);
+    // In the middle of a line, the rest goes to the new line.
+    await fireEvent.changeText(line(2), 'gate code');
+    await fireEvent(line(2), 'selectionChange', {
+      nativeEvent: { selection: { start: 4, end: 4 } },
+    });
+    await fireEvent(line(2), 'submitEditing');
+    expect(onChange).toHaveBeenLastCalledWith('Trip\ngate\n code');
+  });
+
+  it('removes an empty line on Backspace, even when the cursor was never reported (R10.4)', async () => {
+    const { view, onChange } = setup('Trip\n\nPacking');
+    await view;
+    // Tapping an empty line reports no cursor move.
+    await fireEvent(line(2), 'focus');
+    await fireEvent(line(2), 'keyPress', { nativeEvent: { key: 'Backspace' } });
+    expect(onChange).toHaveBeenLastCalledWith('Trip\nPacking');
+  });
+
+  it('joins a line to the one above on Backspace at its start, and not elsewhere (R10.4)', async () => {
+    const { view, onChange } = setup('Trip\nPacking');
+    await view;
+    await fireEvent(line(2), 'focus');
+    await fireEvent(line(2), 'selectionChange', {
+      nativeEvent: { selection: { start: 3, end: 3 } },
+    });
+    await fireEvent(line(2), 'keyPress', { nativeEvent: { key: 'Backspace' } });
+    expect(onChange).not.toHaveBeenCalled();
+    await fireEvent(line(2), 'selectionChange', {
+      nativeEvent: { selection: { start: 0, end: 0 } },
+    });
+    await fireEvent(line(2), 'keyPress', { nativeEvent: { key: 'Backspace' } });
+    expect(onChange).toHaveBeenLastCalledWith('TripPacking');
+  });
 });
