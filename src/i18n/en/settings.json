@@ -10,5 +10,22 @@
     "darkA11y": "Always use the dark theme",
     "note": "The sun or moon button on Home switches between light and dark."
   },
+  "profile": {
+    "title": "Your profile",
+    "detail": "Your name and what you have saved",
+    "openA11y": "Open your profile",
+    "noNameMark": "?"
+  },
+  "privacy": {
+    "title": "Your data",
+    "onPhone": "Your people, places, and notes are stored on this phone.",
+    "contacts": "Your address book is never uploaded.",
+    "location": "MindPin does not track where you are."
+  },
+  "about": {
+    "title": "About MindPin",
+    "tagline": "Pin it once. Ask for it anytime.",
+    "version": "Version {{version}}"
+  },
   "later": "Backup, export, and your account will appear here once sign-in is built."
 }
