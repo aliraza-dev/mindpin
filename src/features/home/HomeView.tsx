@@ -50,6 +50,8 @@ type Props = {
   now: number;
   // Space for the status bar, supplied by the screen.
   topInset?: number;
+  // Room for the floating bottom bar.
+  bottomInset?: number;
   onSearchChange: (text: string) => void;
   onChangeView: (view: HomeListView) => void;
   onOpenNotes: () => void;
@@ -74,6 +76,7 @@ export function HomeView(props: Props) {
   const styles = useStyles();
   const colors = useColors();
   const { firstName, view, people, places, stale, results, now, topInset = 0 } = props;
+  const { bottomInset = 0 } = props;
   const { t } = useTranslation();
   const greeting = t(`home:greeting.${props.greeting}`);
   const nothingSaved = people.length === 0 && places.length === 0;
@@ -194,7 +197,10 @@ export function HomeView(props: Props) {
     <ScrollView
       style={styles.screen}
       {...swipe.panHandlers}
-      contentContainerStyle={[styles.content, { paddingTop: topInset + 11 }]}
+      contentContainerStyle={[
+        styles.content,
+        { paddingTop: topInset + 11, paddingBottom: 104 + bottomInset },
+      ]}
       keyboardShouldPersistTaps="handled"
     >
       <View style={styles.top}>

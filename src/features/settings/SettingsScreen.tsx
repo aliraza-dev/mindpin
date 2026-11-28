@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useTabBarSpace } from '../navigation/tabBarSpace';
+
 import { Chip } from '../../ui/Chip';
 import { themed, useThemePreference, type ThemePreference } from '../../ui/theme';
 import { tokens } from '../../ui/tokens';
@@ -16,12 +18,16 @@ export function SettingsScreen() {
   const styles = useStyles();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const barSpace = useTabBarSpace();
   const preference = useThemePreference();
 
   return (
     <ScrollView
       style={styles.screen}
-      contentContainerStyle={[styles.content, { paddingTop: insets.top + 11 }]}
+      contentContainerStyle={[
+        styles.content,
+        { paddingTop: insets.top + 11, paddingBottom: 32 + barSpace },
+      ]}
     >
       <Text accessibilityRole="header" style={styles.title}>
         {t('settings:title')}

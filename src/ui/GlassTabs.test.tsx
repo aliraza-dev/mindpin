@@ -1,10 +1,18 @@
 // The glass tabs (R6.3, R6.5). Dragging the lens needs a real phone; these tests check the
 // tabs it sits over and how it is drawn once the row is measured.
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { createRef } from 'react';
 import { StyleSheet } from 'react-native';
 
+import type { ViewRef } from './blur';
 import { GlassTabs, LENS_OVER, type GlassTab } from './GlassTabs';
 import { lightColors } from './tokens';
+
+// The native blur is not there in tests; a plain view stands in and keeps its props.
+jest.mock('./blur', () => {
+  const { View } = jest.requireActual<typeof import('react-native')>('react-native');
+  return { ...jest.requireActual<typeof import('./blur')>('./blur'), BlurView: View };
+});
 
 const tabs: GlassTab[] = [
   { key: 'people', label: 'People', accessibilityLabel: 'Show people' },
@@ -57,6 +65,24 @@ describe('GlassTabs', () => {
     await soft.unmount();
     await render(<GlassTabs tabs={tabs} activeIndex={0} onSelect={() => {}} tone="solid" />);
     expect(capsule().backgroundColor).toBe(lightColors.accent);
+  });
+
+  it('is frosted glass over the screen behind when given one, and a flat fill when not', async () => {
+    const flat = await render(<GlassTabs tabs={tabs} activeIndex={0} onSelect={() => {}} />);
+    expect(screen.queryByTestId('glass-frost', HIDDEN)).toBeNull();
+    await flat.unmount();
+    const behind = createRef<ViewRef>();
+    await render(
+      <GlassTabs
+        tabs={tabs}
+        activeIndex={0}
+        onSelect={() => {}}
+        tone="solid"
+        blurTarget={behind}
+      />,
+    );
+    expect(screen.getByTestId('glass-frost', HIDDEN).props.blurTarget).toBe(behind);
+    expect(capsule().backgroundColor).toBe('transparent');
   });
 
   it('shows the name under the icon of the open tab only', async () => {

@@ -15,6 +15,7 @@ import type { SqlDatabase } from '../../db/types';
 import { logEvent } from '../../lib/log';
 import { useDbQuery } from '../../lib/useDbQuery';
 import { AddMenu } from '../../ui/AddMenu';
+import { useTabBarSpace } from '../navigation/tabBarSpace';
 import { themed, useScheme } from '../../ui/theme';
 import { tokens } from '../../ui/tokens';
 import { deletePlace } from '../places/editPlace';
@@ -28,6 +29,7 @@ export function HomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const barSpace = useTabBarSpace();
   const [view, setView] = useState<HomeListView>('people');
   const [searchText, setSearchText] = useState('');
   const [results, setResults] = useState<SearchResult[] | null>(null);
@@ -137,6 +139,7 @@ export function HomeScreen() {
         results={results}
         now={now}
         topInset={insets.top}
+        bottomInset={barSpace}
         onSearchChange={search}
         onChangeView={setView}
         onOpenNotes={() => router.push('/notes')}
@@ -151,6 +154,7 @@ export function HomeScreen() {
         onOpenNote={(noteId) => router.push(`/note/${noteId}`)}
       />
       <AddMenu
+        bottomInset={barSpace}
         openLabel={t('home:add.openA11y')}
         closeLabel={t('home:add.closeA11y')}
         choices={[

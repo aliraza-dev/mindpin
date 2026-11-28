@@ -7,7 +7,7 @@
 // Built from plain views and the built-in animation system. Real blur and bending of what is
 // behind the glass would need a native package. Used for People, Places, and Notes on Home
 // and for the bottom bar.
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type RefObject } from 'react';
 import {
   Animated,
   I18nManager,
@@ -18,9 +18,10 @@ import {
   View,
 } from 'react-native';
 
+import { BlurView, withAlpha, type ViewRef } from './blur';
 import { bubbleLeft, clampBubble, stretchFor, tabUnderBubble } from './glassTabsMath';
 import { Icon, type IconName } from './Icon';
-import { themed, useColors } from './theme';
+import { themed, useColors, useScheme } from './theme';
 import { tokens } from './tokens';
 
 export type GlassTab = {
@@ -41,18 +42,25 @@ type Props = {
   tone?: 'solid' | 'soft';
   // What a screen reader calls each item.
   role?: 'button' | 'tab';
+  // What lies behind the capsule. Given this, and a build that can blur, the capsule is
+  // frosted glass over it instead of a flat fill.
+  blurTarget?: RefObject<ViewRef | null>;
 };
 
 const PAD = 4;
 // How far the lens reaches past the capsule, above and below and to each side.
 export const LENS_OVER = 7;
+// How much of the theme color lies over the blurred screen.
+const FROST_TINT = 0.74;
 // Soft and a little bouncy, like the lens has weight.
 const SETTLE = { tension: 170, friction: 11, useNativeDriver: true };
 
 export function GlassTabs(props: Props) {
   const { tabs, activeIndex, onSelect, height = 48, tone = 'soft', role = 'button' } = props;
+  const { blurTarget } = props;
   const styles = useStyles();
   const colors = useColors();
+  const scheme = useScheme();
   const [width, setWidth] = useState(0);
   // Raised after every drag, so the lens settles again even when the open tab did not
   // change (a tab may open another screen instead of becoming the open one).
@@ -129,14 +137,47 @@ export function GlassTabs(props: Props) {
   const grow = swell.interpolate({ inputRange: [0, 1], outputRange: [1, 1.08] });
   const lensHeight = height + LENS_OVER * 2;
   const onBar = solid ? colors.onAccent : colors.text;
+  const Frost = blurTarget ? BlurView : null;
+  const radius = height / 2;
 
   return (
     // Room around the capsule for the lens, which is larger than it.
     <View style={styles.room}>
       <View
-        style={[styles.capsule, solid && styles.capsuleSolid, { height, borderRadius: height / 2 }]}
+        style={[
+          styles.capsule,
+          solid && styles.capsuleSolid,
+          Frost && styles.capsuleClear,
+          { height, borderRadius: radius },
+        ]}
         {...drag.panHandlers}
       >
+        {Frost ? (
+          <>
+            {/* The screen behind, blurred. Phones before Android 12 show it only dimmed. */}
+            <Frost
+              testID="glass-frost"
+              pointerEvents="none"
+              blurTarget={blurTarget}
+              blurMethod="dimezisBlurViewSdk31Plus"
+              intensity={55}
+              tint={scheme}
+              style={[StyleSheet.absoluteFill, { borderRadius: radius }]}
+            />
+            {/* The theme color over the blur: strong enough to keep the icons readable. */}
+            <View
+              pointerEvents="none"
+              style={[
+                StyleSheet.absoluteFill,
+                styles.frostEdge,
+                {
+                  borderRadius: radius,
+                  backgroundColor: withAlpha(solid ? colors.accent : colors.tealSoft, FROST_TINT),
+                },
+              ]}
+            />
+          </>
+        ) : null}
         {/* Measures the row. Kept apart from the drag, which takes over the capsule's touches. */}
         <View
           testID="glass-measure"
@@ -216,6 +257,9 @@ const useStyles = themed((colors) =>
       backgroundColor: colors.tealSoft,
     },
     capsuleSolid: { backgroundColor: colors.accent },
+    capsuleClear: { backgroundColor: 'transparent' },
+    // A thin bright edge, as on the rim of a pane of glass.
+    frostEdge: { borderWidth: 1, borderColor: GLASS.rim },
     tab: { flex: 1, height: '100%', alignItems: 'center', justifyContent: 'center', gap: 3 },
     // On the solid bar the tabs that are not open are a little fainter.
     tabQuiet: { opacity: 0.8 },

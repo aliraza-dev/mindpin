@@ -8,6 +8,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useTabBarSpace } from '../navigation/tabBarSpace';
+
 import { listPlaceSummaries, type PlaceSummary } from '../../db/placeSummaries';
 import { MAPS_AVAILABLE } from '../../lib/buildFlags';
 import { isValidCoordinates } from '../../lib/geo';
@@ -59,6 +61,7 @@ export function MapScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const barSpace = useTabBarSpace();
   const online = useOnline();
   const { state } = useDbQuery(async (db) => pinsOf(await listPlaceSummaries(db)), 'map', 'map');
 
@@ -85,7 +88,7 @@ export function MapScreen() {
         testID="all-pins-map"
         style={StyleSheet.absoluteFill}
         initialRegion={regionFor(pins)}
-        mapPadding={{ top: insets.top + 56, right: 0, bottom: 0, left: 0 }}
+        mapPadding={{ top: insets.top + 56, right: 0, bottom: barSpace, left: 0 }}
         toolbarEnabled={false}
         showsUserLocation={false}
         showsMyLocationButton={false}

@@ -7,7 +7,15 @@ module.exports = defineConfig([
   expoConfig,
   prettierConfig,
   {
-    ignores: ['node_modules/**', '.expo/**', 'dist/**', 'build/**', 'coverage/**', 'android/**', 'ios/**'],
+    ignores: [
+      'node_modules/**',
+      '.expo/**',
+      'dist/**',
+      'build/**',
+      'coverage/**',
+      'android/**',
+      'ios/**',
+    ],
   },
   {
     // Named exports only (CLAUDE.md). Expo Router route files in app/ are the exception.
