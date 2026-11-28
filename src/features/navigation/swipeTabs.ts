@@ -1,5 +1,5 @@
-// Swiping sideways on a tab screen moves to the tab beside it (owner request, 2026-11-28).
-// Pure: the layout feeds it the drag and gets back the tab to show.
+// Swiping sideways on Home moves between its People and Places lists (owner request,
+// 2026-11-28). Pure: the screen feeds it the drag and gets back the list to show.
 
 // A drag must cover this much of the screen's width, or be a quick flick, to count.
 const DISTANCE = 64;

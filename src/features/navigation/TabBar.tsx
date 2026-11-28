@@ -15,14 +15,12 @@ type Props = {
   onSelect: (index: number) => void;
   // The phone's own bottom edge.
   bottomInset?: number;
-  // Told which tab is open each time the bar is drawn, for the swipe between tabs.
-  onReady?: (activeIndex: number) => void;
 };
 
 export const BAR_HEIGHT = 72;
 const HIGHLIGHT = { width: 96, height: 44 };
 
-export function TabBar({ activeIndex, onSelect, bottomInset = 0, onReady }: Props) {
+export function TabBar({ activeIndex, onSelect, bottomInset = 0 }: Props) {
   const styles = useStyles();
   const colors = useColors();
   const { t } = useTranslation();
@@ -37,10 +35,6 @@ export function TabBar({ activeIndex, onSelect, bottomInset = 0, onReady }: Prop
       friction: 16,
     }).start();
   }, [activeIndex, position]);
-
-  useEffect(() => {
-    onReady?.(activeIndex);
-  });
 
   const slot = width / tabs.length;
   // In a right-to-left layout the first tab is at the right, so the highlight moves the other way.

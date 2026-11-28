@@ -1,8 +1,18 @@
 // The home screen, as drawn in Figma frame "01 Home", with the changes the owner approved:
 // a plain search bar (no microphone) and no Ask MindPin. It only shows what it is given and
 // reports taps; HomeScreen loads the data.
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  I18nManager,
+  PanResponder,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
 import type { Memory } from '../../db/memories';
 import type { Person } from '../../db/people';
@@ -11,6 +21,7 @@ import type { SearchResult } from '../../db/search';
 import { Avatar, initialsOf } from '../../ui/Avatar';
 import { Chip } from '../../ui/Chip';
 import { EmptyIllustration } from '../../ui/EmptyIllustration';
+import { GlassSwitch } from '../../ui/GlassSwitch';
 import { Icon } from '../../ui/Icon';
 import { LogoMark } from '../../ui/LogoMark';
 import { PlaceTile } from '../../ui/PlaceTile';
@@ -19,6 +30,7 @@ import { themed, useColors, type Scheme } from '../../ui/theme';
 import { ThemeToggle } from '../../ui/ThemeToggle';
 import { tokens } from '../../ui/tokens';
 import { notePreview } from '../notes/noteText';
+import { isTabSwipe, tabAfterSwipe } from '../navigation/swipeTabs';
 import { agoText, lastVisitedLabel } from '../visits/lastVisited';
 import type { StalePlace } from '../visits/stalePlaces';
 import { personRowSubtitle, type Greeting, type PersonRow } from './homeRows';
@@ -55,6 +67,8 @@ type Props = {
 };
 
 const STALE_CARDS = 3;
+// The lists a swipe moves between, in order.
+const VIEWS: HomeListView[] = ['people', 'places'];
 
 export function HomeView(props: Props) {
   const styles = useStyles();
@@ -63,6 +77,32 @@ export function HomeView(props: Props) {
   const { t } = useTranslation();
   const greeting = t(`home:greeting.${props.greeting}`);
   const nothingSaved = people.length === 0 && places.length === 0;
+
+  // A sideways swipe on the screen moves between People and Places (owner request). A row
+  // that slides for its own actions takes the touch first, so it is not affected. The
+  // gesture is made once; what it needs to know is kept up to date after every draw.
+  const [{ swipe, keep }] = useState(() => {
+    let now = { index: 0, searching: false, change: (_next: HomeListView) => {} };
+    const pan = PanResponder.create({
+      onMoveShouldSetPanResponder: (_event, gesture) => !now.searching && isTabSwipe(gesture),
+      onPanResponderRelease: (_event, gesture) => {
+        const next = tabAfterSwipe(now.index, VIEWS.length, gesture, I18nManager.isRTL);
+        if (next !== now.index) now.change(VIEWS[next]);
+      },
+    });
+    return {
+      swipe: pan,
+      keep: (latest: typeof now) => {
+        now = latest;
+      },
+    };
+  });
+  useEffect(() => {
+    keep({ index: VIEWS.indexOf(view), searching: results !== null, change: props.onChangeView });
+  });
+  // The side the new list comes in from: Places is after People.
+  const forward = I18nManager.isRTL ? -1 : 1;
+  const back = I18nManager.isRTL ? 1 : -1;
   // Each view has its own picture and message when it has nothing to list.
   const viewEmpty = view === 'people' ? people.length === 0 : places.length === 0;
   const emptyText = nothingSaved
@@ -153,6 +193,7 @@ export function HomeView(props: Props) {
   return (
     <ScrollView
       style={styles.screen}
+      {...swipe.panHandlers}
       contentContainerStyle={[styles.content, { paddingTop: topInset + 11 }]}
       keyboardShouldPersistTaps="handled"
     >
@@ -246,72 +287,76 @@ export function HomeView(props: Props) {
             />
           </View>
 
-          {viewEmpty ? (
-            <>
-              <EmptyIllustration kind={view === 'people' ? 'people' : 'places'} />
-              <Text style={[styles.message, styles.centered]}>{emptyText}</Text>
-            </>
-          ) : (
-            <>
-              <Text accessibilityRole="header" style={styles.heading}>
-                {t('home:recentlySaved')}
-              </Text>
-              {view === 'people'
-                ? card(
-                    people.map((row) => (
-                      <SwipeRow
-                        key={row.person.id}
-                        actions={[
-                          {
-                            key: 'edit',
-                            icon: 'pencil',
-                            accessibilityLabel: t('home:swipe.editA11y', { name: row.person.name }),
-                            onPress: () => props.onEditPerson(row.person.id),
-                          },
-                          {
-                            key: 'delete',
-                            icon: 'trash',
-                            accessibilityLabel: t('home:swipe.deleteA11y', {
-                              name: row.person.name,
-                            }),
-                            danger: true,
-                            onPress: () => props.onDeletePerson(row.person),
-                          },
-                        ]}
-                      >
-                        <Pressable
-                          accessibilityRole="button"
-                          accessibilityLabel={t('home:openPersonA11y', { name: row.person.name })}
-                          onPress={() => props.onOpenPerson(row.person.id)}
-                          style={styles.row}
+          <GlassSwitch switchKey={view} direction={view === 'places' ? forward : back}>
+            {viewEmpty ? (
+              <>
+                <EmptyIllustration kind={view === 'people' ? 'people' : 'places'} />
+                <Text style={[styles.message, styles.centered]}>{emptyText}</Text>
+              </>
+            ) : (
+              <>
+                <Text accessibilityRole="header" style={styles.heading}>
+                  {t('home:recentlySaved')}
+                </Text>
+                {view === 'people'
+                  ? card(
+                      people.map((row) => (
+                        <SwipeRow
+                          key={row.person.id}
+                          actions={[
+                            {
+                              key: 'edit',
+                              icon: 'pencil',
+                              accessibilityLabel: t('home:swipe.editA11y', {
+                                name: row.person.name,
+                              }),
+                              onPress: () => props.onEditPerson(row.person.id),
+                            },
+                            {
+                              key: 'delete',
+                              icon: 'trash',
+                              accessibilityLabel: t('home:swipe.deleteA11y', {
+                                name: row.person.name,
+                              }),
+                              danger: true,
+                              onPress: () => props.onDeletePerson(row.person),
+                            },
+                          ]}
                         >
-                          <Avatar name={row.person.name} tintKey={row.person.id} />
-                          <View style={styles.rowText}>
-                            <Text style={styles.rowTitle} numberOfLines={1}>
-                              {row.person.name}
-                            </Text>
-                            <Text style={styles.rowDetail} numberOfLines={2}>
-                              {personRowSubtitle(row, now)}
-                            </Text>
-                          </View>
-                          {row.placeLabels.length > 1 ? (
-                            <View style={styles.badge}>
-                              <Text style={styles.badgeText}>
-                                {t('home:placesBadge', { count: row.placeLabels.length })}
+                          <Pressable
+                            accessibilityRole="button"
+                            accessibilityLabel={t('home:openPersonA11y', { name: row.person.name })}
+                            onPress={() => props.onOpenPerson(row.person.id)}
+                            style={styles.row}
+                          >
+                            <Avatar name={row.person.name} tintKey={row.person.id} />
+                            <View style={styles.rowText}>
+                              <Text style={styles.rowTitle} numberOfLines={1}>
+                                {row.person.name}
+                              </Text>
+                              <Text style={styles.rowDetail} numberOfLines={2}>
+                                {personRowSubtitle(row, now)}
                               </Text>
                             </View>
-                          ) : null}
-                        </Pressable>
-                      </SwipeRow>
-                    )),
-                  )
-                : card(
-                    places.map(({ place, personName, lastVisitedAt }) =>
-                      placeRow(place, personName, lastVisitedLabel(lastVisitedAt, now)),
-                    ),
-                  )}
-            </>
-          )}
+                            {row.placeLabels.length > 1 ? (
+                              <View style={styles.badge}>
+                                <Text style={styles.badgeText}>
+                                  {t('home:placesBadge', { count: row.placeLabels.length })}
+                                </Text>
+                              </View>
+                            ) : null}
+                          </Pressable>
+                        </SwipeRow>
+                      )),
+                    )
+                  : card(
+                      places.map(({ place, personName, lastVisitedAt }) =>
+                        placeRow(place, personName, lastVisitedLabel(lastVisitedAt, now)),
+                      ),
+                    )}
+              </>
+            )}
+          </GlassSwitch>
 
           {stale.slice(0, STALE_CARDS).map(({ place, personName, lastVisitedAt }) => {
             const title = personName ? `${personName} · ${place.title}` : place.title;
