@@ -73,6 +73,7 @@ function setup(overrides: Partial<Parameters<typeof HomeView>[0]> = {}) {
     onSearchChange: jest.fn(),
     onChangeView: jest.fn(),
     onOpenNotes: jest.fn(),
+    onAddPlace: jest.fn(),
     onOpenPerson: jest.fn(),
     onOpenPlace: jest.fn(),
     onOpenNote: jest.fn(),
@@ -199,5 +200,23 @@ describe('HomeView', () => {
 
     await setup({ people: [], places: [] }).view;
     expect(screen.getByText(/Nothing saved yet/)).toBeTruthy();
+  });
+
+  it('offers adding a place by hand on a new install and in the Places view (R4.7)', async () => {
+    const empty = setup({ people: [], places: [] });
+    await empty.view;
+    await fireEvent.press(screen.getByRole('button', { name: 'Add a place by hand' }));
+    expect(empty.handlers.onAddPlace).toHaveBeenCalledTimes(1);
+    await (await empty.view).unmount();
+
+    const inPeople = setup();
+    await inPeople.view;
+    expect(screen.queryByRole('button', { name: 'Add a place by hand' })).toBeNull();
+    await (await inPeople.view).unmount();
+
+    const inPlaces = setup({ view: 'places' });
+    await inPlaces.view;
+    await fireEvent.press(screen.getByRole('button', { name: 'Add a place by hand' }));
+    expect(inPlaces.handlers.onAddPlace).toHaveBeenCalledTimes(1);
   });
 });

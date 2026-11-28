@@ -85,6 +85,7 @@ export function HomeScreen() {
       onSearchChange={search}
       onChangeView={setView}
       onOpenNotes={() => router.push('/notes')}
+      onAddPlace={() => router.push('/place/new')}
       onOpenPerson={(personId) => router.push(`/person/${personId}`)}
       onOpenPlace={(placeId) => router.push(`/place/${placeId}`)}
       onOpenNote={(noteId) => router.push(`/note/${noteId}`)}

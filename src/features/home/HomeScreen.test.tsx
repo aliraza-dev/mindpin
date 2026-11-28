@@ -52,6 +52,8 @@ describe('HomeScreen', () => {
     await render(<HomeScreen />);
     expect(await screen.findByText(/Nothing saved yet/)).toBeTruthy();
     expect(screen.getByText(/^Good (morning|afternoon|evening)$/)).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Add a place by hand' }));
+    expect(mockRouter.push).toHaveBeenCalledWith('/place/new');
   });
 
   it('searches the saved places as the user types, and returns to the lists when cleared', async () => {

@@ -8,10 +8,11 @@ import type { Memory } from '../../db/memories';
 import type { PlaceSummary } from '../../db/placeSummaries';
 import type { SearchResult } from '../../db/search';
 import { Avatar, initialsOf } from '../../ui/Avatar';
+import { Button } from '../../ui/Button';
 import { Chip } from '../../ui/Chip';
 import { Icon } from '../../ui/Icon';
 import { PlaceTile } from '../../ui/PlaceTile';
-import { tokens } from '../../ui/tokens';
+import { tokens, touchSlop } from '../../ui/tokens';
 import { notePreview } from '../notes/noteText';
 import { agoText, lastVisitedLabel } from '../visits/lastVisited';
 import type { StalePlace } from '../visits/stalePlaces';
@@ -35,6 +36,8 @@ type Props = {
   onSearchChange: (text: string) => void;
   onChangeView: (view: HomeListView) => void;
   onOpenNotes: () => void;
+  // Adding a place without a share (R4.7).
+  onAddPlace: () => void;
   onOpenPerson: (personId: string) => void;
   onOpenPlace: (placeId: string) => void;
   onOpenNote: (noteId: string) => void;
@@ -183,12 +186,33 @@ export function HomeView(props: Props) {
           </View>
 
           {nothingSaved ? (
-            <Text style={styles.message}>{t('home:empty')}</Text>
+            <>
+              <Text style={styles.message}>{t('home:empty')}</Text>
+              <View style={styles.emptyAction}>
+                <Button
+                  label={t('home:addPlace')}
+                  accessibilityLabel={t('home:addPlaceA11y')}
+                  onPress={props.onAddPlace}
+                />
+              </View>
+            </>
           ) : (
             <>
-              <Text accessibilityRole="header" style={styles.heading}>
-                {t('home:recentlySaved')}
-              </Text>
+              <View style={styles.headingRow}>
+                <Text accessibilityRole="header" style={styles.headingText}>
+                  {t('home:recentlySaved')}
+                </Text>
+                {view === 'places' ? (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={t('home:addPlaceA11y')}
+                    onPress={props.onAddPlace}
+                    hitSlop={touchSlop(18)}
+                  >
+                    <Text style={styles.link}>{t('home:addPlace')}</Text>
+                  </Pressable>
+                ) : null}
+              </View>
               {view === 'people'
                 ? card(
                     people.map((row) => (
@@ -303,6 +327,15 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: tokens.color.text,
   },
+  headingRow: {
+    marginTop: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  headingText: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: tokens.color.text },
+  link: { fontFamily: tokens.font.body, fontSize: 15, color: tokens.color.accent },
+  emptyAction: { marginTop: 16, alignItems: 'flex-start' },
   message: {
     marginTop: 18,
     fontFamily: tokens.font.body,

@@ -84,7 +84,7 @@ export function PersonScreen({ personId }: Props) {
       onSharePlaces={sharePlaces}
       onAddPlace={() => router.push({ pathname: '/place/new', params: { personId: person.id } })}
       onOpenPlace={(placeId) => router.push(`/place/${placeId}`)}
-      onNewNote={() => router.push({ pathname: '/note/new', params: { personId: person.id } })}
+      onNewNote={() => router.push({ pathname: '/note/[id]', params: { id: 'new', personId: person.id } })}
       onOpenNote={(noteId) => router.push(`/note/${noteId}`)}
     />
   );
