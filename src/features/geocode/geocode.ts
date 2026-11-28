@@ -38,7 +38,12 @@ export function formatAddress(address: PlatformAddress): string | null {
 
   const street = [clean(address.streetNumber), clean(address.street)].filter(Boolean).join(' ');
   const parts: string[] = [];
-  for (const part of [street || clean(address.name), address.district, address.city, address.region]) {
+  for (const part of [
+    street || clean(address.name),
+    address.district,
+    address.city,
+    address.region,
+  ]) {
     const text = clean(part);
     if (text && !parts.some((p) => p.toLowerCase() === text.toLowerCase())) parts.push(text);
   }
@@ -72,7 +77,9 @@ export function createGeocoder(platform: PlatformGeocoder): Geocoder {
         return { kind: 'retry' };
       }
       const value = results.find(isValidCoordinates);
-      return value ? { kind: 'found', value: { lat: value.lat, lng: value.lng } } : { kind: 'none' };
+      return value
+        ? { kind: 'found', value: { lat: value.lat, lng: value.lng } }
+        : { kind: 'none' };
     },
   };
 }

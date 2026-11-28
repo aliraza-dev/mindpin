@@ -45,12 +45,24 @@ const memory = (overrides: Partial<Memory>): Memory => ({
 
 const places: PlaceSummary[] = [
   {
-    place: memory({ id: 'shop', personId: 'a', title: 'Shop', address: 'Main Road', createdAt: NOW - 2 * DAY }),
+    place: memory({
+      id: 'shop',
+      personId: 'a',
+      title: 'Shop',
+      address: 'Main Road',
+      createdAt: NOW - 2 * DAY,
+    }),
     personName: 'Ahmed Raza',
     lastVisitedAt: null,
   },
   {
-    place: memory({ id: 'home', personId: 'a', title: 'Home', address: 'Street 14', createdAt: NOW - 300 * DAY }),
+    place: memory({
+      id: 'home',
+      personId: 'a',
+      title: 'Home',
+      address: 'Street 14',
+      createdAt: NOW - 300 * DAY,
+    }),
     personName: 'Ahmed Raza',
     lastVisitedAt: NOW - 60 * DAY,
   },
@@ -73,16 +85,21 @@ function setup(overrides: Partial<Parameters<typeof HomeView>[0]> = {}) {
     onSearchChange: jest.fn(),
     onChangeView: jest.fn(),
     onOpenNotes: jest.fn(),
-    onAddPlace: jest.fn(),
     onOpenPerson: jest.fn(),
     onOpenPlace: jest.fn(),
     onOpenNote: jest.fn(),
+    onToggleTheme: jest.fn(),
+    onEditPerson: jest.fn(),
+    onDeletePerson: jest.fn(),
+    onEditPlace: jest.fn(),
+    onDeletePlace: jest.fn(),
   };
   const view = render(
     <HomeView
       greeting="evening"
       firstName="Bilal"
       view="people"
+      scheme="light"
       people={people}
       places={places}
       stale={[]}
@@ -135,7 +152,9 @@ describe('HomeView', () => {
   it('offers People, Places, and Notes (R6.3)', async () => {
     const { handlers, view } = setup();
     await view;
-    expect(screen.getByRole('button', { name: 'Show people' }).props.accessibilityState).toMatchObject({
+    expect(
+      screen.getByRole('button', { name: 'Show people' }).props.accessibilityState,
+    ).toMatchObject({
       selected: true,
     });
     await fireEvent.press(screen.getByRole('button', { name: 'Show places' }));
@@ -167,7 +186,9 @@ describe('HomeView', () => {
     expect(screen.getByText('Last visited 7 months ago')).toBeTruthy();
     expect(screen.getByText('Saved 8 months ago, not visited yet')).toBeTruthy();
     expect(screen.getAllByText('Plan a visit')).toHaveLength(3);
-    await fireEvent.press(screen.getByRole('button', { name: "Open Nani's house to plan a visit" }));
+    await fireEvent.press(
+      screen.getByRole('button', { name: "Open Nani's house to plan a visit" }),
+    );
     expect(handlers.onOpenPlace).toHaveBeenCalledWith('nani');
   });
 
@@ -177,7 +198,12 @@ describe('HomeView', () => {
       results: [
         { memory: places[0].place, personName: 'Ahmed Raza' },
         {
-          memory: memory({ id: 'n1', type: 'note', title: 'Main gate', notes: 'Main gate\nCode on the left' }),
+          memory: memory({
+            id: 'n1',
+            type: 'note',
+            title: 'Main gate',
+            notes: 'Main gate\nCode on the left',
+          }),
           personName: null,
         },
       ],
@@ -202,21 +228,41 @@ describe('HomeView', () => {
     expect(screen.getByText(/Nothing saved yet/)).toBeTruthy();
   });
 
-  it('offers adding a place by hand on a new install and in the Places view (R4.7)', async () => {
-    const empty = setup({ people: [], places: [] });
-    await empty.view;
-    await fireEvent.press(screen.getByRole('button', { name: 'Add a place by hand' }));
-    expect(empty.handlers.onAddPlace).toHaveBeenCalledTimes(1);
-    await (await empty.view).unmount();
+  it('shows the pin mark before the app name', async () => {
+    await setup().view;
+    expect(screen.getByTestId('logo-mark', { includeHiddenElements: true })).toBeTruthy();
+    expect(screen.getByRole('header', { name: 'MindPin' })).toBeTruthy();
+  });
 
+  it('has a quick switch to the other theme (R11.6)', async () => {
+    const light = setup();
+    await light.view;
+    await fireEvent.press(screen.getByRole('button', { name: 'Switch to the dark theme' }));
+    expect(light.handlers.onToggleTheme).toHaveBeenCalledTimes(1);
+    await (await light.view).unmount();
+
+    await setup({ scheme: 'dark' }).view;
+    expect(screen.getByRole('button', { name: 'Switch to the light theme' })).toBeTruthy();
+  });
+
+  it('offers Edit and Delete behind each person and place for the swipe', async () => {
     const inPeople = setup();
     await inPeople.view;
-    expect(screen.queryByRole('button', { name: 'Add a place by hand' })).toBeNull();
+    await fireEvent.press(screen.getByRole('button', { name: 'Edit Ahmed Raza' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Delete Ahmed Raza' }));
+    expect(inPeople.handlers.onEditPerson).toHaveBeenCalledWith('a');
+    expect(inPeople.handlers.onDeletePerson).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'a' }),
+    );
     await (await inPeople.view).unmount();
 
     const inPlaces = setup({ view: 'places' });
     await inPlaces.view;
-    await fireEvent.press(screen.getByRole('button', { name: 'Add a place by hand' }));
-    expect(inPlaces.handlers.onAddPlace).toHaveBeenCalledTimes(1);
+    await fireEvent.press(screen.getByRole('button', { name: 'Edit Shop' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Delete Shop' }));
+    expect(inPlaces.handlers.onEditPlace).toHaveBeenCalledWith('shop');
+    expect(inPlaces.handlers.onDeletePlace).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'shop' }),
+    );
   });
 });

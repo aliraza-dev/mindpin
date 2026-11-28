@@ -6,7 +6,9 @@ import { tokens } from './tokens';
 
 describe('Chip', () => {
   it('reports its selected state to screen readers', async () => {
-    await render(<Chip label="Shop" accessibilityLabel="Label: Shop" selected onPress={() => {}} />);
+    await render(
+      <Chip label="Shop" accessibilityLabel="Label: Shop" selected onPress={() => {}} />,
+    );
     const chip = screen.getByRole('button', { name: 'Label: Shop' });
     expect(chip.props.accessibilityState).toMatchObject({ selected: true });
   });

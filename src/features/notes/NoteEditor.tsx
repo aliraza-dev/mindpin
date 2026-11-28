@@ -1,8 +1,9 @@
 // The note editor (R10.1, R10.3, R10.4, R10.5): one text field per line, so a line can be a
 // heading, a list item, or a checklist item with a circle to tap. The note is Markdown
 // underneath (design.md). There is no Save button: every change is handed to the screen, which
-// stores it. The Figma frame "07 Note editor" could not be read when this was built; the
-// styles follow the other frames (design.md).
+// stores it. It looks like a sheet of ruled paper, after the phone's own notes app: the date
+// at the top, a large first line, and a faint rule under every row (owner request,
+// 2026-11-28). The Figma frame "07 Note editor" could not be read when this was built.
 import { useEffect, useRef, useState, type ComponentRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -35,6 +36,23 @@ export const NOTE_LIMIT = 20_000;
 const TOOLS = ['title', 'heading', 'bold', 'italic', 'bullet', 'number', 'todo'] as const;
 type Tool = (typeof TOOLS)[number];
 
+// Every row of writing is this high, whatever its style, so the rules of the paper fall
+// under each one.
+const RULE = 32;
+// Enough rules to fill a phone screen under a short note.
+const MIN_RULES = 20;
+
+// "28 November 2026 at 7:10 pm", in the phone's own language and clock.
+function editedText(time: number): string {
+  return new Date(time).toLocaleString(undefined, {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+}
+
 type Props = {
   initialBody: string;
   // Opens with the keyboard up on the first line (R10.1).
@@ -42,6 +60,8 @@ type Props = {
   onChange: (body: string) => void;
   onBack: () => void;
   onLink: () => void;
+  // When the note was last edited, shown above it; now, for a new note.
+  editedAt: number;
   topInset?: number;
   bottomInset?: number;
 };
@@ -56,6 +76,9 @@ export function NoteEditor(props: Props) {
   const [full, setFull] = useState(false);
   // Where the cursor must go after two lines are joined; cleared once the user moves it.
   const [cursor, setCursor] = useState<{ line: number; at: number } | null>(null);
+  // The height of the writing, so the rules can run under all of it and on down the page.
+  const [pageHeight, setPageHeight] = useState(0);
+  const ruleCount = Math.max(MIN_RULES, Math.ceil(pageHeight / RULE) + 4);
   const selection = useRef({ start: 0, end: 0 });
   const inputs = useRef<(ComponentRef<typeof TextInput> | null)[]>([]);
   // Set when an edit moves the cursor to another line; that line takes the keyboard next.
@@ -123,7 +146,7 @@ export function NoteEditor(props: Props) {
       style={styles.screen}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <View style={[styles.top, { paddingTop: topInset + 8 }]}>
+      <View style={[styles.top, { paddingTop: topInset + 20 }]}>
         <BackButton onPress={props.onBack} accessibilityLabel={t('notes:back')} />
         <Pressable
           accessibilityRole="button"
@@ -136,78 +159,101 @@ export function NoteEditor(props: Props) {
       </View>
 
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
-        {lines.map((line, index) => {
-          const first = index === 0;
-          const checklist = line.kind === 'todo' || line.kind === 'done';
-          return (
-            <View key={index} style={styles.line}>
-              {line.kind === 'bullet' ? <Text style={styles.prefix}>•</Text> : null}
-              {line.kind === 'number' ? <Text style={styles.prefix}>{numbers[index]}.</Text> : null}
-              {checklist ? (
-                <Pressable
-                  accessibilityRole="checkbox"
-                  accessibilityState={{ checked: line.kind === 'done' }}
-                  accessibilityLabel={t(
-                    line.kind === 'done' ? 'notes:editor.untickA11y' : 'notes:editor.tickA11y',
-                    { text: line.text },
-                  )}
-                  onPress={() => apply(toggleChecklistItem(body, index))}
-                  hitSlop={touchSlop(22)}
-                  style={[styles.circle, line.kind === 'done' && styles.circleOn]}
-                >
-                  {line.kind === 'done' ? <Text style={styles.tick}>✓</Text> : null}
-                </Pressable>
-              ) : null}
-              <TextInput
-                ref={(input) => {
-                  inputs.current[index] = input;
-                }}
-                accessibilityLabel={
-                  first
-                    ? t('notes:editor.firstLineA11y')
-                    : t('notes:editor.lineA11y', { number: index + 1 })
-                }
-                placeholder={
-                  first && lines.length === 1 ? t('notes:editor.placeholder') : undefined
-                }
-                placeholderTextColor={colors.mutedText}
-                multiline
-                scrollEnabled={false}
-                autoFocus={first && props.autoFocus}
-                selection={
-                  cursor && cursor.line === index ? { start: cursor.at, end: cursor.at } : undefined
-                }
-                onFocus={() => setFocus(index)}
-                onChangeText={(text) => typed(index, text)}
-                onSelectionChange={(event) => {
-                  selection.current = event.nativeEvent.selection;
-                }}
-                onKeyPress={(event) => {
-                  if (event.nativeEvent.key === 'Backspace') backspace(index);
-                }}
-                style={[
-                  styles.input,
-                  (first && line.kind === 'text') || line.kind === 'title' ? styles.title : null,
-                  line.kind === 'heading' && styles.heading,
-                  line.kind === 'done' && styles.done,
-                ]}
-              >
-                {emphasisSpans(line.text).map((span, at) => (
-                  <Text
-                    key={at}
-                    style={[
-                      span.bold && styles.bold,
-                      span.italic && styles.italic,
-                      span.mark && styles.mark,
-                    ]}
+        <Text style={styles.date}>{editedText(props.editedAt)}</Text>
+        <View
+          style={[styles.page, { minHeight: ruleCount * RULE }]}
+          onLayout={(event) => setPageHeight(event.nativeEvent.layout.height)}
+        >
+          {/* Ruled paper: one faint line under every row of writing, and on down the page. */}
+          <View
+            testID="note-rules"
+            style={StyleSheet.absoluteFill}
+            pointerEvents="none"
+            accessible={false}
+            importantForAccessibility="no-hide-descendants"
+            accessibilityElementsHidden
+          >
+            {Array.from({ length: ruleCount }, (_, row) => (
+              <View key={row} style={[styles.rule, { top: (row + 1) * RULE - 1 }]} />
+            ))}
+          </View>
+          {lines.map((line, index) => {
+            const first = index === 0;
+            const checklist = line.kind === 'todo' || line.kind === 'done';
+            return (
+              <View key={index} style={styles.line}>
+                {line.kind === 'bullet' ? <Text style={styles.prefix}>•</Text> : null}
+                {line.kind === 'number' ? (
+                  <Text style={styles.prefix}>{numbers[index]}.</Text>
+                ) : null}
+                {checklist ? (
+                  <Pressable
+                    accessibilityRole="checkbox"
+                    accessibilityState={{ checked: line.kind === 'done' }}
+                    accessibilityLabel={t(
+                      line.kind === 'done' ? 'notes:editor.untickA11y' : 'notes:editor.tickA11y',
+                      { text: line.text },
+                    )}
+                    onPress={() => apply(toggleChecklistItem(body, index))}
+                    hitSlop={touchSlop(22)}
+                    style={[styles.circle, line.kind === 'done' && styles.circleOn]}
                   >
-                    {span.text}
-                  </Text>
-                ))}
-              </TextInput>
-            </View>
-          );
-        })}
+                    {line.kind === 'done' ? <Text style={styles.tick}>✓</Text> : null}
+                  </Pressable>
+                ) : null}
+                <TextInput
+                  ref={(input) => {
+                    inputs.current[index] = input;
+                  }}
+                  accessibilityLabel={
+                    first
+                      ? t('notes:editor.firstLineA11y')
+                      : t('notes:editor.lineA11y', { number: index + 1 })
+                  }
+                  placeholder={
+                    first && lines.length === 1 ? t('notes:editor.placeholder') : undefined
+                  }
+                  placeholderTextColor={colors.mutedText}
+                  multiline
+                  scrollEnabled={false}
+                  autoFocus={first && props.autoFocus}
+                  selection={
+                    cursor && cursor.line === index
+                      ? { start: cursor.at, end: cursor.at }
+                      : undefined
+                  }
+                  onFocus={() => setFocus(index)}
+                  onChangeText={(text) => typed(index, text)}
+                  onSelectionChange={(event) => {
+                    selection.current = event.nativeEvent.selection;
+                  }}
+                  onKeyPress={(event) => {
+                    if (event.nativeEvent.key === 'Backspace') backspace(index);
+                  }}
+                  style={[
+                    styles.input,
+                    (first && line.kind === 'text') || line.kind === 'title' ? styles.title : null,
+                    line.kind === 'heading' && styles.heading,
+                    line.kind === 'done' && styles.done,
+                  ]}
+                >
+                  {emphasisSpans(line.text).map((span, at) => (
+                    <Text
+                      key={at}
+                      style={[
+                        span.bold && styles.bold,
+                        span.italic && styles.italic,
+                        span.mark && styles.mark,
+                      ]}
+                    >
+                      {span.text}
+                    </Text>
+                  ))}
+                </TextInput>
+              </View>
+            );
+          })}
+        </View>
         {full ? (
           <Text accessibilityRole="alert" style={styles.full}>
             {t('notes:editor.tooLong')}
@@ -248,21 +294,35 @@ const useStyles = themed((colors) =>
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingHorizontal: tokens.screenPadding,
-      paddingBottom: 8,
+      paddingBottom: 12,
     },
     link: { fontFamily: tokens.font.body, fontSize: 15, color: colors.accent },
-    content: { paddingHorizontal: tokens.screenPadding, paddingBottom: 32 },
+    content: { paddingHorizontal: tokens.screenPadding, paddingBottom: 64 },
+    date: {
+      marginBottom: 12,
+      textAlign: 'center',
+      fontFamily: tokens.font.body,
+      fontSize: 12,
+      color: colors.mutedText,
+    },
+    page: {},
+    rule: {
+      position: 'absolute',
+      start: 0,
+      end: 0,
+      height: StyleSheet.hairlineWidth,
+      backgroundColor: colors.controlBorder,
+    },
     line: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
     prefix: {
       minWidth: 18,
-      paddingTop: 7,
       fontFamily: tokens.font.body,
       fontSize: 16,
-      lineHeight: 24,
+      lineHeight: RULE,
       color: colors.secondaryText,
     },
     circle: {
-      marginTop: 8,
+      marginTop: (RULE - 22) / 2,
       width: 22,
       height: 22,
       borderRadius: 11,
@@ -280,17 +340,18 @@ const useStyles = themed((colors) =>
     },
     input: {
       flex: 1,
-      minHeight: 38,
-      paddingVertical: 7,
+      minHeight: RULE,
+      paddingVertical: 0,
+      includeFontPadding: false,
       paddingHorizontal: 0,
       fontFamily: tokens.font.body,
       fontSize: 16,
-      lineHeight: 24,
+      lineHeight: RULE,
       color: colors.text,
       textAlignVertical: 'top',
     },
-    title: { fontFamily: tokens.font.headingBold, fontSize: 22, lineHeight: 30 },
-    heading: { fontFamily: tokens.font.bodyBold, fontSize: 18, lineHeight: 26 },
+    title: { fontFamily: tokens.font.headingBold, fontSize: 24, lineHeight: RULE },
+    heading: { fontFamily: tokens.font.bodyBold, fontSize: 19, lineHeight: RULE },
     done: { color: colors.mutedText, textDecorationLine: 'line-through' },
     bold: { fontFamily: tokens.font.bodyBold },
     italic: { fontStyle: 'italic' },

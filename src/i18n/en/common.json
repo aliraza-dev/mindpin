@@ -2,13 +2,11 @@
   "tabs": {
     "home": "Home",
     "map": "Map",
-    "newNote": "New note",
     "settings": "Settings"
   },
   "a11y": {
     "home": "Go to Home",
     "map": "Show all pins on the map",
-    "newNote": "Write a new note",
     "settings": "Open Settings"
   },
   "placeholder": {

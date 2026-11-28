@@ -26,7 +26,12 @@ describe('parseShared', () => {
     });
 
     it('reads ?q=lat,lng', () => {
-      expectCoordinates('https://maps.google.com/?q=31.5204,74.3587', 31.5204, 74.3587, 'google_maps');
+      expectCoordinates(
+        'https://maps.google.com/?q=31.5204,74.3587',
+        31.5204,
+        74.3587,
+        'google_maps',
+      );
     });
 
     it('reads an encoded query=lat%2Clng', () => {
@@ -39,11 +44,21 @@ describe('parseShared', () => {
     });
 
     it('handles negative coordinates', () => {
-      expectCoordinates('https://maps.google.com/?q=-33.8688,151.2093', -33.8688, 151.2093, 'google_maps');
+      expectCoordinates(
+        'https://maps.google.com/?q=-33.8688,151.2093',
+        -33.8688,
+        151.2093,
+        'google_maps',
+      );
     });
 
     it('accepts country domains such as google.com.pk', () => {
-      expectCoordinates('https://www.google.com.pk/maps/@31.5,74.35,15z', 31.5, 74.35, 'google_maps');
+      expectCoordinates(
+        'https://www.google.com.pk/maps/@31.5,74.35,15z',
+        31.5,
+        74.35,
+        'google_maps',
+      );
     });
 
     it('reads coordinates written in the /place/ or /search/ path', () => {
@@ -148,7 +163,9 @@ describe('parseShared', () => {
 
     it('finds a short link inside a chat message', () => {
       expect(
-        parseShared("Ahmed: here's the new shop location https://maps.app.goo.gl/xyz come by Friday"),
+        parseShared(
+          "Ahmed: here's the new shop location https://maps.app.goo.gl/xyz come by Friday",
+        ),
       ).toEqual({ kind: 'needs_resolve', url: 'https://maps.app.goo.gl/xyz' });
     });
   });
@@ -167,7 +184,10 @@ describe('parseShared', () => {
     });
 
     it('returns a q address as text for lookup (R2.4)', () => {
-      expect(parseShared('geo:0,0?q=Main+Boulevard')).toEqual({ kind: 'text', text: 'Main Boulevard' });
+      expect(parseShared('geo:0,0?q=Main+Boulevard')).toEqual({
+        kind: 'text',
+        text: 'Main Boulevard',
+      });
     });
   });
 
@@ -276,7 +296,9 @@ describe('parseShared', () => {
       const junk = 'lorem ipsum 12.5 '.repeat(100_000);
       const started = performance.now();
       expectCoordinates(`31.5204, 74.3587 ${junk}`, 31.5204, 74.3587, 'plain_coordinates');
-      const tooFar = parseShared(`${'x'.repeat(10_000)} https://maps.google.com/?q=31.5204,74.3587`);
+      const tooFar = parseShared(
+        `${'x'.repeat(10_000)} https://maps.google.com/?q=31.5204,74.3587`,
+      );
       expect(performance.now() - started).toBeLessThan(500);
       expect(tooFar.kind).toBe('text');
       expect(tooFar.kind === 'text' && tooFar.text.length).toBeLessThanOrEqual(10_000);

@@ -1,6 +1,8 @@
 // T068: the note editor (R10.1, R10.3, R10.4, R10.5).
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
+import { StyleSheet } from 'react-native';
+
 import { initI18n } from '../../i18n';
 import { NOTE_LIMIT, NoteEditor } from './NoteEditor';
 
@@ -12,6 +14,7 @@ function setup(initialBody = '', autoFocus = true) {
     <NoteEditor
       initialBody={initialBody}
       autoFocus={autoFocus}
+      editedAt={new Date(2026, 10, 28, 19, 10).getTime()}
       onChange={onChange}
       onBack={onBack}
       onLink={onLink}
@@ -78,10 +81,14 @@ describe('NoteEditor', () => {
     const { view, onChange } = setup('Trip\ngate code 4471');
     await view;
     await fireEvent(line(2), 'focus');
-    await fireEvent(line(2), 'selectionChange', { nativeEvent: { selection: { start: 5, end: 9 } } });
+    await fireEvent(line(2), 'selectionChange', {
+      nativeEvent: { selection: { start: 5, end: 9 } },
+    });
     await fireEvent.press(tool('Bold'));
     expect(onChange).toHaveBeenLastCalledWith('Trip\ngate **code** 4471');
-    await fireEvent(line(2), 'selectionChange', { nativeEvent: { selection: { start: 0, end: 4 } } });
+    await fireEvent(line(2), 'selectionChange', {
+      nativeEvent: { selection: { start: 0, end: 4 } },
+    });
     await fireEvent.press(tool('Italic'));
     expect(onChange).toHaveBeenLastCalledWith('Trip\n*gate* **code** 4471');
   });
@@ -98,7 +105,9 @@ describe('NoteEditor', () => {
     const { view, onChange } = setup('One\nTwo');
     await view;
     await fireEvent(line(2), 'focus');
-    await fireEvent(line(2), 'selectionChange', { nativeEvent: { selection: { start: 0, end: 0 } } });
+    await fireEvent(line(2), 'selectionChange', {
+      nativeEvent: { selection: { start: 0, end: 0 } },
+    });
     await fireEvent(line(2), 'keyPress', { nativeEvent: { key: 'Backspace' } });
     expect(onChange).toHaveBeenLastCalledWith('OneTwo');
     expect(screen.queryByLabelText('Line 2')).toBeNull();
@@ -109,15 +118,31 @@ describe('NoteEditor', () => {
     await view;
     await fireEvent.changeText(first(), 'x'.repeat(NOTE_LIMIT + 1));
     expect(onChange).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert')).toHaveTextContent('This note is full. Start a new note for the rest.');
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'This note is full. Start a new note for the rest.',
+    );
   });
 
   it('reports Back and Link', async () => {
     const { view, onBack, onLink } = setup('Note');
     await view;
     await fireEvent.press(screen.getByRole('button', { name: 'Go back' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Link this note to a person or place' }));
+    await fireEvent.press(
+      screen.getByRole('button', { name: 'Link this note to a person or place' }),
+    );
     expect(onBack).toHaveBeenCalledTimes(1);
     expect(onLink).toHaveBeenCalledTimes(1);
+  });
+
+  it('looks like ruled paper, with the date above the note', async () => {
+    await setup('Trip\nPacking').view;
+    expect(screen.getByText(/2026/)).toBeTruthy();
+    const rules = screen.getByTestId('note-rules', { includeHiddenElements: true });
+    expect(rules.props.children.length).toBeGreaterThanOrEqual(20);
+    // Every row is the height of one rule, so the lines fall under the writing.
+    const heights = [first(), line(2)].map(
+      (input) => StyleSheet.flatten(input.props.style).lineHeight,
+    );
+    expect(heights).toEqual([32, 32]);
   });
 });

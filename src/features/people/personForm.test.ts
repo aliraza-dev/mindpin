@@ -7,7 +7,9 @@ import { saveEditedPerson, validatePersonForm } from './personForm';
 
 describe('validatePersonForm', () => {
   it('accepts a name with a phone number and tidies the spaces', () => {
-    expect(validatePersonForm({ name: '  Sample   Person ', phone: ' +1 (000)  000-0000 ' })).toEqual({
+    expect(
+      validatePersonForm({ name: '  Sample   Person ', phone: ' +1 (000)  000-0000 ' }),
+    ).toEqual({
       ok: true,
       value: { name: 'Sample Person', phone: '+1 (000) 000-0000' },
     });
@@ -60,8 +62,15 @@ describe('validatePersonForm', () => {
 describe('saveEditedPerson', () => {
   it('changes the name and phone, and keeps the link to the phone contact', async () => {
     const db = await freshDb();
-    const person = await createPerson(db, { name: 'Sample Person', phone: '0300 0000000', contactRef: 'c-1' });
-    const result = await saveEditedPerson(db, person.id, { name: 'New Name', phone: '+92 300 0000000' });
+    const person = await createPerson(db, {
+      name: 'Sample Person',
+      phone: '0300 0000000',
+      contactRef: 'c-1',
+    });
+    const result = await saveEditedPerson(db, person.id, {
+      name: 'New Name',
+      phone: '+92 300 0000000',
+    });
 
     expect(result.ok).toBe(true);
     expect(await getPerson(db, person.id)).toMatchObject({
@@ -92,7 +101,11 @@ describe('saveEditedPerson', () => {
   it("makes the person's places findable by the new name, not the old one (R6.1)", async () => {
     const db = await freshDb();
     const person = await createPerson(db, { name: 'Oldname Person' });
-    const place = await createPlace(db, { personId: person.id, title: 'Home', address: 'Sample Street' });
+    const place = await createPlace(db, {
+      personId: person.id,
+      title: 'Home',
+      address: 'Sample Street',
+    });
     await saveEditedPerson(db, person.id, { name: 'Freshname Person', phone: '' });
 
     expect((await searchMemories(db, 'freshname')).map((r) => r.memory.id)).toEqual([place.id]);
@@ -102,7 +115,10 @@ describe('saveEditedPerson', () => {
   it('refuses a person who is not in MindPin', async () => {
     const db = await freshDb();
     await expect(
-      saveEditedPerson(db, '3f2504e0-4f89-41d3-9a0c-0305e82c3301', { name: 'Sample Person', phone: '' }),
+      saveEditedPerson(db, '3f2504e0-4f89-41d3-9a0c-0305e82c3301', {
+        name: 'Sample Person',
+        phone: '',
+      }),
     ).rejects.toThrow('Person not found');
   });
 });

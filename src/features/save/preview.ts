@@ -53,6 +53,10 @@ export async function previewShared(parsed: ParsedLocation, deps: LookupDeps): P
   try {
     return await look(parsed, deps);
   } catch {
-    return { location: parsed, address: parsed.kind === 'text' ? parsed.text : null, waiting: true };
+    return {
+      location: parsed,
+      address: parsed.kind === 'text' ? parsed.text : null,
+      waiting: true,
+    };
   }
 }

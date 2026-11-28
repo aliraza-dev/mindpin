@@ -65,7 +65,9 @@ describe('MapScreen', () => {
     const { shop } = await seeded();
     await render(<MapScreen />);
     await screen.findByText('2 pinned places');
-    const pin = screen.getAllByTestId('map-pin').find((entry) => entry.props.title.startsWith('Shop'));
+    const pin = screen
+      .getAllByTestId('map-pin')
+      .find((entry) => entry.props.title.startsWith('Shop'));
     await fireEvent(pin!, 'calloutPress');
     expect(mockRouter.push).toHaveBeenCalledWith(`/place/${shop.id}`);
   });

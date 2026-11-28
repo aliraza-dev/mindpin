@@ -7,10 +7,16 @@ import { addVisit } from '../../db/visits';
 import { findStalePlaces } from './stalePlaces';
 
 // Local dates, so the 6-calendar-month rule does not depend on the machine's time zone.
-const on = (year: number, month: number, day: number) => new Date(year, month - 1, day, 12).getTime();
+const on = (year: number, month: number, day: number) =>
+  new Date(year, month - 1, day, 12).getTime();
 const NOW = on(2026, 11, 26);
 
-async function placeSavedOn(db: SqlDatabase, title: string, savedAt: number, visits: number[] = []) {
+async function placeSavedOn(
+  db: SqlDatabase,
+  title: string,
+  savedAt: number,
+  visits: number[] = [],
+) {
   const place = await createPlace(db, { title });
   await db.runAsync('UPDATE memory SET created_at = ? WHERE id = ?', [savedAt, place.id]);
   for (const visitedAt of visits) {
@@ -19,7 +25,8 @@ async function placeSavedOn(db: SqlDatabase, title: string, savedAt: number, vis
   return place;
 }
 
-const titles = async (db: SqlDatabase) => (await findStalePlaces(db, NOW)).map((s) => s.place.title);
+const titles = async (db: SqlDatabase) =>
+  (await findStalePlaces(db, NOW)).map((s) => s.place.title);
 
 describe('findStalePlaces', () => {
   it('finds a place whose last visit was over 6 months ago', async () => {

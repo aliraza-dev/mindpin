@@ -2,7 +2,12 @@
 import { parseShared } from '../../parser/parseShared';
 import { callPerson, messagePerson, normalizePhone, openInMaps } from './externalLinks';
 
-const HOME = { title: 'Home (back gate)', lat: 31.5204, lng: 74.3587, address: 'House 22, Sample Street' };
+const HOME = {
+  title: 'Home (back gate)',
+  lat: 31.5204,
+  lng: 74.3587,
+  address: 'House 22, Sample Street',
+};
 const WEB = 'https://www.google.com/maps/search/?api=1&query=31.5204%2C74.3587';
 
 // An opener that only succeeds for links starting with one of the given prefixes.

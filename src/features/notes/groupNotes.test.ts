@@ -16,7 +16,11 @@ const shape = (sections: NoteSection<{ id: string }>[]) =>
 describe('groupNotes', () => {
   it('puts pinned notes in their own section above all others (R10.6)', () => {
     const sections = groupNotes(
-      [note('today', at(2026, 11, 26, 9)), note('old-pin', at(2026, 3, 1), true), note('new-pin', NOW, true)],
+      [
+        note('today', at(2026, 11, 26, 9)),
+        note('old-pin', at(2026, 3, 1), true),
+        note('new-pin', NOW, true),
+      ],
       NOW,
     );
     expect(shape(sections)).toEqual([
@@ -51,7 +55,11 @@ describe('groupNotes', () => {
 
   it('sorts each section by last edited, newest first', () => {
     const sections = groupNotes(
-      [note('a', at(2026, 11, 26, 8)), note('c', at(2026, 11, 26, 14)), note('b', at(2026, 11, 26, 11))],
+      [
+        note('a', at(2026, 11, 26, 8)),
+        note('c', at(2026, 11, 26, 14)),
+        note('b', at(2026, 11, 26, 11)),
+      ],
       NOW,
     );
     expect(shape(sections)).toEqual([['today', ['c', 'b', 'a']]]);
@@ -59,6 +67,8 @@ describe('groupNotes', () => {
 
   it('leaves out empty sections and treats a clock that moved back as today', () => {
     expect(groupNotes([], NOW)).toEqual([]);
-    expect(shape(groupNotes([note('future', at(2026, 11, 28))], NOW))).toEqual([['today', ['future']]]);
+    expect(shape(groupNotes([note('future', at(2026, 11, 28))], NOW))).toEqual([
+      ['today', ['future']],
+    ]);
   });
 });

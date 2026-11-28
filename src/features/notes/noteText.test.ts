@@ -57,7 +57,9 @@ describe('toggleChecklistItem (R10.5)', () => {
 
   it('only reorders the checklist the item belongs to', () => {
     const body = lines('- [ ] A', '- [ ] B', '', '- [ ] C', '- [ ] D');
-    expect(toggleChecklistItem(body, 2 + 1)).toBe(lines('- [ ] A', '- [ ] B', '', '- [ ] D', '- [x] C'));
+    expect(toggleChecklistItem(body, 2 + 1)).toBe(
+      lines('- [ ] A', '- [ ] B', '', '- [ ] D', '- [x] C'),
+    );
   });
 
   it('moves an item together with its indented sub-items', () => {
@@ -69,11 +71,15 @@ describe('toggleChecklistItem (R10.5)', () => {
 
   it('reorders sub-items among themselves', () => {
     const body = lines('- [ ] A', '  - [ ] A1', '  - [ ] A2', '- [ ] B');
-    expect(toggleChecklistItem(body, 1)).toBe(lines('- [ ] A', '  - [ ] A2', '  - [x] A1', '- [ ] B'));
+    expect(toggleChecklistItem(body, 1)).toBe(
+      lines('- [ ] A', '  - [ ] A2', '  - [x] A1', '- [ ] B'),
+    );
   });
 
   it('works for numbered and starred checklist items', () => {
-    expect(toggleChecklistItem(lines('1. [ ] A', '2. [ ] B'), 0)).toBe(lines('2. [ ] B', '1. [x] A'));
+    expect(toggleChecklistItem(lines('1. [ ] A', '2. [ ] B'), 0)).toBe(
+      lines('2. [ ] B', '1. [x] A'),
+    );
     expect(toggleChecklistItem(lines('* [X] A', '* [ ] B'), 0)).toBe(lines('* [ ] B', '* [ ] A'));
   });
 

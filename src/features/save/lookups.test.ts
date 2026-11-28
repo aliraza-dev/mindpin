@@ -18,13 +18,25 @@ function makeDeps(): LookupDeps {
 describe('startBackgroundLookups', () => {
   it('opens the database and finishes lookups left pending by earlier saves', async () => {
     const db = await freshDb();
-    const place = await createPlace(db, { title: 'Home', lat: 1, lng: 2, status: 'pending_geocode' });
+    const place = await createPlace(db, {
+      title: 'Home',
+      lat: 1,
+      lng: 2,
+      status: 'pending_geocode',
+    });
     const watch = jest.fn(() => ({ remove: jest.fn() }));
 
-    const background = startBackgroundLookups({ openDatabase: async () => db, deps: makeDeps(), watch });
+    const background = startBackgroundLookups({
+      openDatabase: async () => db,
+      deps: makeDeps(),
+      watch,
+    });
     await background.whenIdle();
 
-    expect(await getMemory(db, place.id)).toMatchObject({ address: 'Sample Road', status: 'resolved' });
+    expect(await getMemory(db, place.id)).toMatchObject({
+      address: 'Sample Road',
+      status: 'resolved',
+    });
     expect(watch).toHaveBeenCalledTimes(1);
     background.stop();
   });

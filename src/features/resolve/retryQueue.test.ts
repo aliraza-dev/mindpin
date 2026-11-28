@@ -19,7 +19,11 @@ function makeDeps(overrides: { resolveLink?: jest.Mock; geocoder?: Partial<Geoco
 }
 
 function pendingLink(db: SqlDatabase) {
-  return createPlace(db, { title: 'Shop', sourceRaw: `New shop ${SHORT}`, status: 'pending_resolve' });
+  return createPlace(db, {
+    title: 'Shop',
+    sourceRaw: `New shop ${SHORT}`,
+    status: 'pending_resolve',
+  });
 }
 
 describe('processMemory', () => {
@@ -28,7 +32,9 @@ describe('processMemory', () => {
     const place = await pendingLink(db);
     const { deps, resolveLink, geocoder } = makeDeps({
       resolveLink: jest.fn().mockResolvedValue({ kind: 'coordinates', lat: 31.5, lng: 74.3 }),
-      geocoder: { addressFor: jest.fn().mockResolvedValue({ kind: 'found', value: 'Sample Road' }) },
+      geocoder: {
+        addressFor: jest.fn().mockResolvedValue({ kind: 'found', value: 'Sample Road' }),
+      },
     });
 
     expect(await processMemory(db, place.id, deps)).toBe('resolved');
@@ -75,7 +81,9 @@ describe('processMemory', () => {
     const { deps, geocoder } = makeDeps({
       resolveLink: jest.fn().mockResolvedValue({ kind: 'text', text: 'Corner Shop, Sample Town' }),
       geocoder: {
-        coordinatesFor: jest.fn().mockResolvedValue({ kind: 'found', value: { lat: 1.5, lng: 2.5 } }),
+        coordinatesFor: jest
+          .fn()
+          .mockResolvedValue({ kind: 'found', value: { lat: 1.5, lng: 2.5 } }),
       },
     });
 
@@ -92,7 +100,9 @@ describe('processMemory', () => {
   it('stops retrying a dead link and keeps the original shared text', async () => {
     const db = await freshDb();
     const place = await pendingLink(db);
-    const { deps } = makeDeps({ resolveLink: jest.fn().mockResolvedValue({ kind: 'unresolvable' }) });
+    const { deps } = makeDeps({
+      resolveLink: jest.fn().mockResolvedValue({ kind: 'unresolvable' }),
+    });
 
     expect(await processMemory(db, place.id, deps)).toBe('resolved');
     expect(await getMemory(db, place.id)).toMatchObject({
@@ -105,13 +115,23 @@ describe('processMemory', () => {
 
   it('fills in the address for a place saved with coordinates only (R2.3)', async () => {
     const db = await freshDb();
-    const place = await createPlace(db, { title: 'Home', lat: 31.5, lng: 74.3, status: 'pending_geocode' });
+    const place = await createPlace(db, {
+      title: 'Home',
+      lat: 31.5,
+      lng: 74.3,
+      status: 'pending_geocode',
+    });
     const { deps, resolveLink } = makeDeps({
-      geocoder: { addressFor: jest.fn().mockResolvedValue({ kind: 'found', value: 'Sample Road' }) },
+      geocoder: {
+        addressFor: jest.fn().mockResolvedValue({ kind: 'found', value: 'Sample Road' }),
+      },
     });
 
     expect(await processMemory(db, place.id, deps)).toBe('resolved');
-    expect(await getMemory(db, place.id)).toMatchObject({ address: 'Sample Road', status: 'resolved' });
+    expect(await getMemory(db, place.id)).toMatchObject({
+      address: 'Sample Road',
+      status: 'resolved',
+    });
     expect(resolveLink).not.toHaveBeenCalled();
   });
 
@@ -150,7 +170,12 @@ describe('processMemory', () => {
 
   it('does not overwrite an address the user typed while the lookup was running', async () => {
     const db = await freshDb();
-    const place = await createPlace(db, { title: 'Home', lat: 31.5, lng: 74.3, status: 'pending_geocode' });
+    const place = await createPlace(db, {
+      title: 'Home',
+      lat: 31.5,
+      lng: 74.3,
+      status: 'pending_geocode',
+    });
     const { deps } = makeDeps({
       geocoder: {
         addressFor: jest.fn(async () => {
@@ -187,7 +212,11 @@ describe('processPending', () => {
   it('works through every pending place and reports how many are still waiting', async () => {
     const db = await freshDb();
     const link = await pendingLink(db);
-    const address = await createPlace(db, { title: 'Home', address: 'Sample Street', status: 'pending_geocode' });
+    const address = await createPlace(db, {
+      title: 'Home',
+      address: 'Sample Street',
+      status: 'pending_geocode',
+    });
     await createPlace(db, { title: 'Done', lat: 1, lng: 2 });
     const { deps, resolveLink } = makeDeps({
       geocoder: {
@@ -205,10 +234,17 @@ describe('processPending', () => {
     const info = jest.spyOn(console, 'info').mockImplementation(() => {});
     const db = await freshDb();
     await pendingLink(db);
-    const second = await createPlace(db, { title: 'Home', lat: 1, lng: 2, status: 'pending_geocode' });
+    const second = await createPlace(db, {
+      title: 'Home',
+      lat: 1,
+      lng: 2,
+      status: 'pending_geocode',
+    });
     const { deps } = makeDeps({
       resolveLink: jest.fn().mockRejectedValue(new Error('boom')),
-      geocoder: { addressFor: jest.fn().mockResolvedValue({ kind: 'found', value: 'Sample Road' }) },
+      geocoder: {
+        addressFor: jest.fn().mockResolvedValue({ kind: 'found', value: 'Sample Road' }),
+      },
     });
 
     expect(await processPending(db, deps)).toBe(1);
@@ -249,7 +285,11 @@ describe('startRetryQueue', () => {
 
     network.goOnline();
     await queue.whenIdle();
-    expect(await getMemory(db, place.id)).toMatchObject({ lat: 31.5, lng: 74.3, status: 'resolved' });
+    expect(await getMemory(db, place.id)).toMatchObject({
+      lat: 31.5,
+      lng: 74.3,
+      status: 'resolved',
+    });
   });
 
   it('never runs two passes at once', async () => {

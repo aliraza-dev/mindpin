@@ -6,7 +6,15 @@ import { recentPeople, resolvePersonChoice, suggestPeople } from './matchPerson'
 import type { DeviceContact } from './types';
 
 function person(name: string, contactRef: string | null = null): Person {
-  return { id: `id-${name}`, name, phone: null, contactRef, photoUri: null, createdAt: 0, updatedAt: 0 };
+  return {
+    id: `id-${name}`,
+    name,
+    phone: null,
+    contactRef,
+    photoUri: null,
+    createdAt: 0,
+    updatedAt: 0,
+  };
 }
 
 function contact(name: string, contactRef = `c-${name}`): DeviceContact {
@@ -52,22 +60,26 @@ describe('suggestPeople', () => {
     const people = [person('Sara Malik'), person('sara'), person('Sarah Khan')];
     const result = suggestPeople('  SARA ', people, [contact('Sara')]);
     expect(result[0]).toEqual({ kind: 'person', person: people[1], exactName: true });
-    expect(result.map((s) => (s.kind === 'person' ? s.person.name : `contact:${s.contact.name}`))).toEqual(
-      ['sara', 'Sara Malik', 'Sarah Khan', 'contact:Sara'],
-    );
+    expect(
+      result.map((s) => (s.kind === 'person' ? s.person.name : `contact:${s.contact.name}`)),
+    ).toEqual(['sara', 'Sara Malik', 'Sarah Khan', 'contact:Sara']);
   });
 
   it('matches the start of any word, not the middle of one', () => {
     const people = [person('Usman Khan'), person('Akhan Ali')];
-    expect(suggestPeople('kh', people, []).map((s) => s.kind === 'person' && s.person.name)).toEqual([
-      'Usman Khan',
-    ]);
+    expect(
+      suggestPeople('kh', people, []).map((s) => s.kind === 'person' && s.person.name),
+    ).toEqual(['Usman Khan']);
     expect(suggestPeople('usman k', people, [])).toHaveLength(1);
   });
 
   it('shows the linked person instead of a contact that is already in MindPin (R3.7)', () => {
     const renamed = person('Ahmed (plumber)', 'c-1');
-    const result = suggestPeople('ahmed r', [renamed], [contact('Ahmed Raza', 'c-1'), contact('Ahmed Rauf', 'c-2')]);
+    const result = suggestPeople(
+      'ahmed r',
+      [renamed],
+      [contact('Ahmed Raza', 'c-1'), contact('Ahmed Rauf', 'c-2')],
+    );
     expect(result).toEqual([
       { kind: 'person', person: renamed, exactName: false },
       { kind: 'contact', contact: contact('Ahmed Rauf', 'c-2') },
@@ -81,7 +93,9 @@ describe('suggestPeople', () => {
 
   it('searches 1,000 contacts well within 300 ms (R3.2)', () => {
     const contacts = Array.from({ length: 1000 }, (_, i) => contact(`Person ${i} Family${i % 37}`));
-    const people = Array.from({ length: 200 }, (_, i) => person(`Saved ${i}`, `c-Person ${i} Family${i % 37}`));
+    const people = Array.from({ length: 200 }, (_, i) =>
+      person(`Saved ${i}`, `c-Person ${i} Family${i % 37}`),
+    );
     const started = performance.now();
     const result = suggestPeople('fam', people, contacts);
     expect(performance.now() - started).toBeLessThan(300);
@@ -105,7 +119,12 @@ describe('resolvePersonChoice', () => {
     const db = await freshDb();
     const chosen = await resolvePersonChoice(db, {
       kind: 'contact',
-      contact: { contactRef: 'c-2', name: 'Sara Malik', phone: '+10000000001', photoUri: 'content://p/2' },
+      contact: {
+        contactRef: 'c-2',
+        name: 'Sara Malik',
+        phone: '+10000000001',
+        photoUri: 'content://p/2',
+      },
     });
     expect(chosen).toMatchObject({
       name: 'Sara Malik',
@@ -127,10 +146,12 @@ describe('resolvePersonChoice', () => {
   it('returns the picked existing person, and fails if they are gone', async () => {
     const db = await freshDb();
     const existing = await createPerson(db, { name: 'Usman' });
-    expect(await resolvePersonChoice(db, { kind: 'existing', personId: existing.id })).toEqual(existing);
-    await expect(resolvePersonChoice(db, { kind: 'existing', personId: 'missing' })).rejects.toThrow(
-      /not found/i,
+    expect(await resolvePersonChoice(db, { kind: 'existing', personId: existing.id })).toEqual(
+      existing,
     );
+    await expect(
+      resolvePersonChoice(db, { kind: 'existing', personId: 'missing' }),
+    ).rejects.toThrow(/not found/i);
   });
 
   it('allows saving without a person (R3.11)', async () => {

@@ -51,7 +51,9 @@ async function open(sharedText: string, extra: Partial<Parameters<typeof SaveShe
   const db = ((await (getDatabase as jest.Mock)()) as SqlDatabase | undefined) ?? (await freshDb());
   (getDatabase as jest.Mock).mockResolvedValue(db);
   const onClose = jest.fn();
-  await render(<SaveSheet sharedText={sharedText} sourceApp="WhatsApp" onClose={onClose} {...extra} />);
+  await render(
+    <SaveSheet sharedText={sharedText} sourceApp="WhatsApp" onClose={onClose} {...extra} />,
+  );
   return { db, onClose };
 }
 
@@ -68,7 +70,10 @@ describe('SaveSheet', () => {
     mockMaps.available = true;
     mockMaps.online = true;
     lookups.resolveLink.mockResolvedValue({ kind: 'retry' });
-    lookups.geocoder.addressFor.mockResolvedValue({ kind: 'found', value: 'Main Boulevard, Gulberg' });
+    lookups.geocoder.addressFor.mockResolvedValue({
+      kind: 'found',
+      value: 'Main Boulevard, Gulberg',
+    });
     lookups.geocoder.coordinatesFor.mockResolvedValue({ kind: 'none' });
     contactsMock.getAccess.mockResolvedValue('denied');
     contactsMock.requestAccess.mockResolvedValue('denied');
@@ -81,7 +86,10 @@ describe('SaveSheet', () => {
     expect(screen.getByText('Shared from WhatsApp')).toBeTruthy();
     expect(screen.getByText(PIN_LINK)).toBeTruthy();
     expect(screen.getByText('Pin found in Google Maps link')).toBeTruthy();
-    expect(screen.getByTestId('place-map', MAP).props.region).toMatchObject({ latitude: 31.5204, longitude: 74.3587 });
+    expect(screen.getByTestId('place-map', MAP).props.region).toMatchObject({
+      latitude: 31.5204,
+      longitude: 74.3587,
+    });
   });
 
   it('shows a drawing in place of the map when the build has no maps key or the phone is offline', async () => {
@@ -139,7 +147,11 @@ describe('SaveSheet', () => {
     await fireEvent.press(save());
 
     await waitFor(() => expect(onClose).toHaveBeenCalledWith('saved'));
-    expect((await listPlaceSummaries(db))[0].place).toMatchObject({ lat: 31.5204, address: null, status: 'pending_geocode' });
+    expect((await listPlaceSummaries(db))[0].place).toMatchObject({
+      lat: 31.5204,
+      address: null,
+      status: 'pending_geocode',
+    });
   });
 
   it('saves a short link while offline, to be opened later (R1.5)', async () => {
@@ -148,25 +160,39 @@ describe('SaveSheet', () => {
     await fireEvent.press(save());
 
     await waitFor(() => expect(onClose).toHaveBeenCalledWith('saved'));
-    expect((await listPlaceSummaries(db))[0].place).toMatchObject({ lat: null, status: 'pending_resolve' });
+    expect((await listPlaceSummaries(db))[0].place).toMatchObject({
+      lat: null,
+      status: 'pending_resolve',
+    });
   });
 
   it('keeps an existing person and offers to update their place nearby (R3.5, R3.7)', async () => {
     const db = await freshDb();
     (getDatabase as jest.Mock).mockResolvedValue(db);
     const person = await createPerson(db, { name: 'Ahmed Sample' });
-    const old = await createPlace(db, { personId: person.id, title: 'Shop', address: 'Old text', lat: 31.5205, lng: 74.3587 });
+    const old = await createPlace(db, {
+      personId: person.id,
+      title: 'Shop',
+      address: 'Old text',
+      lat: 31.5205,
+      lng: 74.3587,
+    });
     const { onClose } = await open(PIN_LINK);
     await screen.findByText('Main Boulevard, Gulberg');
     await fireEvent.press(screen.getByRole('button', { name: 'Choose Ahmed Sample' }));
 
     expect(await screen.findByText(/Ahmed Sample already has Shop saved/)).toBeTruthy();
-    await fireEvent.press(screen.getByRole('button', { name: 'Update Shop instead of adding a new place' }));
+    await fireEvent.press(
+      screen.getByRole('button', { name: 'Update Shop instead of adding a new place' }),
+    );
     await fireEvent.press(save('Save this place to Ahmed Sample'));
 
     await waitFor(() => expect(onClose).toHaveBeenCalledWith('saved'));
     expect(await listPlaceSummaries(db)).toHaveLength(1);
-    expect(await getMemory(db, old.id)).toMatchObject({ lat: 31.5204, address: 'Main Boulevard, Gulberg' });
+    expect(await getMemory(db, old.id)).toMatchObject({
+      lat: 31.5204,
+      address: 'Main Boulevard, Gulberg',
+    });
     expect(await listPeople(db)).toHaveLength(1);
   });
 
@@ -192,13 +218,17 @@ describe('SaveSheet', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Save the shared text as a note' }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalledWith('saved_note'));
-    expect(await listNotes(db)).toMatchObject([{ notes: 'See you on Friday', sourceApp: 'WhatsApp' }]);
+    expect(await listNotes(db)).toMatchObject([
+      { notes: 'See you on Friday', sourceApp: 'WhatsApp' },
+    ]);
     expect(await listPlaceSummaries(db)).toEqual([]);
   });
 
   it('lets the user enter an address when no location was found, keeping the shared text (R1.4)', async () => {
     const { db, onClose } = await open('https://example.com/invite');
-    await fireEvent.press(await screen.findByRole('button', { name: 'Type the address of this place' }));
+    await fireEvent.press(
+      await screen.findByRole('button', { name: 'Type the address of this place' }),
+    );
     await fireEvent.press(save());
     expect(await screen.findByText('This place has no pin, so it needs an address.')).toBeTruthy();
     expect(onClose).not.toHaveBeenCalled();
@@ -215,7 +245,9 @@ describe('SaveSheet', () => {
 
   it('offers shared words as the address to check, since they may not be one (R2.4)', async () => {
     await open('See you on Friday');
-    await fireEvent.press(await screen.findByRole('button', { name: 'Type the address of this place' }));
+    await fireEvent.press(
+      await screen.findByRole('button', { name: 'Type the address of this place' }),
+    );
     expect(screen.getByLabelText('Address').props.value).toBe('See you on Friday');
   });
 
@@ -229,7 +261,9 @@ describe('SaveSheet', () => {
     contactsMock.loadContacts.mockResolvedValue([
       { contactRef: 'c-9', name: 'Zara Sample', phone: null, photoUri: null },
     ]);
-    await fireEvent.press(screen.getByRole('button', { name: 'Allow MindPin to read your contacts' }));
+    await fireEvent.press(
+      screen.getByRole('button', { name: 'Allow MindPin to read your contacts' }),
+    );
     await waitFor(() => expect(contactsMock.requestAccess).toHaveBeenCalledTimes(1));
     await fireEvent.changeText(screen.getByLabelText('Whose place is this?'), 'Zar');
     expect(await screen.findByRole('button', { name: 'Choose Zara Sample' })).toBeTruthy();
@@ -247,7 +281,9 @@ describe('SaveSheet', () => {
     await screen.findByText('Main Boulevard, Gulberg');
     (getDatabase as jest.Mock).mockRejectedValueOnce(new Error('closed'));
     await fireEvent.press(save());
-    await waitFor(() => expect(Alert.alert).toHaveBeenCalledWith('The place could not be saved. Try again.'));
+    await waitFor(() =>
+      expect(Alert.alert).toHaveBeenCalledWith('The place could not be saved. Try again.'),
+    );
     expect(onClose).not.toHaveBeenCalled();
   });
 
@@ -255,11 +291,20 @@ describe('SaveSheet', () => {
     const db = await freshDb();
     (getDatabase as jest.Mock).mockResolvedValue(db);
     const person = await createPerson(db, { name: 'Ahmed Sample' });
-    const { onClose } = await open('House 22, Sample Street', { initialPersonId: person.id, sourceApp: null, manual: true });
+    const { onClose } = await open('House 22, Sample Street', {
+      initialPersonId: person.id,
+      sourceApp: null,
+      manual: true,
+    });
     expect(await screen.findByText('Address from the text')).toBeTruthy();
     expect(screen.queryByText(/Shared from/)).toBeNull();
-    await fireEvent.press(await screen.findByRole('button', { name: 'Save this place to Ahmed Sample' }));
+    await fireEvent.press(
+      await screen.findByRole('button', { name: 'Save this place to Ahmed Sample' }),
+    );
     await waitFor(() => expect(onClose).toHaveBeenCalledWith('saved'));
-    expect((await listPlaceSummaries(db))[0]).toMatchObject({ personName: 'Ahmed Sample', place: { address: 'House 22, Sample Street' } });
+    expect((await listPlaceSummaries(db))[0]).toMatchObject({
+      personName: 'Ahmed Sample',
+      place: { address: 'House 22, Sample Street' },
+    });
   });
 });

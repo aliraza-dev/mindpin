@@ -1,7 +1,7 @@
 import type { SqlDatabase } from './types';
 
 // Known keys. Settings are included in backup (design.md).
-export type SettingKey = 'user_first_name' | 'pending_navigate';
+export type SettingKey = 'user_first_name' | 'pending_navigate' | 'theme';
 
 export async function deleteSetting(db: SqlDatabase, key: SettingKey): Promise<void> {
   await db.runAsync('DELETE FROM setting WHERE key = ?', [key]);

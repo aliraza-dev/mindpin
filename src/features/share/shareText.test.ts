@@ -23,11 +23,17 @@ describe('placeShareText (R4.6)', () => {
 
   it('gives a link MindPin itself can read back to the same pin', () => {
     const text = placeShareText(place({ lat: -33.868812345, lng: 151.2093 }));
-    expect(parseShared(text ?? '')).toMatchObject({ kind: 'coordinates', lat: -33.868812, lng: 151.2093 });
+    expect(parseShared(text ?? '')).toMatchObject({
+      kind: 'coordinates',
+      lat: -33.868812,
+      lng: 151.2093,
+    });
   });
 
   it('links to the address when the place has no coordinates', () => {
-    expect(placeShareText(place({ lat: null, lng: null, address: 'Corner Shop & Café, Sample Town' }))).toBe(
+    expect(
+      placeShareText(place({ lat: null, lng: null, address: 'Corner Shop & Café, Sample Town' })),
+    ).toBe(
       'Corner Shop & Café, Sample Town\nhttps://www.google.com/maps/search/?api=1&query=Corner%20Shop%20%26%20Caf%C3%A9%2C%20Sample%20Town',
     );
   });
@@ -49,7 +55,7 @@ describe('placeShareText (R4.6)', () => {
 });
 
 describe('personPlacesShareText (R4.8)', () => {
-  it("lists each place with its label, address, and maps link", () => {
+  it('lists each place with its label, address, and maps link', () => {
     const text = personPlacesShareText([
       place(),
       place({ title: 'Shop', lat: 1.5, lng: 2.5, address: 'Main Boulevard' }),

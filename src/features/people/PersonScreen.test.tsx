@@ -32,7 +32,11 @@ async function seeded() {
     lng: 2.5,
     notes: 'Gate code 4471',
   });
-  const note = await createNote(db, { title: 'Wi-Fi', notes: 'Wi-Fi\nNetwork name', personId: person.id });
+  const note = await createNote(db, {
+    title: 'Wi-Fi',
+    notes: 'Wi-Fi\nNetwork name',
+    personId: person.id,
+  });
   (getDatabase as jest.Mock).mockResolvedValue(db);
   return { db, person, place, note };
 }
@@ -85,7 +89,9 @@ describe('PersonScreen', () => {
       .spyOn(Share, 'share')
       .mockResolvedValue({ action: 'sharedAction', activityType: undefined });
     await render(<PersonScreen personId={person.id} />);
-    await fireEvent.press(await screen.findByRole('button', { name: "Share Sample Person's places" }));
+    await fireEvent.press(
+      await screen.findByRole('button', { name: "Share Sample Person's places" }),
+    );
 
     const message = share.mock.calls[0][0].message as string;
     expect(message).toContain('Home\nStreet 14\nhttps://www.google.com/maps/search/');

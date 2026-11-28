@@ -2,7 +2,11 @@ import { getSchemaVersion, migrate } from './migrate';
 import { openTestDatabase } from './testing/nodeSqlite';
 import type { Migration } from './types';
 
-const first: Migration = { version: 1, name: 'first', sql: 'CREATE TABLE a (id TEXT PRIMARY KEY);' };
+const first: Migration = {
+  version: 1,
+  name: 'first',
+  sql: 'CREATE TABLE a (id TEXT PRIMARY KEY);',
+};
 const second: Migration = {
   version: 2,
   name: 'second',

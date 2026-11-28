@@ -6,8 +6,8 @@ describe('bottom bar (R6.5)', () => {
     await initI18n('en');
   });
 
-  it('has Home, Map, New note, and Settings in that order', () => {
-    expect(tabs.map((t) => t.name)).toEqual(['index', 'map', 'new-note', 'settings']);
+  it('has Home, Map, and Settings in that order, with no + button in the bar', () => {
+    expect(tabs.map((t) => t.name)).toEqual(['index', 'map', 'settings']);
   });
 
   it('has no Ask MindPin tab in v1', () => {
@@ -23,10 +23,5 @@ describe('bottom bar (R6.5)', () => {
 
   it('gives every tab an icon, since the bar shows no text', () => {
     for (const tab of tabs) expect(tab.icon).toBeTruthy();
-  });
-
-  it('makes New note an action that opens a new note, not a screen', () => {
-    const newNote = tabs.find((t) => t.name === 'new-note');
-    expect(newNote?.opensRoute).toBe('/note/new');
   });
 });

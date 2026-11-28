@@ -24,9 +24,15 @@ export type PlaceFormError =
 export type PlaceFormErrors = Partial<Record<PlaceFormField, PlaceFormError>>;
 
 // What is written to the database once the form is accepted.
-export type PlaceEdit = { title: string; address: string | null; notes: string | null; tags: string[] };
+export type PlaceEdit = {
+  title: string;
+  address: string | null;
+  notes: string | null;
+  tags: string[];
+};
 
-export type PlaceFormResult = { ok: true; value: PlaceEdit } | { ok: false; errors: PlaceFormErrors };
+export type PlaceFormResult =
+  { ok: true; value: PlaceEdit } | { ok: false; errors: PlaceFormErrors };
 
 export function labelChoice(label: string): LabelChoice {
   const key = label.trim().toLowerCase();

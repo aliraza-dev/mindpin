@@ -184,7 +184,7 @@ Icons are the SVG files exported from the frames, kept in `assets/icons/`. A lab
 
 ### Dark theme (R11)
 
-There is no Figma frame for the dark theme; these values were chosen on 2026-11-28 and need the owner's review. Every color token has a light and a dark value, and components read them through `src/ui/theme.ts`, never directly. The theme follows the phone's setting; a switch in Settings can be added with that screen.
+There is no Figma frame for the dark theme; these values were chosen on 2026-11-28 and need the owner's review. Every color token has a light and a dark value, and components read them through `src/ui/theme.ts`, never directly. The theme follows the phone's setting unless the user picks Light or Dark; the choice is stored in the `setting` table under `theme`.
 
 | Token | Dark value |
 | --- | --- |

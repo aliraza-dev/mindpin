@@ -54,11 +54,16 @@ describe('AddPlaceScreen', () => {
     const person = await createPerson(db, { name: 'Ahmed Sample' });
     (getDatabase as jest.Mock).mockResolvedValue(db);
     await render(<AddPlaceScreen personId={person.id} />);
-    await fireEvent.changeText(screen.getByLabelText('Maps link or address'), ' House 22, Sample Street ');
+    await fireEvent.changeText(
+      screen.getByLabelText('Maps link or address'),
+      ' House 22, Sample Street ',
+    );
     await fireEvent.press(next());
 
     expect(await screen.findByText('Address from the text')).toBeTruthy();
-    await fireEvent.press(await screen.findByRole('button', { name: 'Save this place to Ahmed Sample' }));
+    await fireEvent.press(
+      await screen.findByRole('button', { name: 'Save this place to Ahmed Sample' }),
+    );
     await waitFor(() => expect(mockRouter.back).toHaveBeenCalledTimes(1));
     expect((await listPlaceSummaries(db))[0]).toMatchObject({
       personName: 'Ahmed Sample',
@@ -70,7 +75,10 @@ describe('AddPlaceScreen', () => {
     const db = await freshDb();
     (getDatabase as jest.Mock).mockResolvedValue(db);
     await render(<AddPlaceScreen personId={null} />);
-    await fireEvent.changeText(screen.getByLabelText('Maps link or address'), 'https://maps.google.com/?q=31.5204,74.3587');
+    await fireEvent.changeText(
+      screen.getByLabelText('Maps link or address'),
+      'https://maps.google.com/?q=31.5204,74.3587',
+    );
     await fireEvent.press(next());
 
     expect(await screen.findByText('Main Boulevard')).toBeTruthy();

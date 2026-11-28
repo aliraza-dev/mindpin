@@ -54,7 +54,9 @@ describe('Menu', () => {
   it('gives every row a touch target of at least 44 px', async () => {
     await setup().view;
     const row = screen.getByRole('menuitem', { name: 'Edit place' });
-    const style = Array.isArray(row.props.style) ? Object.assign({}, ...row.props.style.filter(Boolean)) : row.props.style;
+    const style = Array.isArray(row.props.style)
+      ? Object.assign({}, ...row.props.style.filter(Boolean))
+      : row.props.style;
     expect(style.minHeight).toBeGreaterThanOrEqual(44);
   });
 });

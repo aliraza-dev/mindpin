@@ -81,7 +81,9 @@ export function suggestPeople(
 
   return [
     ...exact.sort(byName).map((person) => ({ kind: 'person' as const, person, exactName: true })),
-    ...partial.sort(byName).map((person) => ({ kind: 'person' as const, person, exactName: false })),
+    ...partial
+      .sort(byName)
+      .map((person) => ({ kind: 'person' as const, person, exactName: false })),
     ...unlinked.sort(byName).map((contact) => ({ kind: 'contact' as const, contact })),
   ].slice(0, limit);
 }

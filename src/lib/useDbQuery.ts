@@ -7,16 +7,13 @@ import { getDatabase } from '../db/database';
 import type { SqlDatabase } from '../db/types';
 import { logEvent } from './log';
 
-export type QueryState<T> = { status: 'loading' } | { status: 'ready'; data: T } | { status: 'error' };
+export type QueryState<T> =
+  { status: 'loading' } | { status: 'ready'; data: T } | { status: 'error' };
 
 // `key` says what the query depends on (for example the person's id): the data is loaded again
 // when it changes. `screen` is a short code for the log, such as "person". Nothing about the
 // data is logged.
-export function useDbQuery<T>(
-  load: (db: SqlDatabase) => Promise<T>,
-  key: string,
-  screen: string,
-) {
+export function useDbQuery<T>(load: (db: SqlDatabase) => Promise<T>, key: string, screen: string) {
   const [state, setState] = useState<QueryState<T>>({ status: 'loading' });
   const [version, setVersion] = useState(0);
 

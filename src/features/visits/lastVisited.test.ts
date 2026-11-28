@@ -71,7 +71,10 @@ describe('recordVisit (R5.1, R5.4)', () => {
   it('keeps the optional note as one line', async () => {
     const db = await freshDb();
     const place = await createPlace(db, { title: 'Home' });
-    const visit = await recordVisit(db, place.id, { source: 'manual', note: '  Eid dinner\n with family ' });
+    const visit = await recordVisit(db, place.id, {
+      source: 'manual',
+      note: '  Eid dinner\n with family ',
+    });
     expect(visit.note).toBe('Eid dinner with family');
     const blank = await recordVisit(db, place.id, { source: 'manual', note: ' \n ' });
     expect(blank.note).toBeNull();
@@ -82,7 +85,11 @@ describe('recordVisit (R5.1, R5.4)', () => {
     const place = await createPlace(db, { title: 'Home' });
     expect(await getLastVisit(db, place.id)).toBeNull();
     await recordVisit(db, place.id, { source: 'manual', visitedAt: 1000 });
-    await recordVisit(db, place.id, { source: 'navigate_confirm', visitedAt: 3000, note: 'Dinner' });
+    await recordVisit(db, place.id, {
+      source: 'navigate_confirm',
+      visitedAt: 3000,
+      note: 'Dinner',
+    });
     await recordVisit(db, place.id, { source: 'manual', visitedAt: 2000 });
     expect((await listVisits(db, place.id)).map((v) => v.visitedAt)).toEqual([3000, 2000, 1000]);
     expect(await getLastVisit(db, place.id)).toMatchObject({ visitedAt: 3000, note: 'Dinner' });

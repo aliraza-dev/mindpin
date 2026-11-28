@@ -22,7 +22,7 @@ Decisions from the Figma review (2026-11-25):
 - Sign-in methods: phone, Google, email sign-in link (no password), and Sign in with Apple on iOS. Facebook is dropped for v1.
 - Home: the top bar is plain search with no microphone; Ask MindPin and its tab are hidden until phase 2.
 - User name: asked once after first sign-in, optional, pre-filled from Google; used only for the greeting.
-- Navigation: bottom bar with Home, Map, New note (+), and Settings. A place can also be added by hand.
+- Navigation: bottom bar with Home, Map, and Settings, and a floating + button on Home for a new note or a new place (changed 2026-11-28; it was a + in the middle of the bar).
 - Person screen: Call, Message, and Share places are in v1.
 - Verify code: the SMS code fills in automatically; "Call me" is dropped.
 - Tester build: the 10 to 15 person test after User Story 2 (tasks phase 1.4) uses an internal build that skips sign-in.
@@ -51,7 +51,11 @@ Decisions during the build (2026-11-26):
 
 Decisions during the build (2026-11-28):
 
-- Adding a place (R4.7): Home offers Add place on a new install and in the Places view, so the app can be used before any share arrives.
+- Adding things (R4.7, R6.5, owner request): the + in the middle of the bottom bar looked out of place and only made notes. It is now a floating button at the bottom right of Home. Tapping it turns the + into a x and shows two choices, New note and Add place, so the app can be used before any share arrives.
+- Home lists (owner request): sliding a person or a place sideways uncovers Edit and Delete. Delete asks the same question as on the edit screens before anything is removed (R3.13, R4.4). Notes keep their Undo instead of a question (R10.10).
+- Note editor look (owner request): it follows the phone's own notes app. The date sits above the note, the first line is large, every row of writing has a faint rule under it and the rules run on down the page, and there is more room at the top.
+- App name on Home (owner request): a small pin in the accent color sits before "MindPin". It is drawn in code until a logo is chosen from the brand frames; the app icon is still the default one.
+- Settings: the screen now exists with the theme choice only. Backup, export, sign-out, and account deletion are added by T122.
 - Notes list (R10.11): swiping a note sideways uncovers Pin, Link, and Delete; press and hold opens a menu with the same three. Only one deleted note waits for Undo at a time: deleting a second one finishes the first.
 - Linking a note (R10.8): the link screen lists every person and every place, each with a None choice. It opens from the Notes list and from the editor.
 - Map (R6.3): a pin shows its label when tapped, and tapping the label opens the place. With no maps key, no connection, or no pinned place, the screen says why instead of drawing a map. The user's own position is never shown.
@@ -189,7 +193,7 @@ As a user, I want to search everything I saved so that I can find a place in sec
 2. Results SHALL appear as the user types, within 300 ms for up to 5,000 saved places.
 3. The home screen SHALL offer People, Places, and Notes views, plus a map view showing all pins.
 4. Search SHALL work fully offline.
-5. The app SHALL have a bottom bar with Home, Map, New note (+), and Settings. The home screen search bar SHALL be plain text search with no microphone; Ask MindPin SHALL NOT appear in v1.
+5. The app SHALL have a bottom bar with Home, Map, and Settings. The home screen SHALL have a floating + button that offers New note and Add place. The home screen search bar SHALL be plain text search with no microphone; Ask MindPin SHALL NOT appear in v1.
 
 ### R7. Account and sign-in
 
@@ -252,11 +256,12 @@ Folders, locked notes, drawings, and attachments are left out of v1; people, pla
 
 Added on 2026-11-28 at the owner's request.
 
-1. The app SHALL follow the phone's light or dark setting, and SHALL change with it while the app is open.
+1. The app SHALL follow the phone's light or dark setting, and SHALL change with it while the app is open, unless the user has chosen a theme (R11.6).
 2. The dark theme SHALL use warm dark backgrounds with an orange accent (`#D97757`); the light theme SHALL stay as designed in Figma.
 3. In both themes, text SHALL have a contrast of at least 4.5:1 against its background.
 4. A screen with nothing to show yet (Home on a new install, Notes with no notes, Map with no pins, a search with no results) SHALL show a small animated illustration above its message.
 5. WHEN the phone is set to reduce motion, the illustration SHALL be still.
+6. The user SHALL be able to choose Light, Dark, or Same as phone in Settings, and to switch between light and dark with one tap from Home. The choice SHALL be remembered.
 
 ## Non-functional requirements
 

@@ -47,8 +47,13 @@ describe('PlaceMap', () => {
     expect(frame.props.accessibilityElementsHidden).toBe(true);
   });
 
-  it('keeps the map maker\'s logo clear of the sheet that overlaps the map', async () => {
+  it("keeps the map maker's logo clear of the sheet that overlaps the map", async () => {
     await render(<PlaceMap lat={1} lng={2} bottomInset={24} />);
-    expect(screen.getByTestId('place-map', MAP).props.mapPadding).toEqual({ top: 0, right: 0, bottom: 24, left: 0 });
+    expect(screen.getByTestId('place-map', MAP).props.mapPadding).toEqual({
+      top: 0,
+      right: 0,
+      bottom: 24,
+      left: 0,
+    });
   });
 });

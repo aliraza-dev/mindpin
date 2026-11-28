@@ -105,7 +105,7 @@ describe('PlaceView', () => {
     expect(plain.color).toBe(tokens.color.text);
   });
 
-  it('offers Navigate, I\'m here, and Share, each with a spoken label (R4.5, R4.6, R5.1)', async () => {
+  it("offers Navigate, I'm here, and Share, each with a spoken label (R4.5, R4.6, R5.1)", async () => {
     const { handlers, view } = setup();
     await view;
     await fireEvent.press(screen.getByRole('button', { name: 'Open Home in your maps app' }));

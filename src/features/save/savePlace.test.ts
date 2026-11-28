@@ -29,7 +29,13 @@ function makeDeps(overrides: { resolveLink?: jest.Mock; geocoder?: Partial<Geoco
 }
 
 function input(overrides: Partial<SavePlaceInput> = {}): SavePlaceInput {
-  return { location: PIN, address: 'Sample Road', person: { kind: 'none' }, label: 'Home', ...overrides };
+  return {
+    location: PIN,
+    address: 'Sample Road',
+    person: { kind: 'none' },
+    label: 'Home',
+    ...overrides,
+  };
 }
 
 async function countRows(db: SqlDatabase, table: 'memory' | 'person') {
@@ -46,7 +52,12 @@ describe('savePlace', () => {
       input({
         person: {
           kind: 'contact',
-          contact: { contactRef: 'c-1', name: 'Sample Person', phone: '+10000000000', photoUri: null },
+          contact: {
+            contactRef: 'c-1',
+            name: 'Sample Person',
+            phone: '+10000000000',
+            photoUri: null,
+          },
         },
         label: ' Shop ',
         notes: 'Blue door',
@@ -87,7 +98,11 @@ describe('savePlace', () => {
           : db.runAsync(source, params),
     };
     await expect(
-      savePlace(failing, input({ person: { kind: 'new', name: 'Sample Person' } }), makeDeps().deps),
+      savePlace(
+        failing,
+        input({ person: { kind: 'new', name: 'Sample Person' } }),
+        makeDeps().deps,
+      ),
     ).rejects.toThrow('interrupted');
     expect(await countRows(db, 'person')).toBe(0);
     expect(await countRows(db, 'memory')).toBe(0);
@@ -101,9 +116,10 @@ describe('savePlace', () => {
       makeDeps().deps,
     );
     const search = (query: string) =>
-      db.getAllAsync<{ memory_id: string }>('SELECT memory_id FROM memory_fts WHERE memory_fts MATCH ?', [
-        query,
-      ]);
+      db.getAllAsync<{ memory_id: string }>(
+        'SELECT memory_id FROM memory_fts WHERE memory_fts MATCH ?',
+        [query],
+      );
     expect(await search('workshop')).toEqual([{ memory_id: result.place.id }]);
     expect(await search('sample')).toEqual([{ memory_id: result.place.id }]);
   });
@@ -127,7 +143,11 @@ describe('savePlace', () => {
 
     const result = await savePlace(
       recording,
-      input({ location: { kind: 'needs_resolve', url: SHORT }, address: null, sourceRaw: `Shop ${SHORT}` }),
+      input({
+        location: { kind: 'needs_resolve', url: SHORT },
+        address: null,
+        sourceRaw: `Shop ${SHORT}`,
+      }),
       deps,
     );
     await new Promise((resolve) => setImmediate(resolve));
@@ -157,7 +177,9 @@ describe('savePlace', () => {
 
     const online = makeDeps({
       resolveLink: jest.fn().mockResolvedValue({ kind: 'coordinates', lat: 1.5, lng: 2.5 }),
-      geocoder: { addressFor: jest.fn().mockResolvedValue({ kind: 'found', value: 'Sample Road' }) },
+      geocoder: {
+        addressFor: jest.fn().mockResolvedValue({ kind: 'found', value: 'Sample Road' }),
+      },
     });
     expect(await processPending(db, online.deps)).toBe(0);
     expect(await getMemory(db, result.place.id)).toMatchObject({
@@ -171,7 +193,9 @@ describe('savePlace', () => {
   it('looks up the address after saving coordinates (R2.3)', async () => {
     const db = await freshDb();
     const { deps } = makeDeps({
-      geocoder: { addressFor: jest.fn().mockResolvedValue({ kind: 'found', value: 'Sample Road' }) },
+      geocoder: {
+        addressFor: jest.fn().mockResolvedValue({ kind: 'found', value: 'Sample Road' }),
+      },
     });
     const result = await savePlace(db, input({ address: null }), deps);
     expect(result.place).toMatchObject({ address: null, status: 'pending_geocode' });
@@ -186,7 +210,9 @@ describe('savePlace', () => {
     const db = await freshDb();
     const { deps, geocoder } = makeDeps({
       geocoder: {
-        coordinatesFor: jest.fn().mockResolvedValue({ kind: 'found', value: { lat: 1.5, lng: 2.5 } }),
+        coordinatesFor: jest
+          .fn()
+          .mockResolvedValue({ kind: 'found', value: { lat: 1.5, lng: 2.5 } }),
       },
     });
     const result = await savePlace(
@@ -197,7 +223,11 @@ describe('savePlace', () => {
     expect(result.place).toMatchObject({ address: 'House 22, Sample Street', lat: null });
     await result.lookups;
     expect(geocoder.coordinatesFor).toHaveBeenCalledWith('House 22, Sample Street');
-    expect(await getMemory(db, result.place.id)).toMatchObject({ lat: 1.5, lng: 2.5, status: 'resolved' });
+    expect(await getMemory(db, result.place.id)).toMatchObject({
+      lat: 1.5,
+      lng: 2.5,
+      status: 'resolved',
+    });
   });
 
   it('saves a typed address when the share had no location (R1.4)', async () => {
@@ -205,7 +235,11 @@ describe('savePlace', () => {
     const { deps } = makeDeps();
     const result = await savePlace(
       db,
-      input({ location: { kind: 'not_found' }, address: ' House 22 ', sourceRaw: 'come by Friday' }),
+      input({
+        location: { kind: 'not_found' },
+        address: ' House 22 ',
+        sourceRaw: 'come by Friday',
+      }),
       deps,
     );
     await result.lookups;
@@ -228,7 +262,11 @@ describe('savePlace', () => {
   it('requires a label and writes nothing without one (R4.1)', async () => {
     const db = await freshDb();
     await expect(
-      savePlace(db, input({ label: '   ', person: { kind: 'new', name: 'Sample' } }), makeDeps().deps),
+      savePlace(
+        db,
+        input({ label: '   ', person: { kind: 'new', name: 'Sample' } }),
+        makeDeps().deps,
+      ),
     ).rejects.toThrow(/label/i);
     expect(await countRows(db, 'person')).toBe(0);
   });
@@ -246,7 +284,11 @@ describe('savePlace', () => {
     const contact = { contactRef: 'c-1', name: 'Sample Person', phone: null, photoUri: null };
     const { deps } = makeDeps();
     const first = await savePlace(db, input({ person: { kind: 'contact', contact } }), deps);
-    const second = await savePlace(db, input({ person: { kind: 'contact', contact }, label: 'Office' }), deps);
+    const second = await savePlace(
+      db,
+      input({ person: { kind: 'contact', contact }, label: 'Office' }),
+      deps,
+    );
     expect(second.person?.id).toBe(first.person?.id);
     expect(await listPeople(db)).toHaveLength(1);
     expect(await countRows(db, 'memory')).toBe(2);
@@ -266,7 +308,9 @@ describe('savePlace', () => {
         tags: ['floor 2'],
       });
       const { deps } = makeDeps({
-        geocoder: { addressFor: jest.fn().mockResolvedValue({ kind: 'found', value: 'New address' }) },
+        geocoder: {
+          addressFor: jest.fn().mockResolvedValue({ kind: 'found', value: 'New address' }),
+        },
       });
 
       const result = await savePlace(
@@ -302,7 +346,9 @@ describe('savePlace', () => {
       const note = await createNote(db, { title: 'Wi-Fi', notes: 'Wi-Fi' });
       const { deps } = makeDeps();
       for (const id of ['missing', deleted.id, note.id]) {
-        await expect(savePlace(db, input({ updatePlaceId: id }), deps)).rejects.toThrow(/not found/i);
+        await expect(savePlace(db, input({ updatePlaceId: id }), deps)).rejects.toThrow(
+          /not found/i,
+        );
       }
       // The failed attempts wrote nothing new.
       expect(await countRows(db, 'memory')).toBe(2);

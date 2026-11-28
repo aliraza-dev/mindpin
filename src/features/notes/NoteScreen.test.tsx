@@ -98,7 +98,9 @@ describe('NoteScreen', () => {
 
   it('says so when the note is gone or the address is malformed', async () => {
     (getDatabase as jest.Mock).mockResolvedValue(await freshDb());
-    const view = await render(<NoteScreen {...none} noteId="0b0f6f0e-0000-4000-8000-000000000000" />);
+    const view = await render(
+      <NoteScreen {...none} noteId="0b0f6f0e-0000-4000-8000-000000000000" />,
+    );
     expect(await screen.findByText('This note is no longer in MindPin.')).toBeTruthy();
     await view.unmount();
     await render(<NoteScreen {...none} validId={false} />);

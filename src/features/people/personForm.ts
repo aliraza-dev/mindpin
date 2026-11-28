@@ -3,7 +3,12 @@
 import { updatePerson, type Person } from '../../db/people';
 import type { SqlDatabase } from '../../db/types';
 
-export const PERSON_LIMITS = { name: 100, phone: 20, phoneMinDigits: 3, phoneMaxDigits: 15 } as const;
+export const PERSON_LIMITS = {
+  name: 100,
+  phone: 20,
+  phoneMinDigits: 3,
+  phoneMaxDigits: 15,
+} as const;
 
 export type PersonFormValues = { name: string; phone: string };
 export type PersonFormErrors = { name?: 'nameRequired' | 'nameTooLong'; phone?: 'phoneInvalid' };
@@ -35,7 +40,8 @@ export function validatePersonForm(values: PersonFormValues): PersonFormResult {
   return { ok: true, value: { name, phone: phone || null } };
 }
 
-export type EditPersonResult = { ok: true; person: Person } | { ok: false; errors: PersonFormErrors };
+export type EditPersonResult =
+  { ok: true; person: Person } | { ok: false; errors: PersonFormErrors };
 
 // Checks the form again and writes it. The link to the phone contact, if any, is kept.
 export async function saveEditedPerson(

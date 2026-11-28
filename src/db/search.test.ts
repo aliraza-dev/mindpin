@@ -82,12 +82,19 @@ describe('searchMemories', () => {
     const { db, shop } = await seeded();
     const [result] = await searchMemories(db, 'shop');
     expect(result.personName).toBe('Ahmed Raza');
-    expect(result.memory).toMatchObject({ id: shop.id, title: 'Shop', tags: ['parking', 'gate code'] });
+    expect(result.memory).toMatchObject({
+      id: shop.id,
+      title: 'Shop',
+      tags: ['parking', 'gate code'],
+    });
   });
 
   it('finds notes and places without a person, and leaves out deleted ones', async () => {
     const { db, shop } = await seeded();
-    const note = await createNote(db, { title: 'Gift ideas', notes: 'Gift ideas\nShawl, glasses case' });
+    const note = await createNote(db, {
+      title: 'Gift ideas',
+      notes: 'Gift ideas\nShawl, glasses case',
+    });
     expect(await searchMemories(db, 'shawl')).toEqual([
       { memory: expect.objectContaining({ id: note.id, type: 'note' }), personName: null },
     ]);
@@ -99,7 +106,8 @@ describe('searchMemories', () => {
     const { db } = await seeded();
     const note = await createNote(db, {
       title: 'Shop opening',
-      notes: 'Shop opening\nFriday at 6pm, family first.\n- [ ] Sweets from the bakery\n- [x] Framed gift',
+      notes:
+        'Shop opening\nFriday at 6pm, family first.\n- [ ] Sweets from the bakery\n- [x] Framed gift',
     });
     for (const word of ['opening', 'friday', 'bakery', 'framed']) {
       expect(await ids(db, word)).toContain(note.id);

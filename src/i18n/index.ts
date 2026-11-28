@@ -8,6 +8,7 @@ import enNotes from './en/notes.json';
 import enPeople from './en/people.json';
 import enPlaces from './en/places.json';
 import enSave from './en/save.json';
+import enSettings from './en/settings.json';
 import enVisits from './en/visits.json';
 
 // All user-facing text lives in translation files, one per feature: src/i18n/en/<feature>.json.
@@ -21,6 +22,7 @@ export const resources = {
     people: enPeople,
     places: enPlaces,
     save: enSave,
+    settings: enSettings,
     visits: enVisits,
   },
 } as const;

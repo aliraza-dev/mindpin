@@ -27,7 +27,12 @@ export function AddPlaceScreen({ personId }: Props) {
 
   if (entered !== null) {
     return (
-      <SaveSheet sharedText={entered} manual initialPersonId={personId} onClose={() => router.back()} />
+      <SaveSheet
+        sharedText={entered}
+        manual
+        initialPersonId={personId}
+        onClose={() => router.back()}
+      />
     );
   }
 

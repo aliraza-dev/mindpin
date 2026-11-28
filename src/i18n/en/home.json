@@ -17,9 +17,25 @@
   "recentlySaved": "Recently saved",
   "results": "Results",
   "noResults": "Nothing matches \"{{text}}\".",
-  "empty": "Nothing saved yet. Share a location to MindPin from another app, add a place by hand, or tap + to write a note.",
-  "addPlace": "Add place",
-  "addPlaceA11y": "Add a place by hand",
+  "empty": "Nothing saved yet. Share a location to MindPin from another app, or tap + to add a place or write a note.",
+  "add": {
+    "openA11y": "Add a place or a note",
+    "closeA11y": "Close the add menu",
+    "note": "New note",
+    "noteA11y": "Write a new note",
+    "place": "Add place",
+    "placeA11y": "Add a place by hand"
+  },
+  "theme": {
+    "toDarkA11y": "Switch to the dark theme",
+    "toLightA11y": "Switch to the light theme"
+  },
+  "swipe": {
+    "edit": "Edit",
+    "editA11y": "Edit {{name}}",
+    "delete": "Delete",
+    "deleteA11y": "Delete {{name}}"
+  },
   "placesBadge_one": "{{count}}\nplace",
   "placesBadge_other": "{{count}}\nplaces",
   "noPlacesYet": "No places yet",

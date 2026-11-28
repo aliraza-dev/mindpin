@@ -40,7 +40,12 @@ describe('contacts bridge', () => {
       ]),
     });
     expect(await createContactsBridge(source).loadContacts()).toEqual([
-      { contactRef: 'c-1', name: 'Sample Person', phone: '+10000000000', photoUri: 'content://photo/1' },
+      {
+        contactRef: 'c-1',
+        name: 'Sample Person',
+        phone: '+10000000000',
+        photoUri: 'content://photo/1',
+      },
       { contactRef: 'c-2', name: 'No Phone', phone: null, photoUri: null },
     ]);
   });
@@ -66,9 +71,13 @@ describe('contacts bridge', () => {
 
   it('reports full, limited, denied, and not-yet-asked access', async () => {
     const access = (response: object) =>
-      createContactsBridge(api({ getPermissionsAsync: jest.fn().mockResolvedValue(response) })).getAccess();
+      createContactsBridge(
+        api({ getPermissionsAsync: jest.fn().mockResolvedValue(response) }),
+      ).getAccess();
     expect(await access({ granted: true, status: 'granted', accessPrivileges: 'all' })).toBe('all');
-    expect(await access({ granted: true, status: 'granted', accessPrivileges: 'limited' })).toBe('limited');
+    expect(await access({ granted: true, status: 'granted', accessPrivileges: 'limited' })).toBe(
+      'limited',
+    );
     expect(await access({ granted: false, status: 'denied' })).toBe('denied');
     expect(await access({ granted: false, status: 'undetermined' })).toBe('not_asked');
   });

@@ -49,7 +49,11 @@ type MapsOptions = { open?: Opener; platform?: string };
 export async function openInMaps(place: Locatable, options: MapsOptions = {}): Promise<boolean> {
   const { open = openUrl, platform = Platform.OS } = options;
   const appLink =
-    platform === 'android' ? androidMapsLink(place) : platform === 'ios' ? iosMapsLink(place) : null;
+    platform === 'android'
+      ? androidMapsLink(place)
+      : platform === 'ios'
+        ? iosMapsLink(place)
+        : null;
   for (const link of [appLink, webMapsLink(place)]) {
     if (link && (await tryOpen(open, link))) return true;
   }

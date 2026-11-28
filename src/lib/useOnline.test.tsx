@@ -4,7 +4,10 @@ import { Text } from 'react-native';
 
 import { useOnline } from './useOnline';
 
-jest.mock('expo-network', () => ({ useNetworkState: jest.fn(), addNetworkStateListener: jest.fn() }));
+jest.mock('expo-network', () => ({
+  useNetworkState: jest.fn(),
+  addNetworkStateListener: jest.fn(),
+}));
 
 function Probe() {
   return <Text>{useOnline() ? 'online' : 'offline'}</Text>;

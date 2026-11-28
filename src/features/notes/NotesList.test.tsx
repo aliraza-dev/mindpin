@@ -70,7 +70,9 @@ describe('NotesList', () => {
     const { view, handlers } = setup();
     await view;
     await fireEvent.press(screen.getByRole('button', { name: 'Pin note Eid plans' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Link note Eid plans to a person or place' }));
+    await fireEvent.press(
+      screen.getByRole('button', { name: 'Link note Eid plans to a person or place' }),
+    );
     await fireEvent.press(screen.getByRole('button', { name: 'Delete note Eid plans' }));
     expect(handlers.onAction.mock.calls.map(([action, target]) => [action, target.id])).toEqual([
       ['pin', 'a'],

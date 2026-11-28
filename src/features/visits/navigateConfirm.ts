@@ -62,7 +62,10 @@ export async function getNavigatePrompt(
 
 // Call with the user's answer. Yes records the visit at the time of Navigate; either answer
 // means the question is not asked again. Returns the recorded visit, or null.
-export async function answerNavigatePrompt(db: SqlDatabase, visited: boolean): Promise<Visit | null> {
+export async function answerNavigatePrompt(
+  db: SqlDatabase,
+  visited: boolean,
+): Promise<Visit | null> {
   const pending = await readPending(db);
   if (!pending) return null;
   return inTransaction(db, async () => {

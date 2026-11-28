@@ -1,8 +1,20 @@
 // T054: what the edit form accepts for a place (R4.1, R4.2, R4.10; design.md "Limits on typed text").
-import { labelChoice, parseTags, tagsToText, validatePlaceForm, type PlaceFormValues } from './placeForm';
+import {
+  labelChoice,
+  parseTags,
+  tagsToText,
+  validatePlaceForm,
+  type PlaceFormValues,
+} from './placeForm';
 
 function values(overrides: Partial<PlaceFormValues> = {}): PlaceFormValues {
-  return { label: 'Home', address: 'House 22, Sample Street', notes: '', tagsText: '', ...overrides };
+  return {
+    label: 'Home',
+    address: 'House 22, Sample Street',
+    notes: '',
+    tagsText: '',
+    ...overrides,
+  };
 }
 
 describe('labelChoice (R4.1)', () => {
@@ -42,18 +54,31 @@ describe('parseTags (R4.2)', () => {
 describe('validatePlaceForm', () => {
   it('accepts a filled form and trims what was typed', () => {
     const result = validatePlaceForm(
-      values({ label: '  Farmhouse ', address: ' Canal Road ', notes: ' White gate ', tagsText: 'Parking, Gate 12' }),
+      values({
+        label: '  Farmhouse ',
+        address: ' Canal Road ',
+        notes: ' White gate ',
+        tagsText: 'Parking, Gate 12',
+      }),
       { hasPin: true },
     );
     expect(result).toEqual({
       ok: true,
-      value: { title: 'Farmhouse', address: 'Canal Road', notes: 'White gate', tags: ['Parking', 'Gate 12'] },
+      value: {
+        title: 'Farmhouse',
+        address: 'Canal Road',
+        notes: 'White gate',
+        tags: ['Parking', 'Gate 12'],
+      },
     });
   });
 
   it('stores empty notes and an empty address as nothing', () => {
     const result = validatePlaceForm(values({ address: '  ', notes: '' }), { hasPin: true });
-    expect(result).toEqual({ ok: true, value: { title: 'Home', address: null, notes: null, tags: [] } });
+    expect(result).toEqual({
+      ok: true,
+      value: { title: 'Home', address: null, notes: null, tags: [] },
+    });
   });
 
   it('requires a label (R4.1)', () => {

@@ -19,10 +19,14 @@ export type LookupDeps = {
   geocoder: Geocoder;
 };
 
-async function resolveFromSource(sourceRaw: string | null, deps: LookupDeps): Promise<ResolveOutcome> {
+async function resolveFromSource(
+  sourceRaw: string | null,
+  deps: LookupDeps,
+): Promise<ResolveOutcome> {
   const parsed = parseShared(sourceRaw ?? '');
   if (parsed.kind === 'needs_resolve') return deps.resolveLink(parsed.url);
-  if (parsed.kind === 'coordinates') return { kind: 'coordinates', lat: parsed.lat, lng: parsed.lng };
+  if (parsed.kind === 'coordinates')
+    return { kind: 'coordinates', lat: parsed.lat, lng: parsed.lng };
   if (parsed.kind === 'text') return parsed;
   return { kind: 'unresolvable' };
 }

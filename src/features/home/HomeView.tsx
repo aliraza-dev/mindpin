@@ -5,16 +5,19 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import type { Memory } from '../../db/memories';
+import type { Person } from '../../db/people';
 import type { PlaceSummary } from '../../db/placeSummaries';
 import type { SearchResult } from '../../db/search';
 import { Avatar, initialsOf } from '../../ui/Avatar';
-import { Button } from '../../ui/Button';
 import { Chip } from '../../ui/Chip';
 import { EmptyIllustration } from '../../ui/EmptyIllustration';
 import { Icon } from '../../ui/Icon';
+import { LogoMark } from '../../ui/LogoMark';
 import { PlaceTile } from '../../ui/PlaceTile';
-import { themed, useColors } from '../../ui/theme';
-import { tokens, touchSlop } from '../../ui/tokens';
+import { SwipeRow } from '../../ui/SwipeRow';
+import { themed, useColors, type Scheme } from '../../ui/theme';
+import { ThemeToggle } from '../../ui/ThemeToggle';
+import { tokens } from '../../ui/tokens';
 import { notePreview } from '../notes/noteText';
 import { agoText, lastVisitedLabel } from '../visits/lastVisited';
 import type { StalePlace } from '../visits/stalePlaces';
@@ -38,8 +41,14 @@ type Props = {
   onSearchChange: (text: string) => void;
   onChangeView: (view: HomeListView) => void;
   onOpenNotes: () => void;
-  // Adding a place without a share (R4.7).
-  onAddPlace: () => void;
+  // The theme showing now, and the quick switch to the other one (R11.6).
+  scheme: Scheme;
+  onToggleTheme: () => void;
+  // Reached by sliding a row aside. Deleting asks first; the screen does the asking.
+  onEditPerson: (personId: string) => void;
+  onDeletePerson: (person: Person) => void;
+  onEditPlace: (placeId: string) => void;
+  onDeletePlace: (place: Memory) => void;
   onOpenPerson: (personId: string) => void;
   onOpenPlace: (placeId: string) => void;
   onOpenNote: (noteId: string) => void;
@@ -56,30 +65,48 @@ export function HomeView(props: Props) {
   const nothingSaved = people.length === 0 && places.length === 0;
 
   const placeRow = (place: Memory, personName: string | null, status: string | null) => (
-    <Pressable
+    <SwipeRow
       key={place.id}
-      accessibilityRole="button"
-      accessibilityLabel={t('home:openPlaceA11y', { label: place.title })}
-      onPress={() => props.onOpenPlace(place.id)}
-      style={styles.row}
+      actions={[
+        {
+          key: 'edit',
+          label: t('home:swipe.edit'),
+          accessibilityLabel: t('home:swipe.editA11y', { name: place.title }),
+          onPress: () => props.onEditPlace(place.id),
+        },
+        {
+          key: 'delete',
+          label: t('home:swipe.delete'),
+          accessibilityLabel: t('home:swipe.deleteA11y', { name: place.title }),
+          danger: true,
+          onPress: () => props.onDeletePlace(place),
+        },
+      ]}
     >
-      <PlaceTile label={place.title} />
-      <View style={styles.rowText}>
-        <Text style={styles.rowTitle} numberOfLines={1}>
-          {place.title}
-        </Text>
-        {personName || place.address ? (
-          <Text style={styles.rowDetail} numberOfLines={1}>
-            {[personName, place.address].filter(Boolean).join(' · ')}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t('home:openPlaceA11y', { label: place.title })}
+        onPress={() => props.onOpenPlace(place.id)}
+        style={styles.row}
+      >
+        <PlaceTile label={place.title} />
+        <View style={styles.rowText}>
+          <Text style={styles.rowTitle} numberOfLines={1}>
+            {place.title}
           </Text>
-        ) : null}
-        {status ? (
-          <Text style={styles.rowStatus} numberOfLines={1}>
-            {status}
-          </Text>
-        ) : null}
-      </View>
-    </Pressable>
+          {personName || place.address ? (
+            <Text style={styles.rowDetail} numberOfLines={1}>
+              {[personName, place.address].filter(Boolean).join(' · ')}
+            </Text>
+          ) : null}
+          {status ? (
+            <Text style={styles.rowStatus} numberOfLines={1}>
+              {status}
+            </Text>
+          ) : null}
+        </View>
+      </Pressable>
+    </SwipeRow>
   );
 
   const noteRow = (note: Memory) => {
@@ -129,19 +156,31 @@ export function HomeView(props: Props) {
           <Text style={styles.greeting}>
             {firstName ? t('home:greetingWithName', { greeting, name: firstName }) : greeting}
           </Text>
-          <Text accessibilityRole="header" style={styles.appName}>
-            {t('home:appName')}
-          </Text>
-        </View>
-        {firstName ? (
-          <View
-            accessible={false}
-            importantForAccessibility="no-hide-descendants"
-            style={styles.profile}
-          >
-            <Text style={styles.profileText}>{initialsOf(firstName).slice(0, 1)}</Text>
+          <View style={styles.brand}>
+            <LogoMark />
+            <Text accessibilityRole="header" style={styles.appName}>
+              {t('home:appName')}
+            </Text>
           </View>
-        ) : null}
+        </View>
+        <View style={styles.topActions}>
+          <ThemeToggle
+            scheme={props.scheme}
+            onPress={props.onToggleTheme}
+            accessibilityLabel={t(
+              props.scheme === 'dark' ? 'home:theme.toLightA11y' : 'home:theme.toDarkA11y',
+            )}
+          />
+          {firstName ? (
+            <View
+              accessible={false}
+              importantForAccessibility="no-hide-descendants"
+              style={styles.profile}
+            >
+              <Text style={styles.profileText}>{initialsOf(firstName).slice(0, 1)}</Text>
+            </View>
+          ) : null}
+        </View>
       </View>
 
       <View style={styles.search}>
@@ -206,58 +245,59 @@ export function HomeView(props: Props) {
             <>
               <EmptyIllustration kind="places" />
               <Text style={styles.message}>{t('home:empty')}</Text>
-              <View style={styles.emptyAction}>
-                <Button
-                  label={t('home:addPlace')}
-                  accessibilityLabel={t('home:addPlaceA11y')}
-                  onPress={props.onAddPlace}
-                />
-              </View>
             </>
           ) : (
             <>
-              <View style={styles.headingRow}>
-                <Text accessibilityRole="header" style={styles.headingText}>
-                  {t('home:recentlySaved')}
-                </Text>
-                {view === 'places' ? (
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel={t('home:addPlaceA11y')}
-                    onPress={props.onAddPlace}
-                    hitSlop={touchSlop(18)}
-                  >
-                    <Text style={styles.link}>{t('home:addPlace')}</Text>
-                  </Pressable>
-                ) : null}
-              </View>
+              <Text accessibilityRole="header" style={styles.heading}>
+                {t('home:recentlySaved')}
+              </Text>
               {view === 'people'
                 ? card(
                     people.map((row) => (
-                      <Pressable
+                      <SwipeRow
                         key={row.person.id}
-                        accessibilityRole="button"
-                        accessibilityLabel={t('home:openPersonA11y', { name: row.person.name })}
-                        onPress={() => props.onOpenPerson(row.person.id)}
-                        style={styles.row}
+                        actions={[
+                          {
+                            key: 'edit',
+                            label: t('home:swipe.edit'),
+                            accessibilityLabel: t('home:swipe.editA11y', { name: row.person.name }),
+                            onPress: () => props.onEditPerson(row.person.id),
+                          },
+                          {
+                            key: 'delete',
+                            label: t('home:swipe.delete'),
+                            accessibilityLabel: t('home:swipe.deleteA11y', {
+                              name: row.person.name,
+                            }),
+                            danger: true,
+                            onPress: () => props.onDeletePerson(row.person),
+                          },
+                        ]}
                       >
-                        <Avatar name={row.person.name} tintKey={row.person.id} />
-                        <View style={styles.rowText}>
-                          <Text style={styles.rowTitle} numberOfLines={1}>
-                            {row.person.name}
-                          </Text>
-                          <Text style={styles.rowDetail} numberOfLines={2}>
-                            {personRowSubtitle(row, now)}
-                          </Text>
-                        </View>
-                        {row.placeLabels.length > 1 ? (
-                          <View style={styles.badge}>
-                            <Text style={styles.badgeText}>
-                              {t('home:placesBadge', { count: row.placeLabels.length })}
+                        <Pressable
+                          accessibilityRole="button"
+                          accessibilityLabel={t('home:openPersonA11y', { name: row.person.name })}
+                          onPress={() => props.onOpenPerson(row.person.id)}
+                          style={styles.row}
+                        >
+                          <Avatar name={row.person.name} tintKey={row.person.id} />
+                          <View style={styles.rowText}>
+                            <Text style={styles.rowTitle} numberOfLines={1}>
+                              {row.person.name}
+                            </Text>
+                            <Text style={styles.rowDetail} numberOfLines={2}>
+                              {personRowSubtitle(row, now)}
                             </Text>
                           </View>
-                        ) : null}
-                      </Pressable>
+                          {row.placeLabels.length > 1 ? (
+                            <View style={styles.badge}>
+                              <Text style={styles.badgeText}>
+                                {t('home:placesBadge', { count: row.placeLabels.length })}
+                              </Text>
+                            </View>
+                          ) : null}
+                        </Pressable>
+                      </SwipeRow>
                     )),
                   )
                 : card(
@@ -302,11 +342,12 @@ export function HomeView(props: Props) {
 const useStyles = themed((colors) =>
   StyleSheet.create({
     screen: { flex: 1, backgroundColor: colors.background },
-    content: { paddingHorizontal: tokens.screenPadding, paddingBottom: 32 },
+    content: { paddingHorizontal: tokens.screenPadding, paddingBottom: 104 },
     top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     greeting: { fontFamily: tokens.font.body, fontSize: 13, color: colors.mutedText },
+    brand: { marginTop: 2, flexDirection: 'row', alignItems: 'center', gap: 8 },
+    topActions: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     appName: {
-      marginTop: 2,
       fontFamily: tokens.font.headingBold,
       fontSize: 28,
       color: colors.text,
@@ -346,15 +387,6 @@ const useStyles = themed((colors) =>
       fontSize: 15,
       color: colors.text,
     },
-    headingRow: {
-      marginTop: 18,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
-    headingText: { fontFamily: tokens.font.bodyBold, fontSize: 15, color: colors.text },
-    link: { fontFamily: tokens.font.body, fontSize: 15, color: colors.accent },
-    emptyAction: { marginTop: 16, alignItems: 'flex-start' },
     message: {
       marginTop: 18,
       fontFamily: tokens.font.body,

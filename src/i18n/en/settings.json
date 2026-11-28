@@ -1,0 +1,14 @@
+{
+  "title": "Settings",
+  "appearance": {
+    "title": "Appearance",
+    "system": "Same as phone",
+    "light": "Light",
+    "dark": "Dark",
+    "systemA11y": "Use the same theme as the phone",
+    "lightA11y": "Always use the light theme",
+    "darkA11y": "Always use the dark theme",
+    "note": "The sun or moon button on Home switches between light and dark."
+  },
+  "later": "Backup, export, and your account will appear here once sign-in is built."
+}

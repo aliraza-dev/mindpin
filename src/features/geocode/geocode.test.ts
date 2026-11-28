@@ -29,9 +29,9 @@ describe('formatAddress', () => {
   });
 
   it('falls back to the place name and drops repeated parts', () => {
-    expect(formatAddress({ name: 'Corner Shop', district: 'Sample Town', city: 'sample town' })).toBe(
-      'Corner Shop, Sample Town',
-    );
+    expect(
+      formatAddress({ name: 'Corner Shop', district: 'Sample Town', city: 'sample town' }),
+    ).toBe('Corner Shop, Sample Town');
   });
 
   it('returns null when the platform gave nothing usable', () => {

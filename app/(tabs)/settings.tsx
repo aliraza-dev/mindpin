@@ -1,6 +1,6 @@
-import { PlaceholderScreen } from '../../src/ui/PlaceholderScreen';
+import { SettingsScreen } from '../../src/features/settings/SettingsScreen';
 
-// Placeholder until the Settings task (T122). Expo Router requires a default export.
+// Expo Router requires a default export for route files.
 export default function SettingsRoute() {
-  return <PlaceholderScreen titleKey="common:tabs.settings" />;
+  return <SettingsScreen />;
 }

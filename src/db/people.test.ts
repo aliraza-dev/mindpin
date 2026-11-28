@@ -67,7 +67,11 @@ describe('people data access', () => {
 describe('deletePerson (R3.13)', () => {
   async function seeded() {
     const db = await freshDb();
-    const person = await createPerson(db, { name: 'Zainab Sample', phone: '0300 0000000', contactRef: 'c-1' });
+    const person = await createPerson(db, {
+      name: 'Zainab Sample',
+      phone: '0300 0000000',
+      contactRef: 'c-1',
+    });
     const place = await createPlace(db, {
       personId: person.id,
       title: 'Home',
@@ -115,7 +119,9 @@ describe('deletePerson (R3.13)', () => {
       deletedAt: null,
       notes: 'Wi-Fi\nNetwork name',
     });
-    expect(await listPlaceSummaries(db)).toMatchObject([{ place: { id: place.id }, personName: null }]);
+    expect(await listPlaceSummaries(db)).toMatchObject([
+      { place: { id: place.id }, personName: null },
+    ]);
   });
 
   it("stops search finding their places by the person's name, but not by anything else", async () => {
@@ -138,7 +144,11 @@ describe('deletePerson (R3.13)', () => {
   it('leaves other people and their places alone', async () => {
     const { db, person } = await seeded();
     const other = await createPerson(db, { name: 'Other Sample' });
-    const otherPlace = await createPlace(db, { personId: other.id, title: 'Shop', address: 'Mall Road' });
+    const otherPlace = await createPlace(db, {
+      personId: other.id,
+      title: 'Shop',
+      address: 'Mall Road',
+    });
     await deletePerson(db, person.id);
 
     expect((await listPeople(db)).map((p) => p.id)).toEqual([other.id]);

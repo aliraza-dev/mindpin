@@ -90,9 +90,7 @@ export async function findPersonByContactRef(
 }
 
 export async function listPeople(db: SqlDatabase): Promise<Person[]> {
-  const rows = await db.getAllAsync<PersonRow>(
-    'SELECT * FROM person ORDER BY name COLLATE NOCASE',
-  );
+  const rows = await db.getAllAsync<PersonRow>('SELECT * FROM person ORDER BY name COLLATE NOCASE');
   return rows.map(toPerson);
 }
 

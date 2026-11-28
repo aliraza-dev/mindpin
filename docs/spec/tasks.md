@@ -348,6 +348,10 @@ pending place; buying the unlock saves it, and a restore on another phone keeps 
 - [X] T146 Light and dark color tokens in `src/ui/tokens.ts`, the theme hooks in `src/ui/theme.ts`, and every component reading colors through them; `userInterfaceStyle` set to automatic in `app.json` (R11.1, R11.2)
 - [X] T147 [P] Empty illustration tests in `src/ui/EmptyIllustration.test.tsx`: each kind draws, is hidden from screen readers, and stays still with reduce motion (R11.4, R11.5)
 - [X] T148 Animated empty illustrations in `src/ui/EmptyIllustration.tsx`, used on Home, Notes, Map, and search with no results (R11.4, R11.5)
+- [X] T149 [P] Theme choice tests in `src/features/settings/themePreference.test.ts`, `src/features/settings/SettingsScreen.test.tsx`, and `src/features/home/HomeScreen.test.tsx`: a choice applies at once, is remembered, and can be switched from Home (R11.6)
+- [X] T150 Theme choice in `src/ui/theme.ts` and `src/features/settings/themePreference.ts`, the switch in `src/ui/ThemeToggle.tsx`, and the Settings screen in `src/features/settings/SettingsScreen.tsx` with its Appearance section (R11.6)
+- [X] T151 Floating + button on Home in `src/ui/AddMenu.tsx` offering New note and Add place, replacing the + in the bottom bar, with tests in `src/ui/AddMenu.test.tsx` (R4.7, R6.5)
+- [X] T152 Slide a person or a place on Home for Edit and Delete, with the delete question, using the shared `src/ui/SwipeRow.tsx`; the pin mark before the app name in `src/ui/LogoMark.tsx`; the ruled-paper look of the note editor (R3.13, R4.4, R10.4)
 
 ---
 

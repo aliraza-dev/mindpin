@@ -1,5 +1,11 @@
 // T054: editing and deleting a place (R4.4, R4.9, R4.10).
-import { createNote, createPlace, getMemory, listNotesForPlace, softDeleteMemory } from '../../db/memories';
+import {
+  createNote,
+  createPlace,
+  getMemory,
+  listNotesForPlace,
+  softDeleteMemory,
+} from '../../db/memories';
 import { createPerson } from '../../db/people';
 import { searchMemories } from '../../db/search';
 import { freshDb } from '../../db/testing/freshDb';
@@ -15,12 +21,21 @@ function makeDeps(geocoder: Partial<Geocoder> = {}) {
     coordinatesFor: jest.fn().mockResolvedValue({ kind: 'none' }),
     ...geocoder,
   };
-  const deps: LookupDeps = { resolveLink: jest.fn().mockResolvedValue({ kind: 'retry' }), geocoder: full };
+  const deps: LookupDeps = {
+    resolveLink: jest.fn().mockResolvedValue({ kind: 'retry' }),
+    geocoder: full,
+  };
   return { deps, geocoder: full };
 }
 
 function values(overrides: Partial<PlaceFormValues> = {}): PlaceFormValues {
-  return { label: 'Home', address: 'House 22, Sample Street', notes: '', tagsText: '', ...overrides };
+  return {
+    label: 'Home',
+    address: 'House 22, Sample Street',
+    notes: '',
+    tagsText: '',
+    ...overrides,
+  };
 }
 
 async function seeded() {
@@ -45,7 +60,12 @@ describe('saveEditedPlace (R4.10)', () => {
     const result = await saveEditedPlace(
       db,
       place.id,
-      values({ label: 'Farmhouse', address: 'Canal Road', notes: 'Blue door', tagsText: 'Parking, Floor 2' }),
+      values({
+        label: 'Farmhouse',
+        address: 'Canal Road',
+        notes: 'Blue door',
+        tagsText: 'Parking, Floor 2',
+      }),
       deps,
     );
 
@@ -61,7 +81,12 @@ describe('saveEditedPlace (R4.10)', () => {
   it('keeps the pin and looks nothing up when the address of a pinned place changes', async () => {
     const { db, place } = await seeded();
     const { deps, geocoder } = makeDeps();
-    const result = await saveEditedPlace(db, place.id, values({ address: 'A corrected address' }), deps);
+    const result = await saveEditedPlace(
+      db,
+      place.id,
+      values({ address: 'A corrected address' }),
+      deps,
+    );
     if (result.ok) await result.lookups;
 
     expect(await getMemory(db, place.id)).toMatchObject({ lat: 1.5, lng: 2.5, status: 'resolved' });
@@ -75,28 +100,52 @@ describe('saveEditedPlace (R4.10)', () => {
     const { deps, geocoder } = makeDeps({
       coordinatesFor: jest.fn().mockResolvedValue({ kind: 'found', value: { lat: 3, lng: 4 } }),
     });
-    const result = await saveEditedPlace(db, place.id, values({ label: 'Shop', address: 'New Road' }), deps);
+    const result = await saveEditedPlace(
+      db,
+      place.id,
+      values({ label: 'Shop', address: 'New Road' }),
+      deps,
+    );
     if (result.ok) await result.lookups;
 
     expect(geocoder.coordinatesFor).toHaveBeenCalledWith('New Road');
-    expect(await getMemory(db, place.id)).toMatchObject({ address: 'New Road', lat: 3, lng: 4, status: 'resolved' });
+    expect(await getMemory(db, place.id)).toMatchObject({
+      address: 'New Road',
+      lat: 3,
+      lng: 4,
+      status: 'resolved',
+    });
   });
 
   it('leaves the lookup waiting when the phone is offline', async () => {
     const db = await freshDb();
     const place = await createPlace(db, { title: 'Shop', address: 'Old Road' });
     const { deps } = makeDeps({ coordinatesFor: jest.fn().mockResolvedValue({ kind: 'retry' }) });
-    const result = await saveEditedPlace(db, place.id, values({ label: 'Shop', address: 'New Road' }), deps);
+    const result = await saveEditedPlace(
+      db,
+      place.id,
+      values({ label: 'Shop', address: 'New Road' }),
+      deps,
+    );
     if (result.ok) await result.lookups;
 
-    expect(await getMemory(db, place.id)).toMatchObject({ address: 'New Road', lat: null, status: 'pending_geocode' });
+    expect(await getMemory(db, place.id)).toMatchObject({
+      address: 'New Road',
+      lat: null,
+      status: 'pending_geocode',
+    });
   });
 
   it('does not look anything up when the address of a place with no pin is unchanged', async () => {
     const db = await freshDb();
     const place = await createPlace(db, { title: 'Shop', address: 'Old Road' });
     const { deps, geocoder } = makeDeps();
-    const result = await saveEditedPlace(db, place.id, values({ label: 'Store', address: 'Old Road' }), deps);
+    const result = await saveEditedPlace(
+      db,
+      place.id,
+      values({ label: 'Store', address: 'Old Road' }),
+      deps,
+    );
     if (result.ok) await result.lookups;
 
     expect(geocoder.coordinatesFor).not.toHaveBeenCalled();
@@ -112,7 +161,11 @@ describe('saveEditedPlace (R4.10)', () => {
     if (result.ok) await result.lookups;
 
     expect(geocoder.addressFor).toHaveBeenCalledWith({ lat: 1.5, lng: 2.5 });
-    expect(await getMemory(db, place.id)).toMatchObject({ address: 'Looked-up Street', lat: 1.5, status: 'resolved' });
+    expect(await getMemory(db, place.id)).toMatchObject({
+      address: 'Looked-up Street',
+      lat: 1.5,
+      status: 'resolved',
+    });
   });
 
   it('writes nothing when the form is not valid', async () => {
@@ -121,7 +174,10 @@ describe('saveEditedPlace (R4.10)', () => {
     const result = await saveEditedPlace(db, place.id, values({ label: ' ' }), deps);
 
     expect(result).toEqual({ ok: false, errors: { label: 'labelRequired' } });
-    expect(await getMemory(db, place.id)).toMatchObject({ title: 'Home', updatedAt: place.updatedAt });
+    expect(await getMemory(db, place.id)).toMatchObject({
+      title: 'Home',
+      updatedAt: place.updatedAt,
+    });
   });
 
   it('keeps the person, the source, and the day it was saved', async () => {
@@ -129,13 +185,21 @@ describe('saveEditedPlace (R4.10)', () => {
     const { deps } = makeDeps();
     await saveEditedPlace(db, place.id, values({ label: 'Office' }), deps);
 
-    expect(await getMemory(db, place.id)).toMatchObject({ personId: person.id, createdAt: place.createdAt });
+    expect(await getMemory(db, place.id)).toMatchObject({
+      personId: person.id,
+      createdAt: place.createdAt,
+    });
   });
 
   it('makes the new words findable and the old ones not (R6.1)', async () => {
     const { db, place } = await seeded();
     const { deps } = makeDeps();
-    await saveEditedPlace(db, place.id, values({ label: 'Farmhouse', notes: 'Blue door', tagsText: 'Orchard' }), deps);
+    await saveEditedPlace(
+      db,
+      place.id,
+      values({ label: 'Farmhouse', notes: 'Blue door', tagsText: 'Orchard' }),
+      deps,
+    );
 
     expect((await searchMemories(db, 'orchard')).map((r) => r.memory.id)).toEqual([place.id]);
     expect((await searchMemories(db, 'farmhouse')).map((r) => r.memory.id)).toEqual([place.id]);

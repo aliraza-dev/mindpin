@@ -105,6 +105,7 @@ function OpenNote({ loaded, topInset, bottomInset, onClose }: OpenProps) {
   const [picking, setPicking] = useState(false);
 
   const [initialBody] = useState(loaded.note?.notes ?? '');
+  const [editedAt] = useState(() => loaded.note?.updatedAt ?? Date.now());
   const id = useRef(loaded.note?.id ?? null);
   const stored = useRef(initialBody);
   const latest = useRef(initialBody);
@@ -175,6 +176,7 @@ function OpenNote({ loaded, topInset, bottomInset, onClose }: OpenProps) {
     <>
       <NoteEditor
         initialBody={initialBody}
+        editedAt={editedAt}
         autoFocus={loaded.note === null}
         onChange={(body) => {
           latest.current = body;

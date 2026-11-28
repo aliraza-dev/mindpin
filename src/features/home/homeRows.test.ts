@@ -24,7 +24,12 @@ const summary = (
   savedDaysAgo: number,
   visitedDaysAgo: number | null,
 ): PlaceSummary => ({
-  place: { id: `${personId}-${title}`, personId, title, createdAt: NOW - savedDaysAgo * DAY } as Memory,
+  place: {
+    id: `${personId}-${title}`,
+    personId,
+    title,
+    createdAt: NOW - savedDaysAgo * DAY,
+  } as Memory,
   personName: null,
   lastVisitedAt: visitedDaysAgo === null ? null : NOW - visitedDaysAgo * DAY,
 });
@@ -41,7 +46,12 @@ describe('greetingFor', () => {
 });
 
 describe('summarizePeople', () => {
-  const people = [person('a', 'Ahmed'), person('s', 'Sara'), person('u', 'Usman'), person('n', 'New', NOW)];
+  const people = [
+    person('a', 'Ahmed'),
+    person('s', 'Sara'),
+    person('u', 'Usman'),
+    person('n', 'New', NOW),
+  ];
   const places = [
     summary('a', 'Shop', 2, null),
     summary('a', 'Home', 300, 60),
@@ -58,7 +68,10 @@ describe('summarizePeople', () => {
       lastSavedAt: NOW - 2 * DAY,
       lastVisitedAt: NOW - 60 * DAY,
     });
-    expect(rows.find((r) => r.person.id === 'n')).toMatchObject({ placeLabels: [], lastSavedAt: null });
+    expect(rows.find((r) => r.person.id === 'n')).toMatchObject({
+      placeLabels: [],
+      lastSavedAt: null,
+    });
   });
 
   it('lists the most recently active person first', () => {

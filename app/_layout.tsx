@@ -14,6 +14,7 @@ import { I18nManager, View } from 'react-native';
 
 import { purgeDeletedNotesAtStart } from '../src/features/notes/purge';
 import { DidYouVisit } from '../src/features/visits/DidYouVisit';
+import { loadThemePreference } from '../src/features/settings/themePreference';
 import { startBackgroundLookups } from '../src/features/save/lookups';
 import { initI18n } from '../src/i18n';
 import { useColors, useScheme } from '../src/ui/theme';
@@ -42,6 +43,7 @@ export default function RootLayout() {
   useEffect(() => {
     const background = startBackgroundLookups();
     void purgeDeletedNotesAtStart();
+    void loadThemePreference();
     return () => background.stop();
   }, []);
 

@@ -20,7 +20,12 @@ const ahmed = person('p1', 'Ahmed Sample', 'c-1');
 const people = [ahmed, person('p2', 'Bilal Sample')];
 const contacts: DeviceContact[] = [
   { contactRef: 'c-1', name: 'Ahmed Sample', phone: '0300 0000000', photoUri: null },
-  { contactRef: 'c-2', name: 'Ahmed Bhai (Plumber)', phone: '0300 0000001', photoUri: 'content://photo/2' },
+  {
+    contactRef: 'c-2',
+    name: 'Ahmed Bhai (Plumber)',
+    phone: '0300 0000001',
+    photoUri: 'content://photo/2',
+  },
 ];
 
 function setup(overrides: Partial<Parameters<typeof ContactPicker>[0]> = {}) {
@@ -70,7 +75,10 @@ describe('ContactPicker', () => {
     const { view, onChange } = setup({ text: 'Ahm', choice: { kind: 'new', name: 'Ahm' } });
     await view;
     await fireEvent.press(screen.getByRole('button', { name: 'Choose Ahmed Bhai (Plumber)' }));
-    expect(onChange).toHaveBeenCalledWith('Ahmed Bhai (Plumber)', { kind: 'contact', contact: contacts[1] });
+    expect(onChange).toHaveBeenCalledWith('Ahmed Bhai (Plumber)', {
+      kind: 'contact',
+      contact: contacts[1],
+    });
     expect(Object.keys(contacts[1]).sort()).toEqual(['contactRef', 'name', 'phone', 'photoUri']);
   });
 
@@ -96,18 +104,31 @@ describe('ContactPicker', () => {
     expect(screen.queryByText(/never uploaded/)).toBeNull();
     await fireEvent(screen.getByLabelText('Whose place is this?'), 'focus');
     expect(
-      screen.getByText('MindPin can suggest people from your contacts. Your address book is never uploaded.'),
+      screen.getByText(
+        'MindPin can suggest people from your contacts. Your address book is never uploaded.',
+      ),
     ).toBeTruthy();
-    await fireEvent.press(screen.getByRole('button', { name: 'Allow MindPin to read your contacts' }));
+    await fireEvent.press(
+      screen.getByRole('button', { name: 'Allow MindPin to read your contacts' }),
+    );
     expect(onAllowContacts).toHaveBeenCalledTimes(1);
   });
 
   it('does not ask again once contacts are allowed or refused, and a typed name still works (R3.4)', async () => {
-    const { view, onChange } = setup({ access: 'denied', contacts: [], text: 'Sa', choice: { kind: 'new', name: 'Sa' } });
+    const { view, onChange } = setup({
+      access: 'denied',
+      contacts: [],
+      text: 'Sa',
+      choice: { kind: 'new', name: 'Sa' },
+    });
     await view;
     await fireEvent(screen.getByLabelText('Whose place is this?'), 'focus');
-    expect(screen.queryByRole('button', { name: 'Allow MindPin to read your contacts' })).toBeNull();
-    expect(screen.getByText('Contacts are off. A typed name is saved as a new person.')).toBeTruthy();
+    expect(
+      screen.queryByRole('button', { name: 'Allow MindPin to read your contacts' }),
+    ).toBeNull();
+    expect(
+      screen.getByText('Contacts are off. A typed name is saved as a new person.'),
+    ).toBeTruthy();
     await fireEvent.changeText(screen.getByLabelText('Whose place is this?'), 'Sara');
     expect(onChange).toHaveBeenLastCalledWith('Sara', { kind: 'new', name: 'Sara' });
   });
@@ -120,7 +141,8 @@ describe('ContactPicker', () => {
       photoUri: null,
     }));
     const started = Date.now();
-    await setup({ text: 'Person 99', choice: { kind: 'new', name: 'Person 99' }, contacts: many }).view;
+    await setup({ text: 'Person 99', choice: { kind: 'new', name: 'Person 99' }, contacts: many })
+      .view;
     expect(screen.getByText('Person 99 Sample')).toBeTruthy();
     expect(Date.now() - started).toBeLessThan(300);
   });

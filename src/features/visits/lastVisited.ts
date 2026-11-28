@@ -5,8 +5,7 @@ import { addVisit, listVisits, type Visit, type VisitSource } from '../../db/vis
 import { translate, type Translate } from '../../i18n';
 
 export type RelativeTime =
-  | { unit: 'now' }
-  | { unit: 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'; count: number };
+  { unit: 'now' } | { unit: 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'; count: number };
 
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;

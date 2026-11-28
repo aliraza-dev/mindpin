@@ -30,20 +30,32 @@ describe('TextField', () => {
     const input = screen.getByLabelText('Name');
     expect(StyleSheet.flatten(input.props.style).borderColor).toBe(tokens.color.controlBorder);
     await fireEvent(input, 'focus');
-    expect(StyleSheet.flatten(screen.getByLabelText('Name').props.style).borderColor).toBe(tokens.color.accent);
+    expect(StyleSheet.flatten(screen.getByLabelText('Name').props.style).borderColor).toBe(
+      tokens.color.accent,
+    );
     await fireEvent(screen.getByLabelText('Name'), 'blur');
-    expect(StyleSheet.flatten(screen.getByLabelText('Name').props.style).borderColor).toBe(tokens.color.controlBorder);
+    expect(StyleSheet.flatten(screen.getByLabelText('Name').props.style).borderColor).toBe(
+      tokens.color.controlBorder,
+    );
   });
 
   it('shows a hint under the field and reads it out with the field', async () => {
-    await render(<TextField label="Tags" hint="Separate tags with commas" value="" onChangeText={() => {}} />);
+    await render(
+      <TextField label="Tags" hint="Separate tags with commas" value="" onChangeText={() => {}} />,
+    );
     expect(screen.getByText('Separate tags with commas')).toBeTruthy();
     expect(screen.getByLabelText('Tags').props.accessibilityHint).toBe('Separate tags with commas');
   });
 
   it('shows an error in place of the hint, announced as an alert', async () => {
     await render(
-      <TextField label="Name" hint="As you know them" error="Type a name." value="" onChangeText={() => {}} />,
+      <TextField
+        label="Name"
+        hint="As you know them"
+        error="Type a name."
+        value=""
+        onChangeText={() => {}}
+      />,
     );
     expect(screen.getByRole('alert')).toHaveTextContent('Type a name.');
     expect(screen.queryByText('As you know them')).toBeNull();

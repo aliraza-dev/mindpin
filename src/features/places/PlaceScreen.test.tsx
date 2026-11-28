@@ -95,14 +95,20 @@ describe('PlaceScreen', () => {
     const { db, place } = await seeded();
     (openInMaps as jest.Mock).mockResolvedValue(true);
     await render(<PlaceScreen placeId={place.id} />);
-    await fireEvent.press(await screen.findByRole('button', { name: 'Open Home in your maps app' }));
+    await fireEvent.press(
+      await screen.findByRole('button', { name: 'Open Home in your maps app' }),
+    );
 
     await waitFor(async () =>
       expect(await getNavigatePrompt(db, Date.now() + 16 * MINUTE)).toMatchObject({
         place: { id: place.id },
       }),
     );
-    expect((openInMaps as jest.Mock).mock.calls[0][0]).toMatchObject({ id: place.id, lat: 1.5, lng: 2.5 });
+    expect((openInMaps as jest.Mock).mock.calls[0][0]).toMatchObject({
+      id: place.id,
+      lat: 1.5,
+      lng: 2.5,
+    });
     expect(Alert.alert).not.toHaveBeenCalled();
   });
 
@@ -110,7 +116,9 @@ describe('PlaceScreen', () => {
     const { db, place } = await seeded();
     (openInMaps as jest.Mock).mockResolvedValue(false);
     await render(<PlaceScreen placeId={place.id} />);
-    await fireEvent.press(await screen.findByRole('button', { name: 'Open Home in your maps app' }));
+    await fireEvent.press(
+      await screen.findByRole('button', { name: 'Open Home in your maps app' }),
+    );
 
     await waitFor(() =>
       expect(Alert.alert).toHaveBeenCalledWith('No maps app could open this place.'),
@@ -121,7 +129,9 @@ describe('PlaceScreen', () => {
   it('records a visit now and shows it (R5.1)', async () => {
     const { db, place } = await seeded();
     await render(<PlaceScreen placeId={place.id} />);
-    await fireEvent.press(await screen.findByRole('button', { name: 'Record a visit to Home now' }));
+    await fireEvent.press(
+      await screen.findByRole('button', { name: 'Record a visit to Home now' }),
+    );
 
     expect(await screen.findByText('1 total')).toBeTruthy();
     expect(await listVisits(db, place.id)).toMatchObject([{ source: 'manual', note: null }]);

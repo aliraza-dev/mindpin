@@ -21,7 +21,11 @@ jest.mock('../../db/database', () => ({ getDatabase: jest.fn() }));
 
 async function seeded(overrides: Partial<Parameters<typeof createPerson>[1]> = {}) {
   const db = await freshDb();
-  const person = await createPerson(db, { name: 'Sample Person', phone: '0300 0000000', ...overrides });
+  const person = await createPerson(db, {
+    name: 'Sample Person',
+    phone: '0300 0000000',
+    ...overrides,
+  });
   (getDatabase as jest.Mock).mockResolvedValue(db);
   return { db, person };
 }
@@ -62,7 +66,10 @@ describe('EditPersonScreen', () => {
     await fireEvent.press(save());
 
     await waitFor(() => expect(mockRouter.back).toHaveBeenCalledTimes(1));
-    expect(await getPerson(db, person.id)).toMatchObject({ name: 'New Name', phone: '+92 300 0000000' });
+    expect(await getPerson(db, person.id)).toMatchObject({
+      name: 'New Name',
+      phone: '+92 300 0000000',
+    });
   });
 
   it('says the phone contacts are not changed, for a person who came from them', async () => {
@@ -88,7 +95,9 @@ describe('EditPersonScreen', () => {
     await fireEvent.press(save());
 
     expect(await screen.findByText('Type a name.')).toBeTruthy();
-    expect(screen.getByText('Enter a valid phone number, for example +92 300 0000000.')).toBeTruthy();
+    expect(
+      screen.getByText('Enter a valid phone number, for example +92 300 0000000.'),
+    ).toBeTruthy();
     expect(mockRouter.back).not.toHaveBeenCalled();
     expect(await getPerson(db, person.id)).toEqual(person);
   });
@@ -157,7 +166,11 @@ describe('EditPersonScreen', () => {
 
   it('deletes the person once confirmed, keeps their places, and returns to Home (R3.13)', async () => {
     const { db, person } = await seeded();
-    const place = await createPlace(db, { personId: person.id, title: 'Home', address: 'Canal Road' });
+    const place = await createPlace(db, {
+      personId: person.id,
+      title: 'Home',
+      address: 'Canal Road',
+    });
     await render(<EditPersonScreen personId={person.id} />);
     await fireEvent.press(
       await screen.findByRole('button', { name: 'Delete Sample Person from MindPin' }),

@@ -40,7 +40,10 @@ describe('NotesScreen', () => {
     await render(<NotesScreen />);
     await fireEvent.press(await screen.findByRole('button', { name: 'Open note Eid plans' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Write a new note' }));
-    expect(mockRouter.push).toHaveBeenCalledWith({ pathname: '/note/[id]', params: { id: note.id } });
+    expect(mockRouter.push).toHaveBeenCalledWith({
+      pathname: '/note/[id]',
+      params: { id: note.id },
+    });
     expect(mockRouter.push).toHaveBeenCalledWith({ pathname: '/note/[id]', params: { id: 'new' } });
   });
 
@@ -57,12 +60,17 @@ describe('NotesScreen', () => {
     await render(<NotesScreen />);
     await fireEvent.press(await remove());
     expect(await screen.findByText('Note deleted')).toBeTruthy();
-    await waitFor(() => expect(screen.queryByRole('button', { name: 'Open note Eid plans' })).toBeNull());
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: 'Open note Eid plans' })).toBeNull(),
+    );
 
     await fireEvent.press(screen.getByRole('button', undo));
     expect(await screen.findByRole('button', { name: 'Open note Eid plans' })).toBeTruthy();
     await waitFor(() => expect(screen.queryByRole('button', undo)).toBeNull());
-    expect(await getMemory(db, note.id)).toMatchObject({ deletedAt: null, updatedAt: note.updatedAt });
+    expect(await getMemory(db, note.id)).toMatchObject({
+      deletedAt: null,
+      updatedAt: note.updatedAt,
+    });
   });
 
   it('removes the note for good when the 5 seconds pass (R10.10)', async () => {

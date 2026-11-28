@@ -55,7 +55,12 @@ const places = [
 ];
 
 const notes = [
-  memory({ id: 'n1', type: 'note', title: 'Things to bring', notes: 'Things to bring\nSweets, gift' }),
+  memory({
+    id: 'n1',
+    type: 'note',
+    title: 'Things to bring',
+    notes: 'Things to bring\nSweets, gift',
+  }),
   memory({
     id: 'n2',
     type: 'note',
@@ -78,7 +83,14 @@ function setup(overrides: Partial<Parameters<typeof PersonView>[0]> = {}) {
     onOpenNote: jest.fn(),
   };
   const view = render(
-    <PersonView person={person} places={places} notes={notes} now={NOW} {...handlers} {...overrides} />,
+    <PersonView
+      person={person}
+      places={places}
+      notes={notes}
+      now={NOW}
+      {...handlers}
+      {...overrides}
+    />,
   );
   return { handlers, view };
 }
@@ -155,7 +167,9 @@ describe('PersonView', () => {
     expect(screen.getByText('Sep 14 · Network name')).toBeTruthy();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Open note Wi-Fi' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Write a new note about Sample Person' }));
+    await fireEvent.press(
+      screen.getByRole('button', { name: 'Write a new note about Sample Person' }),
+    );
     expect(handlers.onOpenNote).toHaveBeenCalledWith('n2');
     expect(handlers.onNewNote).toHaveBeenCalledTimes(1);
   });
