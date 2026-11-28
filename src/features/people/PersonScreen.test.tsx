@@ -1,9 +1,9 @@
 // T053: the person screen loads its own data and hands off to other apps safely.
-import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Alert, Share } from 'react-native';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { Alert, Share, type AlertButton } from 'react-native';
 
 import { getDatabase } from '../../db/database';
-import { createNote, createPlace } from '../../db/memories';
+import { createNote, createPlace, getMemory } from '../../db/memories';
 import { createPerson } from '../../db/people';
 import { freshDb } from '../../db/testing/freshDb';
 import { initI18n } from '../../i18n';
@@ -114,5 +114,49 @@ describe('PersonScreen', () => {
     expect(mockRouter.push).toHaveBeenCalledWith(`/place/${place.id}`);
     expect(mockRouter.push).toHaveBeenCalledWith(`/note/${note.id}`);
     expect(mockRouter.back).toHaveBeenCalledTimes(1);
+  });
+
+  // Presses a button of the question last shown.
+  const answer = async (text: string) => {
+    const calls = (Alert.alert as jest.Mock).mock.calls;
+    const buttons = calls[calls.length - 1][2] as AlertButton[];
+    await act(async () => {
+      await buttons.find((button) => button.text === text)?.onPress?.();
+    });
+  };
+
+  it('edits a place from its slide actions, and deletes it only after Delete (R4.4)', async () => {
+    const { db, person, place } = await seeded();
+    await render(<PersonScreen personId={person.id} />);
+    await fireEvent.press(await screen.findByRole('button', { name: 'Edit Home' }));
+    expect(mockRouter.push).toHaveBeenCalledWith(`/place/${place.id}/edit`);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Delete Home' }));
+    expect(Alert.alert).toHaveBeenCalledWith('Delete Home?', expect.any(String), expect.any(Array));
+    await answer('Cancel');
+    expect((await getMemory(db, place.id))?.deletedAt).toBeNull();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Delete Home' }));
+    await answer('Delete');
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Open Home' })).toBeNull());
+  });
+
+  it('opens a note from its slide actions, and deletes it for good after Delete (R10.10)', async () => {
+    const { db, person, note } = await seeded();
+    await render(<PersonScreen personId={person.id} />);
+    await fireEvent.press(await screen.findByRole('button', { name: 'Edit Wi-Fi' }));
+    expect(mockRouter.push).toHaveBeenCalledWith(`/note/${note.id}`);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Delete Wi-Fi' }));
+    expect(Alert.alert).toHaveBeenCalledWith(
+      'Delete Wi-Fi?',
+      'The note is deleted for good.',
+      expect.any(Array),
+    );
+    await answer('Delete');
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: 'Open note Wi-Fi' })).toBeNull(),
+    );
+    expect(await getMemory(db, note.id)).toBeNull();
   });
 });

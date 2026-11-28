@@ -12,6 +12,7 @@ import { Button } from '../../ui/Button';
 import { IconButton } from '../../ui/IconButton';
 import { PlaceTile } from '../../ui/PlaceTile';
 import { SectionHeader } from '../../ui/SectionHeader';
+import { SwipeRow } from '../../ui/SwipeRow';
 import { themed } from '../../ui/theme';
 import { tokens } from '../../ui/tokens';
 import { notePreview } from '../notes/noteText';
@@ -36,6 +37,10 @@ type Props = {
   onOpenPlace: (placeId: string) => void;
   onNewNote: () => void;
   onOpenNote: (noteId: string) => void;
+  // The actions a row uncovers when it is slid aside (R4.4, R10.10).
+  onEditPlace: (placeId: string) => void;
+  onDeletePlace: (place: Memory) => void;
+  onDeleteNote: (note: Memory) => void;
 };
 
 export function PersonView(props: Props) {
@@ -105,34 +110,53 @@ export function PersonView(props: Props) {
           <Text style={styles.empty}>{t('people:noPlaces', { name: firstName })}</Text>
         ) : null}
         {places.map(({ place, lastVisitedAt }) => (
-          <Pressable
-            key={place.id}
-            accessibilityRole="button"
-            accessibilityLabel={t('people:openPlaceA11y', { label: place.title })}
-            onPress={() => props.onOpenPlace(place.id)}
-            style={styles.placeCard}
-          >
-            <PlaceTile label={place.title} />
-            <View style={styles.placeText}>
-              <Text style={styles.rowTitle} numberOfLines={1}>
-                {place.title}
-              </Text>
-              {place.address ? (
-                <Text style={styles.rowDetail} numberOfLines={1}>
-                  {place.address}
-                </Text>
-              ) : null}
-              {lastVisitedAt === null ? (
-                <Text style={styles.notVisited} numberOfLines={1}>
-                  {t('people:notVisitedSaved', { when: agoText(place.createdAt, now) })}
-                </Text>
-              ) : (
-                <Text style={styles.visited} numberOfLines={1}>
-                  {lastVisitedLabel(lastVisitedAt, now)}
-                </Text>
-              )}
-            </View>
-          </Pressable>
+          <View key={place.id} style={styles.placeFrame}>
+            <SwipeRow
+              actions={[
+                {
+                  key: 'edit',
+                  icon: 'pencil',
+                  accessibilityLabel: t('people:swipe.editA11y', { name: place.title }),
+                  onPress: () => props.onEditPlace(place.id),
+                },
+                {
+                  key: 'delete',
+                  icon: 'trash',
+                  accessibilityLabel: t('people:swipe.deleteA11y', { name: place.title }),
+                  danger: true,
+                  onPress: () => props.onDeletePlace(place),
+                },
+              ]}
+            >
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t('people:openPlaceA11y', { label: place.title })}
+                onPress={() => props.onOpenPlace(place.id)}
+                style={styles.placeCard}
+              >
+                <PlaceTile label={place.title} />
+                <View style={styles.placeText}>
+                  <Text style={styles.rowTitle} numberOfLines={1}>
+                    {place.title}
+                  </Text>
+                  {place.address ? (
+                    <Text style={styles.rowDetail} numberOfLines={1}>
+                      {place.address}
+                    </Text>
+                  ) : null}
+                  {lastVisitedAt === null ? (
+                    <Text style={styles.notVisited} numberOfLines={1}>
+                      {t('people:notVisitedSaved', { when: agoText(place.createdAt, now) })}
+                    </Text>
+                  ) : (
+                    <Text style={styles.visited} numberOfLines={1}>
+                      {lastVisitedLabel(lastVisitedAt, now)}
+                    </Text>
+                  )}
+                </View>
+              </Pressable>
+            </SwipeRow>
+          </View>
         ))}
       </View>
 
@@ -153,20 +177,39 @@ export function PersonView(props: Props) {
               : shortDate(note.updatedAt, now, i18n.language);
             const preview = notePreview(note.notes ?? '');
             return (
-              <Pressable
-                key={note.id}
-                accessibilityRole="button"
-                accessibilityLabel={t('people:openNoteA11y', { title })}
-                onPress={() => props.onOpenNote(note.id)}
-                style={[styles.noteRow, index > 0 && styles.noteDivider]}
-              >
-                <Text style={styles.rowTitle} numberOfLines={1}>
-                  {title}
-                </Text>
-                <Text style={styles.rowDetail} numberOfLines={1}>
-                  {preview ? `${date} · ${preview}` : date}
-                </Text>
-              </Pressable>
+              <View key={note.id} style={index > 0 && styles.noteDivider}>
+                <SwipeRow
+                  actions={[
+                    {
+                      key: 'edit',
+                      icon: 'pencil',
+                      accessibilityLabel: t('people:swipe.editA11y', { name: title }),
+                      onPress: () => props.onOpenNote(note.id),
+                    },
+                    {
+                      key: 'delete',
+                      icon: 'trash',
+                      accessibilityLabel: t('people:swipe.deleteA11y', { name: title }),
+                      danger: true,
+                      onPress: () => props.onDeleteNote(note),
+                    },
+                  ]}
+                >
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={t('people:openNoteA11y', { title })}
+                    onPress={() => props.onOpenNote(note.id)}
+                    style={styles.noteRow}
+                  >
+                    <Text style={styles.rowTitle} numberOfLines={1}>
+                      {title}
+                    </Text>
+                    <Text style={styles.rowDetail} numberOfLines={1}>
+                      {preview ? `${date} · ${preview}` : date}
+                    </Text>
+                  </Pressable>
+                </SwipeRow>
+              </View>
             );
           })}
         </View>
@@ -203,16 +246,21 @@ const useStyles = themed((colors) =>
       gap: 10,
     },
     placeList: { marginTop: 18, marginBottom: 25, gap: 11 },
+    // The card's edge and corners; the row inside slides within them.
+    placeFrame: {
+      borderRadius: tokens.radius.cardMax,
+      borderWidth: 1,
+      borderColor: colors.controlBorder,
+      backgroundColor: colors.surface,
+      overflow: 'hidden',
+    },
     placeCard: {
-      minHeight: 79,
+      minHeight: 77,
       flexDirection: 'row',
       alignItems: 'center',
       gap: 12,
       paddingHorizontal: 12,
       paddingVertical: 12,
-      borderRadius: tokens.radius.cardMax,
-      borderWidth: 1,
-      borderColor: colors.controlBorder,
       backgroundColor: colors.surface,
     },
     placeText: { flex: 1, gap: 2 },

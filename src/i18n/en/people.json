@@ -19,6 +19,17 @@
   "newNoteA11y": "Write a new note about {{name}}",
   "openNoteA11y": "Open note {{title}}",
   "untitledNote": "New note",
+  "swipe": {
+    "editA11y": "Edit {{name}}",
+    "deleteA11y": "Delete {{name}}"
+  },
+  "deleteNote": {
+    "title": "Delete {{title}}?",
+    "message": "The note is deleted for good.",
+    "confirm": "Delete",
+    "cancel": "Cancel",
+    "failed": "The note could not be deleted. Try again."
+  },
   "today": "Today",
   "notFound": "This person is no longer in MindPin.",
   "cannotCall": "No app on this phone can make the call.",

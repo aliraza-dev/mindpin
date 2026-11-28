@@ -82,6 +82,9 @@ function setup(overrides: Partial<Parameters<typeof PersonView>[0]> = {}) {
     onOpenPlace: jest.fn(),
     onNewNote: jest.fn(),
     onOpenNote: jest.fn(),
+    onEditPlace: jest.fn(),
+    onDeletePlace: jest.fn(),
+    onDeleteNote: jest.fn(),
   };
   const view = render(
     <PersonView
