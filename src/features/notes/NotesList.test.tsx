@@ -99,4 +99,28 @@ describe('NotesList', () => {
     await setup([]).view;
     expect(screen.getByText('No notes yet. Tap New note to write one.')).toBeTruthy();
   });
+
+  it('draws 30 notes at first and more as the list is scrolled towards its end (R10.6)', async () => {
+    const many = Array.from({ length: 70 }, (_, index) =>
+      note(`n${index}`, `Note ${index}`, { updatedAt: NOW - index * 60_000 }),
+    );
+    await setup(many).view;
+    const drawn = () => screen.getAllByRole('button', { name: /^Open / }).length;
+    expect(drawn()).toBe(30);
+    const scroll = (y: number) =>
+      fireEvent.scroll(screen.getByTestId('notes-scroll'), {
+        nativeEvent: {
+          contentOffset: { y },
+          layoutMeasurement: { height: 700 },
+          contentSize: { height: 2200 },
+        },
+      });
+    // Far from the end, nothing more is drawn.
+    await scroll(100);
+    expect(drawn()).toBe(30);
+    await scroll(1400);
+    expect(drawn()).toBe(60);
+    await scroll(1400);
+    expect(drawn()).toBe(70);
+  });
 });

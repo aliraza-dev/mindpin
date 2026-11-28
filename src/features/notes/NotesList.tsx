@@ -16,7 +16,7 @@ import { Menu } from '../../ui/Menu';
 import { SwipeRow } from '../../ui/SwipeRow';
 import { themed } from '../../ui/theme';
 import { tokens } from '../../ui/tokens';
-import { groupNotes, type NoteSection } from './groupNotes';
+import { firstNotes, groupNotes, type NoteSection } from './groupNotes';
 import { notePreview } from './noteText';
 
 export type NoteAction = 'pin' | 'link' | 'delete';
@@ -33,6 +33,10 @@ type Props = {
 };
 
 const ACTIONS: NoteAction[] = ['pin', 'link', 'delete'];
+// How many notes are drawn at first, and how many more each time the end comes near.
+export const NOTES_PAGE = 30;
+// How close to the end of the list, in px, the next notes are drawn.
+const NEAR_END = 600;
 
 function sectionTitle(section: NoteSection<Memory>, t: (key: string) => string): string {
   if (section.kind !== 'month') return t(`notes:sections.${section.kind}`);
@@ -47,7 +51,9 @@ export function NotesList(props: Props) {
   const { notes, now, topInset = 0, bottomInset = 0 } = props;
   const { t } = useTranslation();
   const [menuFor, setMenuFor] = useState<Memory | null>(null);
-  const sections = groupNotes(notes, now);
+  // Only the first notes are drawn; more follow as the user scrolls towards the end.
+  const [shown, setShown] = useState(NOTES_PAGE);
+  const sections = firstNotes(groupNotes(notes, now), shown);
 
   const titleOf = (note: Memory) => note.title || t('notes:untitled');
   const actionText = (action: NoteAction, note: Memory) =>
@@ -60,6 +66,13 @@ export function NotesList(props: Props) {
   return (
     <View style={styles.screen}>
       <ScrollView
+        testID="notes-scroll"
+        scrollEventThrottle={100}
+        onScroll={(event) => {
+          const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
+          const left = contentSize.height - contentOffset.y - layoutMeasurement.height;
+          if (left < NEAR_END && shown < notes.length) setShown(shown + NOTES_PAGE);
+        }}
         contentContainerStyle={[
           styles.content,
           { paddingTop: topInset + 8, paddingBottom: bottomInset + 96 },

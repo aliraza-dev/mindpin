@@ -59,3 +59,16 @@ export function groupNotes<T extends Groupable>(notes: T[], now: number): NoteSe
   ];
   return sections.filter((section) => section.notes.length > 0);
 }
+
+// The first `count` notes of the list, in the order it shows them, keeping their sections.
+// The Notes list draws this much and takes more as the user scrolls (owner request).
+export function firstNotes<T>(sections: NoteSection<T>[], count: number): NoteSection<T>[] {
+  const out: NoteSection<T>[] = [];
+  let left = count;
+  for (const section of sections) {
+    if (left <= 0) break;
+    out.push({ ...section, notes: section.notes.slice(0, left) });
+    left -= section.notes.length;
+  }
+  return out;
+}

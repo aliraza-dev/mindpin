@@ -1,5 +1,5 @@
 // T066: the Notes list order and sections (R10.6, R10.7).
-import { groupNotes, type NoteSection } from './groupNotes';
+import { firstNotes, groupNotes, type NoteSection } from './groupNotes';
 
 // Local time, so the test does not depend on the machine's time zone.
 const at = (year: number, month: number, day: number, hour = 12) =>
@@ -70,5 +70,23 @@ describe('groupNotes', () => {
     expect(shape(groupNotes([note('future', at(2026, 11, 28))], NOW))).toEqual([
       ['today', ['future']],
     ]);
+  });
+
+  it('takes the first notes of the list in order, keeping their sections', () => {
+    const sections = groupNotes(
+      [
+        note('p', at(2026, 11, 1), true),
+        note('a', NOW),
+        note('b', NOW - 1000),
+        note('c', at(2026, 11, 22)),
+      ],
+      NOW,
+    );
+    expect(shape(firstNotes(sections, 2))).toEqual([
+      ['pinned', ['p']],
+      ['today', ['a']],
+    ]);
+    expect(firstNotes(sections, 10)).toEqual(sections);
+    expect(firstNotes(sections, 0)).toEqual([]);
   });
 });
