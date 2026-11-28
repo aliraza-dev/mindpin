@@ -48,6 +48,12 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "cc65e1b4-763c-46c3-93df-73bc97c3b13e"
+      }
+    },
+    "owner": "mralirazas-team"
   }
 }
