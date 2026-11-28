@@ -337,7 +337,7 @@ export function NoteEditor(props: Props) {
         ) : null}
       </ScrollView>
 
-      <View style={[styles.toolbar, { paddingBottom: bottomInset }]}>
+      <View style={[styles.toolbar, { marginBottom: bottomInset + 10 }]}>
         {TOOLS.map((tool) => {
           const on = activeTools.has(tool);
           return (
@@ -460,15 +460,17 @@ const useStyles = themed((colors) =>
       fontSize: 12,
       color: colors.amberText,
     },
-    // Seven buttons share the width evenly, each a 44 px touch target.
+    // A floating bar: rounded, clear of the screen's edges, above the keyboard.
     toolbar: {
       flexDirection: 'row',
       alignItems: 'center',
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
+      marginHorizontal: 12,
+      marginTop: 6,
+      paddingHorizontal: 6,
+      borderRadius: 26,
+      borderWidth: 1,
+      borderColor: colors.controlBorder,
       backgroundColor: colors.surface,
-      paddingHorizontal: 8,
-      paddingTop: 6,
     },
     tool: { flex: 1, height: 48, alignItems: 'center', justifyContent: 'center' },
     toolFace: {

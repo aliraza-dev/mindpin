@@ -162,6 +162,7 @@ export function HomeScreen() {
         onOpenNotes={() => router.push('/notes')}
         scheme={scheme}
         onToggleTheme={() => void chooseTheme(oppositeOf(scheme))}
+        onOpenProfile={() => router.push('/profile')}
         onEditPerson={(personId) => router.push(`/person/${personId}/edit`)}
         onDeletePerson={confirmDeletePerson}
         onEditPlace={(placeId) => router.push(`/place/${placeId}/edit`)}

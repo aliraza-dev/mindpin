@@ -60,6 +60,7 @@ type Props = {
   // The theme showing now, and the quick switch to the other one (R11.6).
   scheme: Scheme;
   onToggleTheme: () => void;
+  onOpenProfile: () => void;
   // Reached by sliding a row aside. Deleting asks first; the screen does the asking.
   onEditPerson: (personId: string) => void;
   onDeletePerson: (person: Person) => void;
@@ -226,15 +227,18 @@ export function HomeView(props: Props) {
               props.scheme === 'dark' ? 'home:theme.toLightA11y' : 'home:theme.toDarkA11y',
             )}
           />
-          {firstName ? (
-            <View
-              accessible={false}
-              importantForAccessibility="no-hide-descendants"
-              style={styles.profile}
-            >
-              <Text style={styles.profileText}>{initialsOf(firstName).slice(0, 1)}</Text>
-            </View>
-          ) : null}
+          {/* The user's own circle, which opens their profile. */}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('home:profileA11y')}
+            onPress={props.onOpenProfile}
+            hitSlop={touchSlop(tokens.size.avatar)}
+            style={styles.profile}
+          >
+            <Text style={styles.profileText}>
+              {firstName ? initialsOf(firstName).slice(0, 1) : t('home:profileNoName')}
+            </Text>
+          </Pressable>
         </View>
       </View>
 

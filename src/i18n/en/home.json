@@ -9,6 +9,8 @@
   "searchPlaceholder": "Search people, places and notes",
   "searchA11y": "Search everything you saved",
   "clearSearchA11y": "Clear search",
+  "profileA11y": "Open your profile",
+  "profileNoName": "?",
   "people": "People",
   "peopleA11y": "Show people",
   "places": "Places",

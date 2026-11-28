@@ -1,0 +1,28 @@
+{
+  "title": "Your profile",
+  "back": "Go back",
+  "noNameMark": "?",
+  "onPhone": "Kept on this phone only.",
+  "firstName": "First name",
+  "firstNameHint": "Home greets you by this name. Leave it empty for no name.",
+  "tooLong": "Use 50 characters or fewer.",
+  "save": "Save",
+  "saveA11y": "Save your first name",
+  "saveFailed": "Your name could not be saved. Try again.",
+  "loadFailed": "This screen could not be loaded. Go back and try again.",
+  "later": "Sign-in and backup will be added here later.",
+  "counts": {
+    "people_one": "Person",
+    "people_other": "People",
+    "peopleA11y_one": "{{count}} person saved",
+    "peopleA11y_other": "{{count}} people saved",
+    "places_one": "Place",
+    "places_other": "Places",
+    "placesA11y_one": "{{count}} place saved",
+    "placesA11y_other": "{{count}} places saved",
+    "notes_one": "Note",
+    "notes_other": "Notes",
+    "notesA11y_one": "{{count}} note",
+    "notesA11y_other": "{{count}} notes"
+  }
+}

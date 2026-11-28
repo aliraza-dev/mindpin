@@ -351,6 +351,7 @@ pending place; buying the unlock saves it, and a restore on another phone keeps 
 - [X] T149 [P] Theme choice tests in `src/features/settings/themePreference.test.ts`, `src/features/settings/SettingsScreen.test.tsx`, and `src/features/home/HomeScreen.test.tsx`: a choice applies at once, is remembered, and can be switched from Home (R11.6)
 - [X] T150 Theme choice in `src/ui/theme.ts` and `src/features/settings/themePreference.ts`, the switch in `src/ui/ThemeToggle.tsx`, and the Settings screen in `src/features/settings/SettingsScreen.tsx` with its Appearance section (R11.6)
 - [X] T151 Floating + button on Home in `src/ui/AddMenu.tsx` offering New note and Add place, replacing the + in the bottom bar, with tests in `src/ui/AddMenu.test.tsx` (R4.7, R6.5)
+- [X] T161 Start the profile screen: first name and saved counts in `src/features/profile/`, route `app/profile.tsx`, opened from Home's circle; the note toolbar as a floating bar (R7.8, R10.4)
 - [X] T160 One new line per Enter and a working Backspace between lines in `src/features/notes/NoteEditor.tsx` (R10.4)
 - [X] T159 A color for each person: migration `src/db/migrations/004_person_color.ts` (design.md `person.color`), the palette in `src/ui/personColors.ts`, the choice in `src/features/people/EditPersonScreen.tsx`; place rows on the theme color; a mark before the Notes title (R3.12, R6.3, R10.6)
 - [X] T158 Draw the Notes list 30 notes at a time as the user scrolls (`src/features/notes/NotesList.tsx`, `firstNotes` in `src/features/notes/groupNotes.ts`) (R10.6)

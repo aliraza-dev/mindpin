@@ -7,6 +7,7 @@ import enMap from './en/map.json';
 import enNotes from './en/notes.json';
 import enPeople from './en/people.json';
 import enPlaces from './en/places.json';
+import enProfile from './en/profile.json';
 import enSave from './en/save.json';
 import enSettings from './en/settings.json';
 import enVisits from './en/visits.json';
@@ -21,6 +22,7 @@ export const resources = {
     notes: enNotes,
     people: enPeople,
     places: enPlaces,
+    profile: enProfile,
     save: enSave,
     settings: enSettings,
     visits: enVisits,

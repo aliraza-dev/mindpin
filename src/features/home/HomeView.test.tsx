@@ -92,6 +92,7 @@ function setup(overrides: Partial<Parameters<typeof HomeView>[0]> = {}) {
     onOpenPlace: jest.fn(),
     onOpenNote: jest.fn(),
     onToggleTheme: jest.fn(),
+    onOpenProfile: jest.fn(),
     onEditPerson: jest.fn(),
     onDeletePerson: jest.fn(),
     onEditPlace: jest.fn(),
@@ -310,5 +311,12 @@ describe('HomeView', () => {
       StyleSheet.flatten(screen.getByRole('button', { name: `Open ${name}` }).props.style);
     expect(rowOf(painted[0].person.name).backgroundColor).toBe('#E2F6D3');
     expect(rowOf(painted[1].person.name).backgroundColor).not.toBe('#E2F6D3');
+  });
+
+  it('opens the profile from the circle at the top, with or without a name', async () => {
+    const { handlers, view } = setup({ firstName: null });
+    await view;
+    await fireEvent.press(screen.getByRole('button', { name: 'Open your profile' }));
+    expect(handlers.onOpenProfile).toHaveBeenCalledTimes(1);
   });
 });
