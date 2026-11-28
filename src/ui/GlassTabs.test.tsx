@@ -4,6 +4,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 
 import { GlassTabs, type GlassTab } from './GlassTabs';
+import { lightColors } from './tokens';
 
 const tabs: GlassTab[] = [
   { key: 'people', label: 'People', accessibilityLabel: 'Show people' },
@@ -37,5 +38,14 @@ describe('GlassTabs', () => {
     expect(screen.getAllByRole('tab')).toHaveLength(3);
     const capsule = StyleSheet.flatten(screen.root!.props.style);
     expect(capsule.height).toBeGreaterThanOrEqual(44);
+  });
+
+  it('gives the bubble a faint wash of the theme color and no drop shadow', async () => {
+    await render(<GlassTabs tabs={tabs} activeIndex={0} onSelect={() => {}} />);
+    await fireEvent(screen.getByTestId('glass-measure', HIDDEN), 'layout', layout);
+    const bubble = StyleSheet.flatten(screen.getByTestId('glass-bubble', HIDDEN).props.style);
+    expect(bubble.backgroundColor).toBe(lightColors.tealSoft);
+    expect(bubble.elevation).toBeUndefined();
+    expect(bubble.shadowOpacity).toBeUndefined();
   });
 });

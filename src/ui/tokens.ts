@@ -33,6 +33,8 @@ export const lightColors = {
   // Text on the accent color and on the dark card.
   onAccent: '#FFFFFF',
   onDark: '#FFFFFF',
+  // The light catching a pane or bubble of glass.
+  shine: 'rgba(255, 255, 255, 0.6)',
 };
 
 export type Colors = typeof lightColors;
@@ -67,6 +69,7 @@ export const darkColors: Colors = {
   bubbleText: '#F5F4EF',
   onAccent: '#1F1E1D',
   onDark: '#F5F4EF',
+  shine: 'rgba(255, 255, 255, 0.09)',
 };
 
 // Sizes, fonts, and radii are the same in both themes. `color` here is the light theme, for

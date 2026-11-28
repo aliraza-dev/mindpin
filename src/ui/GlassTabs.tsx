@@ -142,7 +142,7 @@ export function GlassTabs({ tabs, activeIndex, onSelect, height = 48, role = 'bu
           ]}
         >
           {/* The light catching the top of the glass. */}
-          <View style={styles.shine} />
+          <View style={styles.gloss} />
         </Animated.View>
       ) : null}
       {tabs.map((tab, index) => {
@@ -178,33 +178,30 @@ const useStyles = themed((colors) =>
       alignItems: 'center',
       padding: PAD,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: colors.shine,
       backgroundColor: colors.divider,
     },
-    // The bubble: brighter glass, lifted off the capsule.
+    // The bubble: glass with a faint wash of the theme color and a bright rim. It has no
+    // drop shadow: on Android a shadow under a moving, rounded view can show as a dark box.
     bubble: {
       position: 'absolute',
       top: PAD - 1,
       left: PAD - 1,
       overflow: 'hidden',
       borderWidth: 1,
-      borderColor: colors.controlBorder,
-      backgroundColor: colors.surface,
-      elevation: 3,
-      shadowColor: '#000000',
-      shadowOpacity: 0.12,
-      shadowRadius: 6,
-      shadowOffset: { width: 0, height: 2 },
+      borderColor: colors.shine,
+      backgroundColor: colors.tealSoft,
     },
-    shine: {
+    // The gloss: the top half of the bubble is a touch lighter, edge to edge, so it reads as
+    // light on curved glass and not as a shape sitting on the button.
+    gloss: {
       position: 'absolute',
-      top: 1,
-      left: 10,
-      right: 10,
-      height: '42%',
-      borderRadius: 20,
-      backgroundColor: colors.background,
-      opacity: 0.55,
+      top: 0,
+      left: 0,
+      right: 0,
+      height: '50%',
+      backgroundColor: colors.shine,
+      opacity: 0.5,
     },
     tab: { flex: 1, height: '100%', alignItems: 'center', justifyContent: 'center' },
     label: { fontFamily: tokens.font.body, fontSize: 14, color: colors.mutedText },

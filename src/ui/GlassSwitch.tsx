@@ -92,8 +92,7 @@ const useStyles = themed((colors) =>
       top: -80,
       bottom: -80,
       width: 70,
-      backgroundColor: colors.background,
-      opacity: 0.7,
+      backgroundColor: colors.shine,
     },
   }),
 );

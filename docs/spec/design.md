@@ -200,6 +200,7 @@ There is no Figma frame for the dark theme; these values were chosen on 2026-11-
 | Indigo tint, with its text | `#2F3150`; text `#B9BDF2` |
 | Raised card (the dark card of the light theme) | `#3A3936`, text `#F5F4EF`, muted text `#C2C0B6`, action `#F2B66D` |
 | Inactive dot, map placeholder | `#5A5954`, `#2F3A2C` |
+| Shine on glass | white at 9% (60% in the light theme) |
 
 Two tokens exist so the same component works in both themes: text on the accent color (white in light, `#1F1E1D` in dark, because white on orange fails the contrast rule) and text on the dark card.
 
