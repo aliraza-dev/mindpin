@@ -14,6 +14,7 @@ import navHome from '../../assets/icons/nav-home.svg';
 import navMap from '../../assets/icons/nav-map.svg';
 import navSettings from '../../assets/icons/nav-settings.svg';
 import navigate from '../../assets/icons/navigate.svg';
+import note from '../../assets/icons/note.svg';
 import pencil from '../../assets/icons/pencil.svg';
 import pin from '../../assets/icons/pin.svg';
 import place from '../../assets/icons/place.svg';
@@ -37,6 +38,7 @@ const ICONS = {
   // Drawn for the actions behind a list row; not from Figma.
   link: { source: link, width: 24, height: 24 },
   pencil: { source: pencil, width: 24, height: 24 },
+  note: { source: note, width: 24, height: 24 },
   pin: { source: pin, width: 24, height: 24 },
   place: { source: place, width: 24, height: 24 },
   trash: { source: trash, width: 24, height: 24 },

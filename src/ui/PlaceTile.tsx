@@ -1,6 +1,5 @@
 import { StyleSheet, View } from 'react-native';
 
-import { tintFor } from './Avatar';
 import { Icon } from './Icon';
 import { useColors } from './theme';
 import { tokens } from './tokens';
@@ -10,23 +9,21 @@ type Props = { label: string };
 const HOME = ['home', 'house'];
 const SHOP = ['shop', 'store', 'market'];
 
-// The square icon next to a place. Home and Shop have icons in the design. Any other place
-// shows a map pin on a tinted square; the tint comes from the label, so the same place always
-// has the same color (owner request, 2026-11-28).
+// The round icon next to a place: a circle, like the circle of a person, so the two lists
+// match (owner request, 2026-11-28). Home and Shop have icons in the design, cut to a circle
+// here. Any other place shows a map pin on the theme color.
 export function PlaceTile({ label }: Props) {
   const colors = useColors();
   const key = label.trim().toLowerCase();
-  if (HOME.includes(key)) return <Icon name="tileHome" />;
-  if (SHOP.includes(key)) return <Icon name="tileShop" />;
-  const tint = tintFor(key, colors);
+  const drawn = HOME.includes(key) ? 'tileHome' : SHOP.includes(key) ? 'tileShop' : null;
   return (
     <View
       testID="place-tile"
       accessible={false}
       importantForAccessibility="no-hide-descendants"
-      style={[styles.tile, { backgroundColor: tint.background }]}
+      style={[styles.tile, !drawn && { backgroundColor: colors.accent }]}
     >
-      <Icon name="place" tintColor={tint.text} />
+      {drawn ? <Icon name={drawn} /> : <Icon name="place" tintColor={colors.onAccent} />}
     </View>
   );
 }
@@ -35,7 +32,8 @@ const styles = StyleSheet.create({
   tile: {
     width: tokens.size.tile,
     height: tokens.size.tile,
-    borderRadius: tokens.radius.cardMin,
+    borderRadius: tokens.size.tile / 2,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },

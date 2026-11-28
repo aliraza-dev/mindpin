@@ -123,4 +123,10 @@ describe('NotesList', () => {
     await scroll(1400);
     expect(drawn()).toBe(70);
   });
+
+  it('has a note mark before its title (R10.6)', async () => {
+    await setup().view;
+    expect(screen.getByTestId('notes-mark')).toBeTruthy();
+    expect(screen.getByRole('header', { name: 'Notes' })).toBeTruthy();
+  });
 });

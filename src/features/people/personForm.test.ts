@@ -121,4 +121,15 @@ describe('saveEditedPerson', () => {
       }),
     ).rejects.toThrow('Person not found');
   });
+
+  it('stores only a known color, and leaves the color alone when the form has none', async () => {
+    expect(validatePersonForm({ name: 'A', phone: '', color: 'mint' })).toMatchObject({
+      value: { color: 'mint' },
+    });
+    expect(validatePersonForm({ name: 'A', phone: '', color: 'not-a-color' })).toMatchObject({
+      value: { color: null },
+    });
+    const plain = validatePersonForm({ name: 'A', phone: '' });
+    expect(plain.ok && 'color' in plain.value).toBe(false);
+  });
 });

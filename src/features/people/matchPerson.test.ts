@@ -12,6 +12,7 @@ function person(name: string, contactRef: string | null = null): Person {
     phone: null,
     contactRef,
     photoUri: null,
+    color: null,
     createdAt: 0,
     updatedAt: 0,
   };

@@ -5,7 +5,7 @@
 import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getDatabase } from '../../db/database';
@@ -13,9 +13,10 @@ import { deletePerson, getPerson, type Person } from '../../db/people';
 import { useDbQuery } from '../../lib/useDbQuery';
 import { Button } from '../../ui/Button';
 import { FormScreen } from '../../ui/FormScreen';
+import { PERSON_COLORS, isPersonColor, personPaint } from '../../ui/personColors';
 import { ScreenMessage } from '../../ui/ScreenMessage';
 import { TextField } from '../../ui/TextField';
-import { themed } from '../../ui/theme';
+import { themed, useColors } from '../../ui/theme';
 import { tokens } from '../../ui/tokens';
 import { PERSON_LIMITS, saveEditedPerson, type PersonFormErrors } from './personForm';
 
@@ -76,6 +77,8 @@ function EditPersonForm({ person, topInset, bottomInset, onDone, onDeleted }: Fo
   const { t } = useTranslation();
   const [name, setName] = useState(person.name);
   const [phone, setPhone] = useState(person.phone ?? '');
+  const [color, setColor] = useState(isPersonColor(person.color) ? person.color : null);
+  const colors = useColors();
   const [errors, setErrors] = useState<PersonFormErrors>({});
   // Stops a double tap on Save or Delete from writing twice.
   const busy = useRef(false);
@@ -87,7 +90,11 @@ function EditPersonForm({ person, topInset, bottomInset, onDone, onDeleted }: Fo
     if (busy.current) return;
     busy.current = true;
     try {
-      const result = await saveEditedPerson(await getDatabase(), person.id, { name, phone });
+      const result = await saveEditedPerson(await getDatabase(), person.id, {
+        name,
+        phone,
+        color,
+      });
       if (!result.ok) {
         setErrors(result.errors);
         return;
@@ -164,6 +171,38 @@ function EditPersonForm({ person, topInset, bottomInset, onDone, onDeleted }: Fo
         autoComplete="off"
         error={errorText('phone')}
       />
+      {/* The color of the person's row in the list: none, or one of the pad. */}
+      <View>
+        <Text style={styles.label}>{t('people:editForm.color')}</Text>
+        <View accessibilityRole="radiogroup" style={styles.swatches}>
+          {[null, ...PERSON_COLORS].map((option) => {
+            // No color: the row stays as the list draws it.
+            const tint = personPaint(option, colors) ?? {
+              background: colors.surface,
+              text: colors.secondaryText,
+            };
+            const on = option === color;
+            return (
+              <Pressable
+                key={option ?? 'auto'}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: on }}
+                accessibilityLabel={t(`people:editForm.colors.${option ?? 'auto'}`)}
+                onPress={() => setColor(option)}
+                style={[styles.swatch, on && styles.swatchOn]}
+              >
+                <View style={[styles.swatchFill, { backgroundColor: tint.background }]}>
+                  {option === null ? (
+                    <Text style={[styles.swatchAuto, { color: tint.text }]}>
+                      {t('people:editForm.colorAutoMark')}
+                    </Text>
+                  ) : null}
+                </View>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
       {person.contactRef ? (
         <Text style={styles.note}>{t('people:editForm.contactsNote')}</Text>
       ) : null}
@@ -174,6 +213,29 @@ function EditPersonForm({ person, topInset, bottomInset, onDone, onDeleted }: Fo
 const useStyles = themed((colors) =>
   StyleSheet.create({
     blank: { flex: 1, backgroundColor: colors.background },
+    label: { fontFamily: tokens.font.bodyBold, fontSize: 13, color: colors.secondaryText },
+    swatches: { marginTop: 8, flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
+    // A 44 px touch target around a 34 px circle; the ring shows the chosen one.
+    swatch: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 2,
+      borderColor: 'transparent',
+    },
+    swatchOn: { borderColor: colors.accent },
+    swatchFill: {
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.controlBorder,
+    },
+    swatchAuto: { fontFamily: tokens.font.bodyBold, fontSize: 13 },
     note: { fontFamily: tokens.font.body, fontSize: 13, color: colors.mutedText },
   }),
 );

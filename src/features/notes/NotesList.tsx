@@ -12,9 +12,10 @@ import { shortDate } from '../../lib/dates';
 import { BackButton } from '../../ui/BackButton';
 import { Button } from '../../ui/Button';
 import { EmptyIllustration } from '../../ui/EmptyIllustration';
+import { Icon } from '../../ui/Icon';
 import { Menu } from '../../ui/Menu';
 import { SwipeRow } from '../../ui/SwipeRow';
-import { themed } from '../../ui/theme';
+import { themed, useColors } from '../../ui/theme';
 import { tokens } from '../../ui/tokens';
 import { firstNotes, groupNotes, type NoteSection } from './groupNotes';
 import { notePreview } from './noteText';
@@ -48,6 +49,7 @@ function sectionTitle(section: NoteSection<Memory>, t: (key: string) => string):
 
 export function NotesList(props: Props) {
   const styles = useStyles();
+  const colors = useColors();
   const { notes, now, topInset = 0, bottomInset = 0 } = props;
   const { t } = useTranslation();
   const [menuFor, setMenuFor] = useState<Memory | null>(null);
@@ -86,9 +88,14 @@ export function NotesList(props: Props) {
             onPress={props.onNew}
           />
         </View>
-        <Text accessibilityRole="header" style={styles.title}>
-          {t('notes:title')}
-        </Text>
+        <View style={styles.titleRow}>
+          <View testID="notes-mark" style={styles.titleMark}>
+            <Icon name="note" tintColor={colors.onAccent} />
+          </View>
+          <Text accessibilityRole="header" style={styles.title}>
+            {t('notes:title')}
+          </Text>
+        </View>
 
         {sections.length === 0 ? (
           <>
@@ -171,8 +178,17 @@ const useStyles = themed((colors) =>
     screen: { flex: 1, backgroundColor: colors.background },
     content: { paddingHorizontal: tokens.screenPadding },
     top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    titleRow: { marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 10 },
+    // The mark before the title, as the pin is before the app's name on Home.
+    titleMark: {
+      width: 36,
+      height: 36,
+      borderRadius: 11,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.accent,
+    },
     title: {
-      marginTop: 14,
       fontFamily: tokens.font.headingBold,
       fontSize: 28,
       color: colors.text,

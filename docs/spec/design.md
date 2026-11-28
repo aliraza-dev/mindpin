@@ -41,6 +41,7 @@ Places and notes are stored as a generic memory item so receipts, voice notes, a
 | phone | text | Optional |
 | contact_ref | text | Device contact ID, optional; unique among people when set; device-specific, so re-linked by phone number after restore |
 | photo_uri | text | Optional |
+| color | text | Optional; one of the color names in `src/ui/personColors.ts` (theme, orange, coral, peach, sand, mint, sage, fog, storm, dusk, blossom, clay, chalk). Null means no color: the person's row is drawn like any other. The color fills the row; the avatar keeps the tint picked from the id |
 | created_at, updated_at | integer | Unix ms |
 
 ### memory

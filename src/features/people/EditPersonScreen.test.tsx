@@ -198,4 +198,19 @@ describe('EditPersonScreen', () => {
     expect(mockRouter.dismissTo).not.toHaveBeenCalled();
     expect(await getPerson(db, person.id)).toEqual(person);
   });
+
+  it('offers a color for the person and stores the one chosen (R3.12)', async () => {
+    const { db, person } = await seeded();
+    await render(<EditPersonScreen personId={person.id} />);
+    // None until a color is chosen.
+    expect(await screen.findByRole('radio', { name: 'No color' })).toBeChecked();
+    expect(screen.getAllByRole('radio')).toHaveLength(14);
+    await fireEvent.press(screen.getByRole('radio', { name: 'Claude orange' }));
+    expect(screen.getByRole('radio', { name: 'Claude orange' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: 'No color' })).not.toBeChecked();
+    await fireEvent.press(save());
+
+    await waitFor(() => expect(mockRouter.back).toHaveBeenCalledTimes(1));
+    expect(await getPerson(db, person.id)).toMatchObject({ color: 'orange' });
+  });
 });

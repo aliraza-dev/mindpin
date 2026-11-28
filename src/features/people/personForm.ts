@@ -2,6 +2,7 @@
 // phone's address book. The limits are the ones in design.md, "Limits on typed text".
 import { updatePerson, type Person } from '../../db/people';
 import type { SqlDatabase } from '../../db/types';
+import { isPersonColor } from '../../ui/personColors';
 
 export const PERSON_LIMITS = {
   name: 100,
@@ -10,9 +11,10 @@ export const PERSON_LIMITS = {
   phoneMaxDigits: 15,
 } as const;
 
-export type PersonFormValues = { name: string; phone: string };
+// `color` is left out by a form that does not offer the choice; null means no color.
+export type PersonFormValues = { name: string; phone: string; color?: string | null };
 export type PersonFormErrors = { name?: 'nameRequired' | 'nameTooLong'; phone?: 'phoneInvalid' };
-export type PersonEdit = { name: string; phone: string | null };
+export type PersonEdit = { name: string; phone: string | null; color?: string | null };
 
 export type PersonFormResult =
   { ok: true; value: PersonEdit } | { ok: false; errors: PersonFormErrors };
@@ -37,7 +39,10 @@ export function validatePersonForm(values: PersonFormValues): PersonFormResult {
   if (phone && !isPhone(phone)) errors.phone = 'phoneInvalid';
 
   if (Object.keys(errors).length > 0) return { ok: false, errors };
-  return { ok: true, value: { name, phone: phone || null } };
+  const value: PersonEdit = { name, phone: phone || null };
+  // Anything that is not one of the known colors is stored as no color.
+  if (values.color !== undefined) value.color = isPersonColor(values.color) ? values.color : null;
+  return { ok: true, value };
 }
 
 export type EditPersonResult =

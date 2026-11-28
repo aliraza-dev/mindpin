@@ -39,6 +39,7 @@ const person: Person = {
   phone: '+10000000000',
   contactRef: 'c-1',
   photoUri: null,
+  color: null,
   createdAt: NOW,
   updatedAt: NOW,
 };

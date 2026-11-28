@@ -12,6 +12,7 @@ const person = (id: string, name: string, contactRef: string | null = null): Per
   phone: null,
   contactRef,
   photoUri: null,
+  color: null,
   createdAt: 1,
   updatedAt: 1,
 });
@@ -139,6 +140,7 @@ describe('ContactPicker', () => {
       name: `Person ${i} Sample`,
       phone: null,
       photoUri: null,
+      color: null,
     }));
     const started = Date.now();
     await setup({ text: 'Person 99', choice: { kind: 'new', name: 'Person 99' }, contacts: many })

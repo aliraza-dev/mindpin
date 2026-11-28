@@ -25,6 +25,7 @@ import { GlassSwitch } from '../../ui/GlassSwitch';
 import { GlassTabs } from '../../ui/GlassTabs';
 import { Icon } from '../../ui/Icon';
 import { LogoMark } from '../../ui/LogoMark';
+import { personPaint } from '../../ui/personColors';
 import { PlaceTile } from '../../ui/PlaceTile';
 import { SwipeRow } from '../../ui/SwipeRow';
 import { themed, useColors, type Scheme } from '../../ui/theme';
@@ -104,6 +105,7 @@ export function HomeView(props: Props) {
   useEffect(() => {
     keep({ index: VIEWS.indexOf(view), searching: results !== null, change: props.onChangeView });
   });
+  const paintOf = (person: Person) => personPaint(person.color, colors);
   // The side the new list comes in from: Places is after People.
   const forward = I18nManager.isRTL ? -1 : 1;
   const back = I18nManager.isRTL ? 1 : -1;
@@ -354,14 +356,32 @@ export function HomeView(props: Props) {
                             accessibilityRole="button"
                             accessibilityLabel={t('home:openPersonA11y', { name: row.person.name })}
                             onPress={() => props.onOpenPerson(row.person.id)}
-                            style={styles.row}
+                            // The person's color, when one was chosen, fills the row.
+                            style={[
+                              styles.row,
+                              paintOf(row.person) && {
+                                backgroundColor: paintOf(row.person)?.background,
+                              },
+                            ]}
                           >
                             <Avatar name={row.person.name} tintKey={row.person.id} />
                             <View style={styles.rowText}>
-                              <Text style={styles.rowTitle} numberOfLines={1}>
+                              <Text
+                                style={[
+                                  styles.rowTitle,
+                                  paintOf(row.person) && { color: paintOf(row.person)?.text },
+                                ]}
+                                numberOfLines={1}
+                              >
                                 {row.person.name}
                               </Text>
-                              <Text style={styles.rowDetail} numberOfLines={2}>
+                              <Text
+                                style={[
+                                  styles.rowDetail,
+                                  paintOf(row.person) && { color: paintOf(row.person)?.text },
+                                ]}
+                                numberOfLines={2}
+                              >
                                 {personRowSubtitle(row, now)}
                               </Text>
                             </View>

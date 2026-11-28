@@ -14,6 +14,7 @@ const person = (id: string, name: string, updatedAt = 0): Person => ({
   phone: null,
   contactRef: null,
   photoUri: null,
+  color: null,
   createdAt: updatedAt,
   updatedAt,
 });

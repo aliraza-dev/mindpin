@@ -1,7 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { tintFor } from './personColors';
 import { useColors } from './theme';
-import { tokens, type Colors } from './tokens';
+import { tokens } from './tokens';
+
+export { tintFor } from './personColors';
 
 // Up to two initials: the first letters of the first two words.
 export function initialsOf(name: string): string {
@@ -12,18 +15,6 @@ export function initialsOf(name: string): string {
     .map((word) => Array.from(word)[0] ?? '')
     .join('')
     .toUpperCase();
-}
-
-// The same person always gets the same tint, in the colors of the current theme.
-export function tintFor(key: string, colors: Colors) {
-  const tints = [
-    { background: colors.tealTint, text: colors.tealText },
-    { background: colors.amberTint, text: colors.amberText },
-    { background: colors.indigoTint, text: colors.indigoText },
-  ];
-  let sum = 0;
-  for (let i = 0; i < key.length; i++) sum = (sum + key.charCodeAt(i)) % tints.length;
-  return tints[sum];
 }
 
 type Props = { name: string; tintKey: string; size?: 'small' | 'large' };

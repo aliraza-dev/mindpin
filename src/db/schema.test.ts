@@ -41,7 +41,16 @@ describe('schema (design.md data model)', () => {
   it('creates person, memory, visit, and setting with the designed columns', async () => {
     const db = await freshDb();
     expect(await columns(db, 'person')).toEqual(
-      ['contact_ref', 'created_at', 'id', 'name', 'phone', 'photo_uri', 'updated_at'].sort(),
+      [
+        'color',
+        'contact_ref',
+        'created_at',
+        'id',
+        'name',
+        'phone',
+        'photo_uri',
+        'updated_at',
+      ].sort(),
     );
     expect(await columns(db, 'memory')).toEqual(
       [
@@ -244,5 +253,28 @@ describe('full-text search index', () => {
     const db = await seed();
     await db.runAsync("UPDATE memory SET deleted_at = 1 WHERE id = 'm1'");
     expect(await search(db, 'shop')).toEqual([]);
+  });
+});
+
+describe('upgrade from schema version 3 to 4 (person color)', () => {
+  it('keeps the people already saved, with no color chosen', async () => {
+    const db = openTestDatabase();
+    await migrate(
+      db,
+      migrations.filter((m) => m.version <= 3),
+    );
+    await insertPerson(db, 'p1', 'Sample Person', 'contact-1');
+    await migrate(db, migrations);
+    const row = await db.getFirstAsync<{ name: string; color: string | null }>(
+      'SELECT name, color FROM person WHERE id = ?',
+      ['p1'],
+    );
+    expect(row).toEqual({ name: 'Sample Person', color: null });
+    await db.runAsync('UPDATE person SET color = ? WHERE id = ?', ['mint', 'p1']);
+    const changed = await db.getFirstAsync<{ color: string | null }>(
+      'SELECT color FROM person WHERE id = ?',
+      ['p1'],
+    );
+    expect(changed?.color).toBe('mint');
   });
 });

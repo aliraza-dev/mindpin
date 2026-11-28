@@ -8,6 +8,8 @@ export type Person = {
   phone: string | null;
   contactRef: string | null;
   photoUri: string | null;
+  // One of the names in src/ui/personColors.ts, or null for the app's own choice.
+  color: string | null;
   createdAt: number;
   updatedAt: number;
 };
@@ -17,6 +19,7 @@ export type NewPerson = {
   phone?: string | null;
   contactRef?: string | null;
   photoUri?: string | null;
+  color?: string | null;
 };
 
 type PersonRow = {
@@ -25,6 +28,7 @@ type PersonRow = {
   phone: string | null;
   contact_ref: string | null;
   photo_uri: string | null;
+  color: string | null;
   created_at: number;
   updated_at: number;
 };
@@ -36,6 +40,7 @@ function toPerson(row: PersonRow): Person {
     phone: row.phone,
     contactRef: row.contact_ref,
     photoUri: row.photo_uri,
+    color: row.color,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -55,18 +60,20 @@ export async function createPerson(db: SqlDatabase, input: NewPerson): Promise<P
     phone: input.phone ?? null,
     contactRef: input.contactRef ?? null,
     photoUri: input.photoUri ?? null,
+    color: input.color ?? null,
     createdAt: now,
     updatedAt: now,
   };
   await db.runAsync(
-    `INSERT INTO person (id, name, phone, contact_ref, photo_uri, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO person (id, name, phone, contact_ref, photo_uri, color, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       person.id,
       person.name,
       person.phone,
       person.contactRef,
       person.photoUri,
+      person.color,
       person.createdAt,
       person.updatedAt,
     ],
@@ -121,12 +128,21 @@ export async function updatePerson(
     phone: patch.phone === undefined ? existing.phone : patch.phone,
     contactRef: patch.contactRef === undefined ? existing.contactRef : patch.contactRef,
     photoUri: patch.photoUri === undefined ? existing.photoUri : patch.photoUri,
+    color: patch.color === undefined ? existing.color : patch.color,
     updatedAt: Math.max(Date.now(), existing.updatedAt),
   };
   await db.runAsync(
-    `UPDATE person SET name = ?, phone = ?, contact_ref = ?, photo_uri = ?, updated_at = ?
+    `UPDATE person SET name = ?, phone = ?, contact_ref = ?, photo_uri = ?, color = ?, updated_at = ?
      WHERE id = ?`,
-    [updated.name, updated.phone, updated.contactRef, updated.photoUri, updated.updatedAt, id],
+    [
+      updated.name,
+      updated.phone,
+      updated.contactRef,
+      updated.photoUri,
+      updated.color,
+      updated.updatedAt,
+      id,
+    ],
   );
   return updated;
 }

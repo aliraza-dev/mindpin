@@ -4,6 +4,8 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { Memory } from '../../db/memories';
 import type { Person } from '../../db/people';
 import type { PlaceSummary } from '../../db/placeSummaries';
+import { StyleSheet } from 'react-native';
+
 import { initI18n } from '../../i18n';
 import { summarizePeople } from './homeRows';
 import { HomeView } from './HomeView';
@@ -17,6 +19,7 @@ const person = (id: string, name: string): Person => ({
   phone: null,
   contactRef: null,
   photoUri: null,
+  color: null,
   createdAt: 0,
   updatedAt: 0,
 });
@@ -296,5 +299,16 @@ describe('HomeView', () => {
     await setup({ people: [], places: [] }).view;
     expect(screen.getByTestId('empty-people', HIDDEN)).toBeTruthy();
     expect(screen.getByText(/Nothing saved yet/)).toBeTruthy();
+  });
+
+  it("fills a person's row with their color, and leaves the others plain (R3.12)", async () => {
+    const painted = people.map((row, index) =>
+      index === 0 ? { ...row, person: { ...row.person, color: 'mint' } } : row,
+    );
+    await setup({ people: painted }).view;
+    const rowOf = (name: string) =>
+      StyleSheet.flatten(screen.getByRole('button', { name: `Open ${name}` }).props.style);
+    expect(rowOf(painted[0].person.name).backgroundColor).toBe('#E2F6D3');
+    expect(rowOf(painted[1].person.name).backgroundColor).not.toBe('#E2F6D3');
   });
 });
