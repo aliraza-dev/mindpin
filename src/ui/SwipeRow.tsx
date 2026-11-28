@@ -38,8 +38,15 @@ export function SwipeRow({ actions, children }: Props) {
     };
     const pan = PanResponder.create({
       // Only a sideways drag is taken, so the list still scrolls and taps still open the row.
+      // A closed row takes only a drag towards its actions; a drag the other way is left to
+      // the screen, which may use it to change lists.
       onMoveShouldSetPanResponder: (_event, gesture) =>
-        Math.abs(gesture.dx) > 12 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.5,
+        Math.abs(gesture.dx) > 12 &&
+        Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.5 &&
+        (open || Math.sign(gesture.dx) === side),
+      // Once the row has the drag it keeps it: a screen that also listens for sideways
+      // swipes would otherwise take the drag over part way.
+      onPanResponderTerminationRequest: () => false,
       onPanResponderMove: (_event, gesture) => {
         const to = rest() + gesture.dx;
         position.setValue(

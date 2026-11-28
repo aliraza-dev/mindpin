@@ -2,7 +2,7 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, BackHandler, StyleSheet, Text, View } from 'react-native';
+import { Alert, BackHandler, Keyboard, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getDatabase } from '../../db/database';
@@ -61,6 +61,7 @@ export function HomeScreen() {
     useCallback(() => {
       if (!searching) return;
       const back = BackHandler.addEventListener('hardwareBackPress', () => {
+        Keyboard.dismiss();
         latestSearch.current += 1;
         setSearchText('');
         setResults(null);

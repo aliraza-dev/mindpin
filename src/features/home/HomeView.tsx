@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   I18nManager,
+  Keyboard,
   PanResponder,
   Pressable,
   ScrollView,
@@ -254,7 +255,10 @@ export function HomeView(props: Props) {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={t('home:clearSearchA11y')}
-            onPress={() => props.onSearchChange('')}
+            onPress={() => {
+              Keyboard.dismiss();
+              props.onSearchChange('');
+            }}
             hitSlop={touchSlop(24)}
             style={styles.clear}
           >

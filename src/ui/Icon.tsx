@@ -16,6 +16,7 @@ import navSettings from '../../assets/icons/nav-settings.svg';
 import navigate from '../../assets/icons/navigate.svg';
 import pencil from '../../assets/icons/pencil.svg';
 import pin from '../../assets/icons/pin.svg';
+import place from '../../assets/icons/place.svg';
 import search from '../../assets/icons/search.svg';
 import share from '../../assets/icons/share.svg';
 import trash from '../../assets/icons/trash.svg';
@@ -37,6 +38,7 @@ const ICONS = {
   link: { source: link, width: 24, height: 24 },
   pencil: { source: pencil, width: 24, height: 24 },
   pin: { source: pin, width: 24, height: 24 },
+  place: { source: place, width: 24, height: 24 },
   trash: { source: trash, width: 24, height: 24 },
   unpin: { source: unpin, width: 24, height: 24 },
   navHome: { source: navHome, width: 18, height: 18 },

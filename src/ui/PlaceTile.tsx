@@ -1,35 +1,42 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { tintFor } from './Avatar';
 import { Icon } from './Icon';
-import { themed } from './theme';
+import { useColors } from './theme';
 import { tokens } from './tokens';
 
 type Props = { label: string };
 
-// The square icon next to a place. Home and Shop have icons in the design; any other label
-// shows its first letter until an icon is drawn for it (design.md).
+const HOME = ['home', 'house'];
+const SHOP = ['shop', 'store', 'market'];
+
+// The square icon next to a place. Home and Shop have icons in the design. Any other place
+// shows a map pin on a tinted square; the tint comes from the label, so the same place always
+// has the same color (owner request, 2026-11-28).
 export function PlaceTile({ label }: Props) {
-  const styles = useStyles();
+  const colors = useColors();
   const key = label.trim().toLowerCase();
-  if (key === 'home') return <Icon name="tileHome" />;
-  if (key === 'shop') return <Icon name="tileShop" />;
+  if (HOME.includes(key)) return <Icon name="tileHome" />;
+  if (SHOP.includes(key)) return <Icon name="tileShop" />;
+  const tint = tintFor(key, colors);
   return (
-    <View accessible={false} importantForAccessibility="no-hide-descendants" style={styles.tile}>
-      <Text style={styles.letter}>{(Array.from(label.trim())[0] ?? '').toUpperCase()}</Text>
+    <View
+      testID="place-tile"
+      accessible={false}
+      importantForAccessibility="no-hide-descendants"
+      style={[styles.tile, { backgroundColor: tint.background }]}
+    >
+      <Icon name="place" tintColor={tint.text} />
     </View>
   );
 }
 
-const useStyles = themed((colors) =>
-  StyleSheet.create({
-    tile: {
-      width: tokens.size.tile,
-      height: tokens.size.tile,
-      borderRadius: tokens.radius.cardMin,
-      backgroundColor: colors.divider,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    letter: { fontFamily: tokens.font.bodyBold, fontSize: 18, color: colors.secondaryText },
-  }),
-);
+const styles = StyleSheet.create({
+  tile: {
+    width: tokens.size.tile,
+    height: tokens.size.tile,
+    borderRadius: tokens.radius.cardMin,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
