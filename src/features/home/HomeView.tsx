@@ -19,9 +19,9 @@ import type { Person } from '../../db/people';
 import type { PlaceSummary } from '../../db/placeSummaries';
 import type { SearchResult } from '../../db/search';
 import { Avatar, initialsOf } from '../../ui/Avatar';
-import { Chip } from '../../ui/Chip';
 import { EmptyIllustration } from '../../ui/EmptyIllustration';
 import { GlassSwitch } from '../../ui/GlassSwitch';
+import { GlassTabs } from '../../ui/GlassTabs';
 import { Icon } from '../../ui/Icon';
 import { LogoMark } from '../../ui/LogoMark';
 import { PlaceTile } from '../../ui/PlaceTile';
@@ -268,22 +268,26 @@ export function HomeView(props: Props) {
       ) : (
         <>
           <View style={styles.chips}>
-            <Chip
-              label={t('home:people')}
-              accessibilityLabel={t('home:peopleA11y')}
-              selected={view === 'people'}
-              onPress={() => props.onChangeView('people')}
-            />
-            <Chip
-              label={t('home:places')}
-              accessibilityLabel={t('home:placesA11y')}
-              selected={view === 'places'}
-              onPress={() => props.onChangeView('places')}
-            />
-            <Chip
-              label={t('home:notes')}
-              accessibilityLabel={t('home:notesA11y')}
-              onPress={props.onOpenNotes}
+            <GlassTabs
+              activeIndex={VIEWS.indexOf(view)}
+              onSelect={(index) => {
+                // Notes is its own screen; the other two are the lists below.
+                if (index === VIEWS.length) props.onOpenNotes();
+                else props.onChangeView(VIEWS[index]);
+              }}
+              tabs={[
+                {
+                  key: 'people',
+                  label: t('home:people'),
+                  accessibilityLabel: t('home:peopleA11y'),
+                },
+                {
+                  key: 'places',
+                  label: t('home:places'),
+                  accessibilityLabel: t('home:placesA11y'),
+                },
+                { key: 'notes', label: t('home:notes'), accessibilityLabel: t('home:notesA11y') },
+              ]}
             />
           </View>
 
@@ -430,7 +434,7 @@ const useStyles = themed((colors) =>
       fontSize: 15,
       color: colors.text,
     },
-    chips: { marginTop: 17, flexDirection: 'row', gap: 9 },
+    chips: { marginTop: 17 },
     heading: {
       marginTop: 18,
       fontFamily: tokens.font.bodyBold,
