@@ -1,6 +1,7 @@
 // The note editor (R10.1, R10.3, R10.4, R10.5): one text field per line, so a line can be a
 // heading, a list item, or a checklist item with a circle to tap. The note is Markdown
-// underneath (design.md). There is no Save button: every change is handed to the screen, which
+// underneath (design.md), but no Markdown is ever shown: bold is bold, italic is italic, and
+// the text on screen is exactly what was typed. There is no Save button: every change is handed to the screen, which
 // stores it. It looks like a sheet of ruled paper, after the phone's own notes app: the date
 // at the top, a large first line, and a faint rule under every row (owner request,
 // 2026-11-28). The Figma frame "07 Note editor" could not be read when this was built.
@@ -21,12 +22,16 @@ import { BackButton } from '../../ui/BackButton';
 import { themed, useColors } from '../../ui/theme';
 import { tokens, touchSlop } from '../../ui/tokens';
 import {
+  BOLD,
   editLine,
-  emphasisSpans,
+  ITALIC,
   joinWithPrevious,
   parseBody,
-  toggleEmphasis,
+  rangeHas,
+  styleAt,
+  styledSpans,
   toggleLineKind,
+  toggleStyle,
 } from './editorLines';
 import { toggleChecklistItem } from './noteText';
 
@@ -79,7 +84,11 @@ export function NoteEditor(props: Props) {
   // The height of the writing, so the rules can run under all of it and on down the page.
   const [pageHeight, setPageHeight] = useState(0);
   const ruleCount = Math.max(MIN_RULES, Math.ceil(pageHeight / RULE) + 4);
-  const selection = useRef({ start: 0, end: 0 });
+  // The cursor or the selected text, and the line it is in.
+  const [selected, setSelected] = useState({ line: 0, start: 0, end: 0 });
+  // Bold or italic switched on or off with nothing selected: what is typed next takes it.
+  // Null when new writing simply follows the writing before it.
+  const [typing, setTyping] = useState<number | null>(null);
   const inputs = useRef<(ComponentRef<typeof TextInput> | null)[]>([]);
   // Set when an edit moves the cursor to another line; that line takes the keyboard next.
   const moveTo = useRef<number | null>(null);
@@ -108,25 +117,31 @@ export function NoteEditor(props: Props) {
   };
 
   const typed = (index: number, text: string) => {
-    const edit = editLine(body, index, text);
+    const edit = editLine(body, index, text, typing);
     setCursor(null);
+    setSelected({ line: edit.focus, start: edit.cursor, end: edit.cursor });
     apply(edit.body, edit.focus);
+  };
+
+  const moved = (index: number, next: { start: number; end: number }) => {
+    // The cursor going somewhere else ends a style chosen for what is typed next. One step
+    // is typing or deleting, which keeps it.
+    const jumped =
+      next.start !== next.end ||
+      index !== selected.line ||
+      Math.abs(next.start - selected.start) > 1;
+    if (jumped) setTyping(null);
+    setSelected({ line: index, ...next });
   };
 
   const backspace = (index: number) => {
-    const { start, end } = selection.current;
-    if (start !== 0 || end !== 0) return;
+    if (selected.line !== index || selected.start !== 0 || selected.end !== 0) return;
     const edit = joinWithPrevious(body, index);
-    if (edit.cursor !== null) setCursor({ line: edit.focus, at: edit.cursor });
+    if (edit.cursor !== null) {
+      setCursor({ line: edit.focus, at: edit.cursor });
+      setSelected({ line: edit.focus, start: edit.cursor, end: edit.cursor });
+    }
     apply(edit.body, edit.focus);
-  };
-
-  const emphasise = (mark: '**' | '*') => {
-    const line = lines[focus];
-    if (!line) return;
-    const { start, end } = selection.current;
-    const text = toggleEmphasis(line.text, start, end, mark);
-    apply(editLine(body, focus, text).body);
   };
 
   // The number shown beside each numbered line: each run of them counts from 1.
@@ -136,19 +151,34 @@ export function NoteEditor(props: Props) {
   }, []);
 
   // The styles the line being written has, so their buttons can show as on.
+  // Bold and italic show as on for the selected text when all of it has the style, and
+  // otherwise for what would be typed at the cursor.
   const current = lines[focus];
+  const here = selected.line === focus ? selected : { line: focus, start: 0, end: 0 };
+  const ranged = here.start !== here.end;
+  const cursorStyle = typing ?? (current ? styleAt(current, here.start) : 0);
+  const has = (style: number) =>
+    ranged && current
+      ? rangeHas(current, here.start, here.end, style)
+      : (cursorStyle & style) !== 0;
   const activeTools = new Set<Tool>();
   if (current) {
     if (current.kind === 'done') activeTools.add('todo');
     else if (current.kind !== 'text') activeTools.add(current.kind);
-    const spans = emphasisSpans(current.text);
-    if (spans.some((span) => span.bold)) activeTools.add('bold');
-    if (spans.some((span) => span.italic)) activeTools.add('italic');
+    if (has(BOLD)) activeTools.add('bold');
+    if (has(ITALIC)) activeTools.add('italic');
   }
 
+  // With text selected the style goes on that text. With only a cursor it is switched on or
+  // off for what is typed next, and the button shows it.
+  const emphasise = (style: number) => {
+    if (ranged) apply(toggleStyle(body, focus, here.start, here.end, style));
+    else setTyping(cursorStyle ^ style);
+  };
+
   const runTool = (tool: Tool) => {
-    if (tool === 'bold') emphasise('**');
-    else if (tool === 'italic') emphasise('*');
+    if (tool === 'bold') emphasise(BOLD);
+    else if (tool === 'italic') emphasise(ITALIC);
     else apply(toggleLineKind(body, focus, tool));
   };
 
@@ -235,9 +265,7 @@ export function NoteEditor(props: Props) {
                   }
                   onFocus={() => setFocus(index)}
                   onChangeText={(text) => typed(index, text)}
-                  onSelectionChange={(event) => {
-                    selection.current = event.nativeEvent.selection;
-                  }}
+                  onSelectionChange={(event) => moved(index, event.nativeEvent.selection)}
                   onKeyPress={(event) => {
                     if (event.nativeEvent.key === 'Backspace') backspace(index);
                   }}
@@ -248,15 +276,8 @@ export function NoteEditor(props: Props) {
                     line.kind === 'done' && styles.done,
                   ]}
                 >
-                  {emphasisSpans(line.text).map((span, at) => (
-                    <Text
-                      key={at}
-                      style={[
-                        span.bold && styles.bold,
-                        span.italic && styles.italic,
-                        span.mark && styles.mark,
-                      ]}
-                    >
+                  {styledSpans(line).map((span, at) => (
+                    <Text key={at} style={[span.bold && styles.bold, span.italic && styles.italic]}>
                       {span.text}
                     </Text>
                   ))}
@@ -385,7 +406,6 @@ const useStyles = themed((colors) =>
     done: { color: colors.mutedText, textDecorationLine: 'line-through' },
     bold: { fontFamily: tokens.font.bodyBold },
     italic: { fontStyle: 'italic' },
-    mark: { color: colors.inactiveDot },
     full: {
       marginTop: 12,
       fontFamily: tokens.font.bodyBold,

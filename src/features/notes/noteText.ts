@@ -1,6 +1,8 @@
 // Working with a note's text. A note is stored as Markdown, with checklists as task items
 // such as "- [ ] Sweets" (design.md). Pure functions: no database, no UI.
 
+import { parseInline } from './editorLines';
+
 const HEADING = /^\s*#{1,6}\s+/;
 const LIST_MARKER = /^\s*(?:[-*+]|\d+[.)])\s+/;
 const CHECKBOX = /^\[[ xX]\]\s*/;
@@ -9,13 +11,8 @@ const CHECKLIST_ITEM = /^(\s*)(?:[-*+]|\d+[.)])\s+\[([ xX])\]/;
 
 // Shows a line as plain text: without its heading, list, or checkbox marker, or emphasis marks.
 function plainText(line: string): string {
-  return line
-    .replace(HEADING, '')
-    .replace(LIST_MARKER, '')
-    .replace(CHECKBOX, '')
-    .replace(/\*\*(.+?)\*\*/g, '$1')
-    .replace(/__(.+?)__/g, '$1')
-    .replace(/(^|[^\w*])\*([^*\s][^*]*?)\*(?![\w*])/g, '$1$2')
+  return parseInline(line.replace(HEADING, '').replace(LIST_MARKER, '').replace(CHECKBOX, ''))
+    .text.replace(/__(.+?)__/g, '$1')
     .replace(/(^|[^\w_])_([^_\s][^_]*?)_(?![\w_])/g, '$1$2')
     .trim();
 }

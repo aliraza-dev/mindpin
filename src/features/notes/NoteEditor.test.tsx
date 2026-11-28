@@ -91,6 +91,41 @@ describe('NoteEditor', () => {
     });
     await fireEvent.press(tool('Italic'));
     expect(onChange).toHaveBeenLastCalledWith('Trip\n*gate* **code** 4471');
+    // Bold again on the same word takes it away.
+    await fireEvent(line(2), 'selectionChange', {
+      nativeEvent: { selection: { start: 5, end: 9 } },
+    });
+    expect(tool('Bold')).toBeSelected();
+    await fireEvent.press(tool('Bold'));
+    expect(onChange).toHaveBeenLastCalledWith('Trip\n*gate* code 4471');
+  });
+
+  it('never shows Markdown marks in the writing (R10.4)', async () => {
+    await setup('Trip\ngate **code** and *ring*').view;
+    const runs = line(2).props.children as { props: { children: string } }[];
+    expect(runs.map((run) => run.props.children).join('')).toBe('gate code and ring');
+  });
+
+  it('with nothing selected, Bold is switched on for what is typed next (R10.4)', async () => {
+    const { view, onChange } = setup('Trip\ngate');
+    await view;
+    await fireEvent(line(2), 'focus');
+    await fireEvent(line(2), 'selectionChange', {
+      nativeEvent: { selection: { start: 4, end: 4 } },
+    });
+    expect(tool('Bold')).not.toBeSelected();
+    await fireEvent.press(tool('Bold'));
+    expect(tool('Bold')).toBeSelected();
+    expect(onChange).not.toHaveBeenCalled();
+    await fireEvent.changeText(line(2), 'gate x');
+    expect(onChange).toHaveBeenLastCalledWith('Trip\ngate **x**');
+    await fireEvent.changeText(line(2), 'gate xy');
+    expect(onChange).toHaveBeenLastCalledWith('Trip\ngate **xy**');
+    // Switched off again, the writing goes on plain.
+    await fireEvent.press(tool('Bold'));
+    expect(tool('Bold')).not.toBeSelected();
+    await fireEvent.changeText(line(2), 'gate xyz');
+    expect(onChange).toHaveBeenLastCalledWith('Trip\ngate **xy**z');
   });
 
   it('ticks a checklist item with its circle and moves it to the bottom (R10.4, R10.5)', async () => {
@@ -153,6 +188,10 @@ describe('NoteEditor', () => {
     expect(tool('Heading')).toBeSelected();
     expect(tool('Title')).not.toBeSelected();
     await fireEvent(line(3), 'focus');
+    // The cursor at the end of the bold word.
+    await fireEvent(line(3), 'selectionChange', {
+      nativeEvent: { selection: { start: 6, end: 6 } },
+    });
     expect(tool('Checklist')).toBeSelected();
     expect(tool('Bold')).toBeSelected();
     expect(tool('Heading')).not.toBeSelected();

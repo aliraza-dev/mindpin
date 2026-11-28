@@ -82,7 +82,7 @@ Places and notes are stored as a generic memory item so receipts, voice notes, a
 
 A full-text index covers person name, title, address, notes, and tags.
 
-The note editor is a rich-text component that reads and writes Markdown. It is built in the app, with no native package: one text field per line, so a line can be a title, a heading, a bulleted or numbered item, or a checklist item with a circle to tap. Bold and italic are shown in place with their Markdown marks drawn faintly. A new note has no row until the first keystroke, and a note left empty is not kept.
+The note editor is a rich-text component that reads and writes Markdown. It is built in the app, with no native package: one text field per line, so a line can be a title, a heading, a bulleted or numbered item, or a checklist item with a circle to tap. The editor never shows Markdown marks: bold is drawn bold and italic is drawn italic, and the text on screen is exactly what was typed. Each line keeps the style of every character beside its text, and Markdown is written only when the note is stored. An asterisk the user types is stored as `\*`. A new note has no row until the first keystroke, and a note left empty is not kept.
 
 ### Limits on typed text
 
