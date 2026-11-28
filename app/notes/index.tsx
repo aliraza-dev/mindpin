@@ -1,6 +1,6 @@
-import { PlaceholderScreen } from '../../src/ui/PlaceholderScreen';
+import { NotesScreen } from '../../src/features/notes/NotesScreen';
 
-// Placeholder until the Notes list is built (T078). Expo Router requires a default export.
+// Expo Router requires a default export for route files.
 export default function NotesRoute() {
-  return <PlaceholderScreen titleKey="home:notes" />;
+  return <NotesScreen />;
 }

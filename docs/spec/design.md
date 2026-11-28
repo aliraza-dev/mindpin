@@ -82,7 +82,7 @@ Places and notes are stored as a generic memory item so receipts, voice notes, a
 
 A full-text index covers person name, title, address, notes, and tags.
 
-The note editor is a rich-text component that reads and writes Markdown.
+The note editor is a rich-text component that reads and writes Markdown. It is built in the app, with no native package: one text field per line, so a line can be a title, a heading, a bulleted or numbered item, or a checklist item with a circle to tap. Bold and italic are shown in place with their Markdown marks drawn faintly. A new note has no row until the first keystroke, and a note left empty is not kept.
 
 ### Limits on typed text
 
@@ -96,6 +96,7 @@ Every typed field is trimmed and has a limit, enforced in the form and again bef
 | Tags | up to 10, each 1 to 40 characters, no duplicates (ignoring case); typed separated by commas |
 | Person name | 1 to 100 characters |
 | Phone number | up to 20 characters, holding 3 to 15 digits; only digits, spaces, `+`, `-`, and brackets |
+| Note | 20,000 characters for the whole note; the editor refuses more and says so |
 
 ### Deleting a place
 

@@ -1,6 +1,14 @@
 {
   "notVisitedYet": "Not visited yet",
   "lastVisited": "Last visited {{when}}",
+  "prompt": {
+    "title": "Did you visit {{label}}?",
+    "detail": "You tapped Navigate at {{time}}. MindPin does not track where you go, so it asks.",
+    "yes": "Yes, I went",
+    "yesA11y": "Yes, record a visit to {{label}}",
+    "no": "No",
+    "noA11y": "No, I did not visit {{label}}"
+  },
   "ago": {
     "now": "just now",
     "minute_one": "{{count}} minute ago",

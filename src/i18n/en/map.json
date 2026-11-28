@@ -1,0 +1,10 @@
+{
+  "title": "Map",
+  "count_one": "{{count}} pinned place",
+  "count_other": "{{count}} pinned places",
+  "pinA11y": "Open {{label}}",
+  "empty": "No pinned places yet. A place appears here once it has a location.",
+  "offline": "The map needs a connection. Your places are still on the Home screen.",
+  "unavailable": "The map is not set up in this build yet. Your places are on the Home screen.",
+  "loadFailed": "The map could not be loaded. Close the app and open it again."
+}

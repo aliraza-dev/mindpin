@@ -49,6 +49,15 @@ Decisions during the build (2026-11-26):
 - Deleting a note (R10.10, owner decision 2026-11-27): a deleted note is gone for good. Recently Deleted and the 30-day wait are removed; an Undo button for 5 seconds on the same screen replaces them. If the app is closed while Undo is showing, the note is removed at the next start.
 - After Navigate (R5.2): only the latest Navigate is remembered. The question appears the first time the app is opened at least 15 minutes later, so going back to check a gate code does not trigger it. Yes records the visit at the time of Navigate; No drops it.
 
+Decisions during the build (2026-11-28):
+
+- Adding a place (R4.7): Home offers Add place on a new install and in the Places view, so the app can be used before any share arrives.
+- Notes list (R10.11): swiping a note sideways uncovers Pin, Link, and Delete; press and hold opens a menu with the same three. Only one deleted note waits for Undo at a time: deleting a second one finishes the first.
+- Linking a note (R10.8): the link screen lists every person and every place, each with a None choice. It opens from the Notes list and from the editor.
+- Map (R6.3): a pin shows its label when tapped, and tapping the label opens the place. With no maps key, no connection, or no pinned place, the screen says why instead of drawing a map. The user's own position is never shown.
+- Did you visit (R5.2): the question is a sheet over whatever screen is open, also when the app returns from the background.
+- The Notes and Note editor frames could not be read from Figma on this date (the plan's tool-call limit was reached), so those screens follow the styles of the other frames and must be compared with the frames later.
+
 Decisions during the build (2026-11-27):
 
 - Place screen (R4.4, owner decision): Edit and Delete sit behind a "⋯" button at the top right, opposite the back button. This button is not in the Figma frame.

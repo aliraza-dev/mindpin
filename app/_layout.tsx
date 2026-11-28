@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { I18nManager, View } from 'react-native';
 
 import { purgeDeletedNotesAtStart } from '../src/features/notes/purge';
+import { DidYouVisit } from '../src/features/visits/DidYouVisit';
 import { startBackgroundLookups } from '../src/features/save/lookups';
 import { initI18n } from '../src/i18n';
 import { tokens } from '../src/ui/tokens';
@@ -49,6 +50,7 @@ export default function RootLayout() {
   return (
     <View testID="app-root" style={{ flex: 1, backgroundColor: tokens.color.background }}>
       <Stack screenOptions={{ headerShown: false }} />
+      <DidYouVisit />
     </View>
   );
 }

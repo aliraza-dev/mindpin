@@ -1,0 +1,75 @@
+{
+  "back": "Go back",
+  "title": "Notes",
+  "newNote": "New note",
+  "newNoteA11y": "Write a new note",
+  "empty": "No notes yet. Tap New note to write one.",
+  "untitled": "New note",
+  "openA11y": "Open note {{title}}",
+  "loadFailed": "This screen could not be loaded. Go back and try again.",
+  "notFound": "This note is no longer in MindPin.",
+  "sections": {
+    "pinned": "Pinned",
+    "today": "Today",
+    "previous7": "Previous 7 days",
+    "previous30": "Previous 30 days"
+  },
+  "actions": {
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "link": "Link",
+    "delete": "Delete",
+    "pinA11y": "Pin note {{title}}",
+    "unpinA11y": "Unpin note {{title}}",
+    "linkA11y": "Link note {{title}} to a person or place",
+    "deleteA11y": "Delete note {{title}}",
+    "closeMenuA11y": "Close the menu",
+    "failed": "That could not be done. Try again."
+  },
+  "undo": {
+    "message": "Note deleted",
+    "action": "Undo",
+    "actionA11y": "Bring the deleted note back"
+  },
+  "link": {
+    "title": "Link this note",
+    "done": "Done",
+    "doneA11y": "Save the links and close",
+    "cancel": "Cancel",
+    "cancelA11y": "Close without changing the links",
+    "person": "Person",
+    "place": "Place",
+    "none": "None",
+    "noPersonA11y": "Link to no person",
+    "noPlaceA11y": "Link to no place",
+    "personA11y": "Link to {{name}}",
+    "placeA11y": "Link to {{label}}",
+    "failed": "The links could not be saved. Try again."
+  },
+  "editor": {
+    "lineA11y": "Line {{number}}",
+    "firstLineA11y": "Note title, line 1",
+    "placeholder": "Start writing",
+    "tickA11y": "Tick {{text}}",
+    "untickA11y": "Untick {{text}}",
+    "linkA11y": "Link this note to a person or place",
+    "saveFailed": "The note could not be saved. Check the phone's storage and try again.",
+    "tooLong": "This note is full. Start a new note for the rest.",
+    "toolbar": {
+      "title": "H1",
+      "heading": "H2",
+      "bold": "B",
+      "italic": "I",
+      "bullet": "•",
+      "number": "1.",
+      "todo": "☐",
+      "titleA11y": "Title",
+      "headingA11y": "Heading",
+      "boldA11y": "Bold",
+      "italicA11y": "Italic",
+      "bulletA11y": "Bulleted list",
+      "numberA11y": "Numbered list",
+      "todoA11y": "Checklist"
+    }
+  }
+}

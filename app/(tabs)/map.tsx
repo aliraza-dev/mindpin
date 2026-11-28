@@ -1,6 +1,6 @@
-import { PlaceholderScreen } from '../../src/ui/PlaceholderScreen';
+import { MapScreen } from '../../src/features/map/MapScreen';
 
-// Placeholder until the map task (T064). Expo Router requires a default export.
+// Expo Router requires a default export for route files.
 export default function MapRoute() {
-  return <PlaceholderScreen titleKey="common:tabs.map" />;
+  return <MapScreen />;
 }

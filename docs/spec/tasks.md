@@ -172,7 +172,7 @@ Navigate and Share.
 - [X] T144 [US2] Delete a person in `src/db/people.ts`, from a button at the bottom of the edit form in `src/features/people/EditPersonScreen.tsx` (depends on T142) (R3.13)
 - [X] T142 [US2] Edit person form in `src/features/people/EditPersonScreen.tsx` and `src/features/people/personForm.ts`, opened by the edit button on the person screen, route `app/person/[id]/edit.tsx` (depends on T061) (R3.12)
 - [X] T063 [US2] Add a place by hand from a typed address or pasted link, opening the save sheet, route `app/place/new.tsx` (R4.7)
-- [ ] T064 [US2] Map of all pins in `src/features/map/MapScreen.tsx`, rendered by `app/(tabs)/map.tsx` (R6.3)
+- [X] T064 [US2] Map of all pins in `src/features/map/MapScreen.tsx`, rendered by `app/(tabs)/map.tsx` (R6.3)
 
 **Checkpoint**: the testable core is done. Ship an internal build with `SKIP_SIGN_IN` on to 10 to
 15 testers and watch whether they use share-to-save before building further (R7.1).
@@ -191,8 +191,8 @@ Notes list under Today with its first line as title, and search finds a word fro
 - [X] T065 [P] [US3] Note text tests in `src/features/notes/noteText.test.ts`: first line becomes `memory.title`, the rest is the preview; ticking a checklist item moves it to the bottom of its checklist (R10.2, R10.5)
 - [X] T066 [P] [US3] Grouping tests in `src/features/notes/groupNotes.test.ts`: pinned notes first; sorted by last edited; groups Today, Previous 7 days, Previous 30 days, then by month (R10.6, R10.7)
 - [X] T067 [P] [US3] Delete tests in `src/features/notes/deleteNote.test.ts` and `src/features/notes/purge.test.ts`: a deleted note disappears at once; Undo within 5 seconds brings it back unchanged; after 5 seconds, on leaving the screen, or at the next app start it is removed permanently (R10.10)
-- [ ] T068 [P] [US3] Editor tests in `src/features/notes/NoteEditor.test.tsx`: opens blank with the keyboard up; saves as the user types with no Save button; headings, bold, italic, bulleted and numbered lists, and checklists (R10.1, R10.3, R10.4)
-- [ ] T069 [P] [US3] Notes list tests in `src/features/notes/NotesList.test.tsx`: swipe and long-press both offer pin, link, and delete (R10.11)
+- [X] T068 [P] [US3] Editor tests in `src/features/notes/NoteEditor.test.tsx`: opens blank with the keyboard up; saves as the user types with no Save button; headings, bold, italic, bulleted and numbered lists, and checklists (R10.1, R10.3, R10.4)
+- [X] T069 [P] [US3] Notes list tests in `src/features/notes/NotesList.test.tsx`: swipe and long-press both offer pin, link, and delete (R10.11)
 - [X] T070 [P] [US3] Linking tests in `src/features/notes/linkNote.test.ts`: a note links to a person, a place, or both, and appears on their screens (R10.8)
 - [X] T071 [P] [US3] Save-as-note tests in `src/features/save/saveAsNote.test.ts`: shared text with no location offers "Save as note"; notes never count toward the place limit (R10.9, R10.12)
 - [X] T072 [P] [US3] Extend `src/db/search.test.ts` so standalone note text is found (R6.1)
@@ -203,10 +203,10 @@ Notes list under Today with its first line as title, and search finds a word fro
 - [X] T074 [P] [US3] Title, preview, and checklist sinking in `src/features/notes/noteText.ts` (R10.2, R10.5)
 - [X] T075 [P] [US3] Pinned section and date grouping in `src/features/notes/groupNotes.ts` (R10.6, R10.7)
 - [X] T076 [P] [US3] Deleting a note with a 5-second Undo in `src/features/notes/deleteNote.ts`, and the clean-up of interrupted deletions, run at app start from `app/_layout.tsx`, in `src/features/notes/purge.ts` (R10.10)
-- [ ] T077 [US3] Rich-text note editor that reads and writes Markdown, opens before the database row exists and creates it on the first keystroke, strings in `src/i18n/en/notes.json`, in `src/features/notes/NoteEditor.tsx`, route `app/note/[id].tsx` (R10.1 to R10.5)
-- [ ] T078 [US3] Notes list with swipe and long-press actions in `src/features/notes/NotesList.tsx`, route `app/notes/index.tsx` (depends on T075) (R10.6, R10.7, R10.11)
-- [ ] T079 [US3] Undo bar shown for 5 seconds after a note is deleted, in `src/features/notes/UndoDeleteBar.tsx`, used by the Notes list; leaving the screen finishes the deletion (depends on T076, T078) (R10.10)
-- [ ] T080 [US3] Link picker and linked notes on the person and place screens, in `src/features/notes/linkNote.ts` and `src/features/notes/LinkPicker.tsx` (depends on T061, T062) (R10.8)
+- [X] T077 [US3] Rich-text note editor that reads and writes Markdown, opens before the database row exists and creates it on the first keystroke, strings in `src/i18n/en/notes.json`, in `src/features/notes/NoteEditor.tsx`, route `app/note/[id].tsx` (R10.1 to R10.5)
+- [X] T078 [US3] Notes list with swipe and long-press actions in `src/features/notes/NotesList.tsx`, route `app/notes/index.tsx` (depends on T075) (R10.6, R10.7, R10.11)
+- [X] T079 [US3] Undo bar shown for 5 seconds after a note is deleted, in `src/features/notes/UndoDeleteBar.tsx`, used by the Notes list; leaving the screen finishes the deletion (depends on T076, T078) (R10.10)
+- [X] T080 [US3] Link picker and linked notes on the person and place screens, in `src/features/notes/linkNote.ts` and `src/features/notes/LinkPicker.tsx` (depends on T061, T062) (R10.8)
 - [X] T081 [US3] "Save as note" option in the save sheet, in `src/features/save/saveAsNote.ts` (depends on T046) (R10.9, R10.12)
 
 **Checkpoint**: User Stories 1 to 3 pass all tests.
@@ -233,7 +233,7 @@ appears at the top of its history. A place unvisited for 7 months appears on the
 - [X] T087 [P] [US4] Stale place query in `src/features/visits/stalePlaces.ts` (R5.5)
 - [X] T088 [P] [US4] Pending navigate record and prompt logic in `src/features/visits/navigateConfirm.ts` (R5.2)
 - [ ] T089 [US4] "I'm here" button and visit list with notes on the place screen, strings in `src/i18n/en/visits.json`, in `src/features/visits/VisitList.tsx` (depends on T062, T086) (R5.1, R5.3, R5.4)
-- [ ] T090 [US4] "Did you visit?" prompt shown on app open from `app/_layout.tsx`, in `src/features/visits/DidYouVisit.tsx` (depends on T088) (R5.2)
+- [X] T090 [US4] "Did you visit?" prompt shown on app open from `app/_layout.tsx`, in `src/features/visits/DidYouVisit.tsx` (depends on T088) (R5.2)
 - [X] T091 [US4] "Not visited in a while" card on the home screen, in `src/features/visits/StaleCard.tsx` (depends on T059, T087) (R5.5)
 
 **Checkpoint**: User Stories 1 to 4 pass all tests.
