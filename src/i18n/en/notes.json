@@ -50,6 +50,7 @@
     "lineA11y": "Line {{number}}",
     "firstLineA11y": "Note title, line 1",
     "placeholder": "Start writing",
+    "bodyA11y": "Note",
     "tickA11y": "Tick {{text}}",
     "untickA11y": "Untick {{text}}",
     "linkA11y": "Link this note to a person or place",

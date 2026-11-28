@@ -133,7 +133,7 @@ function marker(kind: LineKind, number: number): string {
 }
 
 // Builds the note text from its lines, numbering each run of numbered lines from 1.
-function build(lines: ParsedLine[]): string {
+export function buildBody(lines: ParsedLine[]): string {
   let count = 0;
   return lines
     .map(({ kind, text, marks }) => {
@@ -205,13 +205,13 @@ export function editLine(body: string, index: number, typed: string, style?: num
   const parts = typed.split('\n');
   if (parts.length === 1) {
     lines[index] = { ...current, text: typed, marks };
-    return { body: build(lines), focus: index, cursor: head + added };
+    return { body: buildBody(lines), focus: index, cursor: head + added };
   }
 
   const isList = LIST_KINDS.includes(current.kind);
   if (isList && parts.length === 2 && parts[0] === '' && parts[1] === '') {
     lines[index] = { kind: 'text', text: '', marks: '' };
-    return { body: build(lines), focus: index, cursor: 0 };
+    return { body: buildBody(lines), focus: index, cursor: 0 };
   }
 
   const nextKind: LineKind = !isList ? 'text' : current.kind === 'done' ? 'todo' : current.kind;
@@ -225,7 +225,7 @@ export function editLine(body: string, index: number, typed: string, style?: num
   lines.splice(index, 1, { ...current, ...pieces[0] }, ...rest);
   // The cursor stays just before whatever followed it.
   const last = pieces[pieces.length - 1].text.length;
-  return { body: build(lines), focus: index + rest.length, cursor: Math.max(0, last - tail) };
+  return { body: buildBody(lines), focus: index + rest.length, cursor: Math.max(0, last - tail) };
 }
 
 // Backspace at the start of a line: a heading or list item becomes plain text first; a plain
@@ -239,7 +239,7 @@ export function joinWithPrevious(
   if (!current) return { body, focus: index, cursor: null };
   if (current.kind !== 'text') {
     lines[index] = { ...current, kind: 'text' };
-    return { body: build(lines), focus: index, cursor: 0 };
+    return { body: buildBody(lines), focus: index, cursor: 0 };
   }
   if (index === 0) return { body, focus: 0, cursor: null };
   const previous = lines[index - 1];
@@ -248,7 +248,7 @@ export function joinWithPrevious(
     text: previous.text + current.text,
     marks: previous.marks + current.marks,
   });
-  return { body: build(lines), focus: index - 1, cursor: previous.text.length };
+  return { body: buildBody(lines), focus: index - 1, cursor: previous.text.length };
 }
 
 // A toolbar button: gives the line that style, or takes it away when it already has it.
@@ -258,7 +258,7 @@ export function toggleLineKind(body: string, index: number, kind: LineKind): str
   if (!current) return body;
   const same = current.kind === kind || (kind === 'todo' && current.kind === 'done');
   lines[index] = { ...current, kind: same ? 'text' : kind };
-  return build(lines);
+  return buildBody(lines);
 }
 
 // Bold or italic for the selected part of a line. When all of it already has the style, the
@@ -284,7 +284,7 @@ export function toggleStyle(
     ...current,
     marks: current.marks.slice(0, from) + changed + current.marks.slice(to),
   };
-  return build(lines);
+  return buildBody(lines);
 }
 
 export type Span = { text: string; bold: boolean; italic: boolean };
@@ -305,4 +305,26 @@ export function styledSpans(line: ParsedLine): Span[] {
     from = to;
   }
   return spans;
+}
+
+// Moves the ticked items of every checklist below its unticked ones, keeping each group in
+// its order (R10.5). A checklist is a run of checklist lines next to each other.
+export function sortChecklists(body: string): string {
+  const lines = parseBody(body);
+  const out: ParsedLine[] = [];
+  let run: ParsedLine[] = [];
+  const flush = () => {
+    out.push(...run.filter((line) => line.kind === 'todo'));
+    out.push(...run.filter((line) => line.kind === 'done'));
+    run = [];
+  };
+  for (const line of lines) {
+    if (line.kind === 'todo' || line.kind === 'done') run.push(line);
+    else {
+      flush();
+      out.push(line);
+    }
+  }
+  flush();
+  return buildBody(out);
 }

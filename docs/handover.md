@@ -80,6 +80,7 @@ These work today, but the owner has not confirmed them:
 ## Added on 2026-11-28
 
 - The app runs on the owner's Android phone from an EAS development build. Code changes reach it through `npx expo start --dev-client` with no rebuild, as long as no native package is added.
+- `react-native-enriched-html` was added for the note editor. Like the blur, it works only in a development build made after it was added; an earlier build keeps the old line-by-line editor. The new editor has not been seen on a phone.
 - `expo-blur` was added for the frosted bottom bar. The blur shows only in a development build made after that (`npx eas-cli build --profile development --platform android`); the earlier build still runs and shows the bar without blur. The blurred bar has not been seen on a phone.
 - Built and tested in Jest: adding a place from Home, the Notes list, the note editor, linking a note, Undo after deleting a note, the map of all pins, the "Did you visit?" question, the dark theme (R11), and the animated pictures on empty screens.
 - Not yet seen on a phone, and the most likely to need fixes there: typing in the note editor (it uses one text field per line, with bold and italic drawn inside the field), the sideways swipe on a note, and the dark theme's colors. The dark colors were chosen without a Figma frame.

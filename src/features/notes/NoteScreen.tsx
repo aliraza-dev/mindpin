@@ -23,6 +23,7 @@ import { useDbQuery } from '../../lib/useDbQuery';
 import { ScreenMessage } from '../../ui/ScreenMessage';
 import { themed } from '../../ui/theme';
 import { LinkPicker } from './LinkPicker';
+import { sortChecklists } from './editorLines';
 import { NoteEditor } from './NoteEditor';
 import { noteTitle } from './noteText';
 
@@ -144,6 +145,8 @@ function OpenNote({ loaded, topInset, bottomInset, onClose }: OpenProps) {
   };
 
   const finish = async () => {
+    // The rich editor ticks an item where it stands; the order is put right on leaving (R10.5).
+    latest.current = sortChecklists(latest.current);
     await write();
     // A note left empty is not kept.
     if (id.current !== null && latest.current.trim() === '') {

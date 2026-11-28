@@ -1,11 +1,13 @@
-// The note editor (R10.1, R10.3, R10.4, R10.5): one text field per line, so a line can be a
+// The note editor (R10.1, R10.3, R10.4, R10.5). Where the build has the phone's rich-text
+// engine, the note is written in that (RichNoteEditor.tsx). This file holds the choice between
+// the two, and the editor built in the app, which older builds fall back to: one text field per line, so a line can be a
 // heading, a list item, or a checklist item with a circle to tap. The note is Markdown
 // underneath (design.md), but no Markdown is ever shown: bold is bold, italic is italic, and
 // the text on screen is exactly what was typed. There is no Save button: every change is handed to the screen, which
 // stores it. It looks like a sheet of ruled paper, after the phone's own notes app: the date
 // at the top, a large first line, and a faint rule under every row (owner request,
 // 2026-11-28). Each row draws its own rule, so the rules cannot drift from the writing. The Figma frame "07 Note editor" could not be read when this was built.
-import { useEffect, useRef, useState, type ComponentRef } from 'react';
+import { Component, useEffect, useRef, useState, type ComponentRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   KeyboardAvoidingView,
@@ -33,43 +35,19 @@ import {
   toggleLineKind,
   toggleStyle,
 } from './editorLines';
+import { RichInput } from './enriched';
+import { editedText, NOTE_LIMIT, type NoteEditorProps } from './noteEditorShared';
 import { toggleChecklistItem } from './noteText';
+import { NoteToolbar, type Tool } from './NoteToolbar';
+import { RichNoteEditor } from './RichNoteEditor';
 
-// A note longer than this is refused, so one note cannot fill the phone (design.md: limits).
-export const NOTE_LIMIT = 20_000;
-
-const TOOLS = ['title', 'heading', 'bold', 'italic', 'bullet', 'number', 'todo'] as const;
-type Tool = (typeof TOOLS)[number];
+export { NOTE_LIMIT } from './noteEditorShared';
 
 // Every row of writing is this high, whatever its style, so the rules of the paper fall
 // under each one.
 const RULE = 32;
 // Enough rules to fill a phone screen under a short note.
 const MIN_RULES = 20;
-
-// "28 November 2026 at 7:10 pm", in the phone's own language and clock.
-function editedText(time: number): string {
-  return new Date(time).toLocaleString(undefined, {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  });
-}
-
-type Props = {
-  initialBody: string;
-  // Opens with the keyboard up on the first line (R10.1).
-  autoFocus: boolean;
-  onChange: (body: string) => void;
-  onBack: () => void;
-  onLink: () => void;
-  // When the note was last edited, shown above it; now, for a new note.
-  editedAt: number;
-  topInset?: number;
-  bottomInset?: number;
-};
 
 // One line of the note on ruled paper. The rules belong to the row and are measured up from
 // its own bottom edge, so each sits under its writing whatever height the phone gives the
@@ -88,7 +66,7 @@ function RuledRow({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function NoteEditor(props: Props) {
+function LineNoteEditor(props: NoteEditorProps) {
   const styles = useStyles();
   const colors = useColors();
   const { topInset = 0, bottomInset = 0 } = props;
@@ -337,46 +315,7 @@ export function NoteEditor(props: Props) {
         ) : null}
       </ScrollView>
 
-      <View style={[styles.toolbar, { marginBottom: bottomInset + 10 }]}>
-        {TOOLS.map((tool) => {
-          const on = activeTools.has(tool);
-          return (
-            <Pressable
-              key={tool}
-              accessibilityRole="button"
-              accessibilityLabel={t(`notes:editor.toolbar.${tool}A11y`)}
-              accessibilityState={{ selected: on }}
-              onPress={() => runTool(tool)}
-              style={styles.tool}
-            >
-              <View style={[styles.toolFace, on && styles.toolFaceOn]}>
-                {tool === 'bullet' || tool === 'todo' ? (
-                  // Drawn, not typed: list marks from a font sit at different heights.
-                  <View style={styles.listIcon}>
-                    <View
-                      style={[
-                        tool === 'bullet' ? styles.listDot : styles.listCircle,
-                        on && (tool === 'bullet' ? styles.listDotOn : styles.listCircleOn),
-                      ]}
-                    />
-                    <View style={[styles.listBar, on && styles.listBarOn]} />
-                  </View>
-                ) : (
-                  <Text
-                    style={[
-                      styles.toolText,
-                      tool === 'italic' && styles.toolItalic,
-                      on && styles.toolTextOn,
-                    ]}
-                  >
-                    {t(`notes:editor.toolbar.${tool}`)}
-                  </Text>
-                )}
-              </View>
-            </Pressable>
-          );
-        })}
-      </View>
+      <NoteToolbar active={activeTools} onTool={runTool} bottomInset={bottomInset} />
     </KeyboardAvoidingView>
   );
 }
@@ -460,50 +399,42 @@ const useStyles = themed((colors) =>
       fontSize: 12,
       color: colors.amberText,
     },
-    // A floating bar: rounded, clear of the screen's edges, above the keyboard.
-    toolbar: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginHorizontal: 12,
-      marginTop: 6,
-      paddingHorizontal: 6,
-      borderRadius: 26,
-      borderWidth: 1,
-      borderColor: colors.controlBorder,
-      backgroundColor: colors.surface,
-    },
-    tool: { flex: 1, height: 48, alignItems: 'center', justifyContent: 'center' },
-    toolFace: {
-      width: 40,
-      height: 36,
-      borderRadius: 10,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    // The style the current line has.
-    toolFaceOn: { backgroundColor: colors.tealSoft },
-    toolText: {
-      fontFamily: tokens.font.bodyBold,
-      fontSize: 16,
-      lineHeight: 20,
-      textAlign: 'center',
-      includeFontPadding: false,
-      color: colors.text,
-    },
-    toolItalic: { fontFamily: tokens.font.bodySemiBold, fontStyle: 'italic' },
-    toolTextOn: { color: colors.tealText },
-    listIcon: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-    listDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.text },
-    listDotOn: { backgroundColor: colors.tealText },
-    listCircle: {
-      width: 12,
-      height: 12,
-      borderRadius: 6,
-      borderWidth: 2,
-      borderColor: colors.text,
-    },
-    listCircleOn: { borderColor: colors.tealText },
-    listBar: { width: 12, height: 2.5, borderRadius: 2, backgroundColor: colors.text },
-    listBarOn: { backgroundColor: colors.tealText },
   }),
 );
+
+// Keeps the note open if the rich editor fails: the editor built in the app takes over.
+class Fallback extends Component<
+  { fallback: ReactNode; children: ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
+
+export function NoteEditor(props: NoteEditorProps) {
+  // What was last written, so the fallback starts from it and not from the note as opened.
+  const latest = useRef(props.initialBody);
+  if (!RichInput) return <LineNoteEditor {...props} />;
+  const onChange = (body: string) => {
+    latest.current = body;
+    props.onChange(body);
+  };
+  return (
+    <Fallback fallback={<LatestLineEditor {...props} latest={latest} />}>
+      <RichNoteEditor {...props} Input={RichInput} onChange={onChange} />
+    </Fallback>
+  );
+}
+
+function LatestLineEditor(props: NoteEditorProps & { latest: { current: string } }) {
+  const { latest, ...rest } = props;
+  const [body] = useState(() => latest.current);
+  return <LineNoteEditor {...rest} initialBody={body} />;
+}
