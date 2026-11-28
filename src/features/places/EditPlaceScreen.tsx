@@ -12,21 +12,13 @@ import { getMemory, type Memory } from '../../db/memories';
 import { useDbQuery } from '../../lib/useDbQuery';
 import { FormScreen } from '../../ui/FormScreen';
 import { ScreenMessage } from '../../ui/ScreenMessage';
+import { joinTags, TagsField } from '../../ui/TagsField';
 import { TextField } from '../../ui/TextField';
 import { themed } from '../../ui/theme';
 import { deviceLookups } from '../save/lookups';
 import { saveEditedPlace } from './editPlace';
 import { chosenLabel, LabelPicker } from './LabelPicker';
-import {
-  PLACE_LIMITS,
-  labelChoice,
-  tagsToText,
-  type LabelChoice,
-  type PlaceFormErrors,
-} from './placeForm';
-
-// Room for ten tags of full length with their commas.
-const TAGS_TEXT_LIMIT = PLACE_LIMITS.tags * (PLACE_LIMITS.tag + 2);
+import { PLACE_LIMITS, labelChoice, type LabelChoice, type PlaceFormErrors } from './placeForm';
 
 type Props = {
   // Null when the screen address did not carry a well-formed id.
@@ -81,7 +73,8 @@ function EditPlaceForm({ place, topInset, bottomInset, onDone }: FormProps) {
   const [customLabel, setCustomLabel] = useState(savedChoice === 'custom' ? place.title : '');
   const [address, setAddress] = useState(place.address ?? '');
   const [notes, setNotes] = useState(place.notes ?? '');
-  const [tagsText, setTagsText] = useState(tagsToText(place.tags));
+  // The saved tags open as pills, with nothing being typed after them.
+  const [tagsText, setTagsText] = useState(() => joinTags(place.tags));
   const [errors, setErrors] = useState<PlaceFormErrors>({});
   // Stops a double tap on Save from writing twice.
   const saving = useRef(false);
@@ -147,12 +140,12 @@ function EditPlaceForm({ place, topInset, bottomInset, onDone }: FormProps) {
         multiline
         error={errorText('notes')}
       />
-      <TextField
+      <TagsField
         label={t('places:editForm.tags')}
         value={tagsText}
         onChangeText={setTagsText}
-        maxLength={TAGS_TEXT_LIMIT}
-        autoCapitalize="sentences"
+        tagMaxLength={PLACE_LIMITS.tag}
+        removeLabel={(tag) => t('places:editForm.removeTagA11y', { tag })}
         hint={t('places:editForm.tagsHint')}
         error={errorText('tags')}
       />

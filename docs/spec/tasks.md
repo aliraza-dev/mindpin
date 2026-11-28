@@ -351,6 +351,7 @@ pending place; buying the unlock saves it, and a restore on another phone keeps 
 - [X] T149 [P] Theme choice tests in `src/features/settings/themePreference.test.ts`, `src/features/settings/SettingsScreen.test.tsx`, and `src/features/home/HomeScreen.test.tsx`: a choice applies at once, is remembered, and can be switched from Home (R11.6)
 - [X] T150 Theme choice in `src/ui/theme.ts` and `src/features/settings/themePreference.ts`, the switch in `src/ui/ThemeToggle.tsx`, and the Settings screen in `src/features/settings/SettingsScreen.tsx` with its Appearance section (R11.6)
 - [X] T151 Floating + button on Home in `src/ui/AddMenu.tsx` offering New note and Add place, replacing the + in the bottom bar, with tests in `src/ui/AddMenu.test.tsx` (R4.7, R6.5)
+- [X] T165 Tags as pills in `src/ui/TagsField.tsx`, used by the Save sheet and the edit-place form (R4.2)
 - [X] T164 Slide a place or a note on a person's screen for Edit and Delete, in `src/features/people/PersonView.tsx` and `PersonScreen.tsx` (R4.4, R10.10)
 - [X] T163 Settings before sign-in: the profile row, the data statement, and the version, in `src/features/settings/SettingsScreen.tsx` (R8.1, R8.5); T122 still adds backup, export, sign-out, and account deletion
 - [X] T162 The note editor on `react-native-enriched-html`: `src/features/notes/RichNoteEditor.tsx`, the Markdown and HTML converters in `src/features/notes/noteHtml.ts`, the shared `NoteToolbar.tsx`, and the fallback in `NoteEditor.tsx` (R10.4, R10.5)

@@ -66,7 +66,10 @@ describe('EditPlaceScreen', () => {
     expect(screen.getByRole('button', { name: 'Label this place Shop' })).not.toBeSelected();
     expect(screen.getByLabelText('Address').props.value).toBe('House 22, Sample Street');
     expect(screen.getByLabelText('Notes for next time').props.value).toBe('White gate');
-    expect(screen.getByLabelText('Tags').props.value).toBe('Gate code 4471, 2nd floor');
+    // The saved tags are pills; nothing is being typed yet.
+    expect(screen.getByLabelText('Tags').props.value).toBe('');
+    expect(screen.getByText('Gate code 4471')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Remove tag 2nd floor' })).toBeTruthy();
     expect(screen.queryByLabelText('Your label')).toBeNull();
   });
 
@@ -76,6 +79,9 @@ describe('EditPlaceScreen', () => {
     await fireEvent.press(await screen.findByRole('button', { name: 'Label this place Office' }));
     await fireEvent.changeText(screen.getByLabelText('Address'), 'Canal Road');
     await fireEvent.changeText(screen.getByLabelText('Notes for next time'), 'Blue door');
+    // The two saved tags are taken away with their crosses, and two new ones typed.
+    await fireEvent.press(screen.getByRole('button', { name: 'Remove tag Gate code 4471' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Remove tag 2nd floor' }));
     await fireEvent.changeText(screen.getByLabelText('Tags'), 'Parking, Floor 3');
     await fireEvent.press(save());
 

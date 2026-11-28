@@ -27,6 +27,7 @@ import { parseShared } from '../../parser/parseShared';
 import { Button } from '../../ui/Button';
 import { Chip } from '../../ui/Chip';
 import { Icon } from '../../ui/Icon';
+import { TagsField } from '../../ui/TagsField';
 import { TextField } from '../../ui/TextField';
 import { themed } from '../../ui/theme';
 import { tokens, touchSlop } from '../../ui/tokens';
@@ -50,7 +51,6 @@ import { savePlace } from './savePlace';
 
 // Shared text comes from other apps: only its start is ever kept (design.md, security rules).
 const MAX_KEPT_TEXT = 10_000;
-const TAGS_TEXT_LIMIT = PLACE_LIMITS.tags * (PLACE_LIMITS.tag + 2);
 
 export type SaveSheetResult = 'saved' | 'saved_note' | 'cancelled';
 
@@ -440,11 +440,12 @@ export function SaveSheet({
                   multiline
                   error={errorText('notes')}
                 />
-                <TextField
+                <TagsField
                   label={t('places:editForm.tags')}
                   value={tagsText}
                   onChangeText={setTagsText}
-                  maxLength={TAGS_TEXT_LIMIT}
+                  tagMaxLength={PLACE_LIMITS.tag}
+                  removeLabel={(tag) => t('places:editForm.removeTagA11y', { tag })}
                   hint={t('places:editForm.tagsHint')}
                   error={errorText('tags')}
                 />

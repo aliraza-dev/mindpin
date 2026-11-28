@@ -45,7 +45,8 @@
     "address": "Address",
     "notes": "Notes for next time",
     "tags": "Tags",
-    "tagsHint": "Separate tags with commas, for example: Gate code 4471, 2nd floor",
+    "tagsHint": "Type a comma to finish a tag, for example: Gate code 4471, 2nd floor",
+    "removeTagA11y": "Remove tag {{tag}}",
     "saveFailed": "The changes could not be saved. Try again.",
     "errors": {
       "labelRequired": "Choose or type a label.",
