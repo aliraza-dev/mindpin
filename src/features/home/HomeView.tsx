@@ -28,7 +28,7 @@ import { PlaceTile } from '../../ui/PlaceTile';
 import { SwipeRow } from '../../ui/SwipeRow';
 import { themed, useColors, type Scheme } from '../../ui/theme';
 import { ThemeToggle } from '../../ui/ThemeToggle';
-import { tokens } from '../../ui/tokens';
+import { tokens, touchSlop } from '../../ui/tokens';
 import { notePreview } from '../notes/noteText';
 import { isTabSwipe, tabAfterSwipe } from '../navigation/swipeTabs';
 import { agoText, lastVisitedLabel } from '../visits/lastVisited';
@@ -249,6 +249,19 @@ export function HomeView(props: Props) {
           maxLength={100}
           style={styles.searchInput}
         />
+        {props.searchText ? (
+          // A cross, drawn from two bars, that empties the search.
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('home:clearSearchA11y')}
+            onPress={() => props.onSearchChange('')}
+            hitSlop={touchSlop(24)}
+            style={styles.clear}
+          >
+            <View style={[styles.clearBar, styles.clearBarA]} />
+            <View style={[styles.clearBar, styles.clearBarB]} />
+          </Pressable>
+        ) : null}
       </View>
 
       {results ? (
@@ -440,6 +453,23 @@ const useStyles = themed((colors) =>
       fontSize: 15,
       color: colors.text,
     },
+    clear: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.divider,
+    },
+    clearBar: {
+      position: 'absolute',
+      width: 11,
+      height: 2,
+      borderRadius: 1,
+      backgroundColor: colors.secondaryText,
+    },
+    clearBarA: { transform: [{ rotate: '45deg' }] },
+    clearBarB: { transform: [{ rotate: '-45deg' }] },
     chips: { marginTop: 17 },
     heading: {
       marginTop: 18,

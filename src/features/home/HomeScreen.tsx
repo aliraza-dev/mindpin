@@ -1,8 +1,8 @@
 // Loads the home screen's data from the on-device database and runs the search.
-import { useRouter } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, BackHandler, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getDatabase } from '../../db/database';
@@ -52,6 +52,22 @@ export function HomeScreen() {
     },
     'home',
     'home',
+  );
+
+  // While something is typed in the search, the phone's Back button empties it instead of
+  // leaving the app (owner request, 2026-11-28).
+  const searching = searchText !== '';
+  useFocusEffect(
+    useCallback(() => {
+      if (!searching) return;
+      const back = BackHandler.addEventListener('hardwareBackPress', () => {
+        latestSearch.current += 1;
+        setSearchText('');
+        setResults(null);
+        return true;
+      });
+      return () => back.remove();
+    }, [searching]),
   );
 
   const search = async (text: string) => {

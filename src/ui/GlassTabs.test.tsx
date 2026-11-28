@@ -2,6 +2,7 @@
 // tabs it sits over and how it is drawn once the row is measured.
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { createRef } from 'react';
+import * as ReactNative from 'react-native';
 import { StyleSheet } from 'react-native';
 
 import type { ViewRef } from './blur';
@@ -83,6 +84,18 @@ describe('GlassTabs', () => {
     );
     expect(screen.getByTestId('glass-frost', HIDDEN).props.blurTarget).toBe(behind);
     expect(capsule().backgroundColor).toBe('transparent');
+  });
+
+  it('has no line of light on the lens in the dark theme', async () => {
+    const light = await render(<GlassTabs tabs={tabs} activeIndex={0} onSelect={() => {}} />);
+    await measure();
+    expect(screen.getByTestId('glass-glint', HIDDEN)).toBeTruthy();
+    await light.unmount();
+    jest.spyOn(ReactNative, 'useColorScheme').mockReturnValue('dark');
+    await render(<GlassTabs tabs={tabs} activeIndex={0} onSelect={() => {}} />);
+    await measure();
+    expect(screen.queryByTestId('glass-glint', HIDDEN)).toBeNull();
+    jest.restoreAllMocks();
   });
 
   it('shows the name under the icon of the open tab only', async () => {

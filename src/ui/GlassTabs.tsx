@@ -230,8 +230,9 @@ export function GlassTabs(props: Props) {
           >
             {/* The thick edge of the glass, where it bends the light. */}
             <View style={[styles.rim, { borderRadius: lensHeight / 2.4 - 2 }]} />
-            {/* A thin line of light along the top edge. */}
-            <View style={styles.glint} />
+            {/* A thin line of light along the top edge. On the dark theme it reads as a stray
+                white line, so it is left out there. */}
+            {scheme === 'light' ? <View testID="glass-glint" style={styles.glint} /> : null}
           </Animated.View>
         ) : null}
       </View>
@@ -239,7 +240,7 @@ export function GlassTabs(props: Props) {
   );
 }
 
-// The glass is lit the same in both themes: it is the light on it that makes it glass.
+// The light on the glass is what makes it glass.
 const GLASS = {
   body: 'rgba(255, 255, 255, 0.07)',
   rim: 'rgba(255, 255, 255, 0.24)',

@@ -192,6 +192,17 @@ describe('HomeView', () => {
     expect(handlers.onOpenPlace).toHaveBeenCalledWith('nani');
   });
 
+  it('offers a cross that empties the search once something is typed (R6.1)', async () => {
+    const empty = setup();
+    await empty.view;
+    expect(screen.queryByRole('button', { name: 'Clear search' })).toBeNull();
+    await (await empty.view).unmount();
+    const { handlers, view } = setup({ searchText: 'main', results: [] });
+    await view;
+    await fireEvent.press(screen.getByRole('button', { name: 'Clear search' }));
+    expect(handlers.onSearchChange).toHaveBeenCalledWith('');
+  });
+
   it('shows search results in place of the lists while searching (R6.1, R6.2)', async () => {
     const { handlers, view } = setup({
       searchText: 'main',

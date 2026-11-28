@@ -1,6 +1,6 @@
 // T052: the home screen loads its own data and searches as the user types.
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { Alert, type AlertButton } from 'react-native';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { Alert, BackHandler, type AlertButton } from 'react-native';
 
 import { getDatabase } from '../../db/database';
 import { createPlace, getMemory } from '../../db/memories';
@@ -79,6 +79,24 @@ describe('HomeScreen', () => {
 
     await fireEvent.changeText(input, '');
     expect(await screen.findByText('Recently saved')).toBeTruthy();
+  });
+
+  it('empties the search on the Back button of the phone instead of leaving the app (R6.1)', async () => {
+    const listen = jest.spyOn(BackHandler, 'addEventListener');
+    await seeded();
+    await render(<HomeScreen />);
+    // With nothing typed, Back is left alone.
+    expect(listen).not.toHaveBeenCalled();
+    const input = await screen.findByLabelText('Search everything you saved');
+    await fireEvent.changeText(input, 'gul');
+    expect(await screen.findByText('Results')).toBeTruthy();
+    // The handler the screen gave the phone's Back button.
+    const handler = listen.mock.calls[listen.mock.calls.length - 1][1];
+    await act(async () => {
+      expect((handler as () => boolean)()).toBe(true);
+    });
+    expect(await screen.findByText('Recently saved')).toBeTruthy();
+    expect(screen.getByLabelText('Search everything you saved').props.value).toBe('');
   });
 
   it('switches between people and places, and opens them', async () => {
