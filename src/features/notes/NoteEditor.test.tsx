@@ -145,4 +145,33 @@ describe('NoteEditor', () => {
     );
     expect(heights).toEqual([32, 32]);
   });
+
+  it('shows which styles the current line has on the toolbar', async () => {
+    await setup('Trip\n## Packing\n- [ ] **Sweets**').view;
+    expect(tool('Heading')).not.toBeSelected();
+    await fireEvent(line(2), 'focus');
+    expect(tool('Heading')).toBeSelected();
+    expect(tool('Title')).not.toBeSelected();
+    await fireEvent(line(3), 'focus');
+    expect(tool('Checklist')).toBeSelected();
+    expect(tool('Bold')).toBeSelected();
+    expect(tool('Heading')).not.toBeSelected();
+    expect(tool('Italic')).not.toBeSelected();
+  });
+
+  it('spreads the seven toolbar buttons evenly', async () => {
+    await setup().view;
+    const names = [
+      'Title',
+      'Heading',
+      'Bold',
+      'Italic',
+      'Bulleted list',
+      'Numbered list',
+      'Checklist',
+    ];
+    for (const name of names) {
+      expect(StyleSheet.flatten(tool(name).props.style)).toMatchObject({ flex: 1, height: 48 });
+    }
+  });
 });

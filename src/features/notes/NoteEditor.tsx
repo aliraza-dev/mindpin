@@ -135,6 +135,17 @@ export function NoteEditor(props: Props) {
     return all;
   }, []);
 
+  // The styles the line being written has, so their buttons can show as on.
+  const current = lines[focus];
+  const activeTools = new Set<Tool>();
+  if (current) {
+    if (current.kind === 'done') activeTools.add('todo');
+    else if (current.kind !== 'text') activeTools.add(current.kind);
+    const spans = emphasisSpans(current.text);
+    if (spans.some((span) => span.bold)) activeTools.add('bold');
+    if (spans.some((span) => span.italic)) activeTools.add('italic');
+  }
+
   const runTool = (tool: Tool) => {
     if (tool === 'bold') emphasise('**');
     else if (tool === 'italic') emphasise('*');
@@ -262,25 +273,44 @@ export function NoteEditor(props: Props) {
       </ScrollView>
 
       <View style={[styles.toolbar, { paddingBottom: bottomInset }]}>
-        <ScrollView
-          horizontal
-          keyboardShouldPersistTaps="always"
-          showsHorizontalScrollIndicator={false}
-        >
-          {TOOLS.map((tool) => (
+        {TOOLS.map((tool) => {
+          const on = activeTools.has(tool);
+          return (
             <Pressable
               key={tool}
               accessibilityRole="button"
               accessibilityLabel={t(`notes:editor.toolbar.${tool}A11y`)}
+              accessibilityState={{ selected: on }}
               onPress={() => runTool(tool)}
               style={styles.tool}
             >
-              <Text style={[styles.toolText, tool === 'italic' && styles.italic]}>
-                {t(`notes:editor.toolbar.${tool}`)}
-              </Text>
+              <View style={[styles.toolFace, on && styles.toolFaceOn]}>
+                {tool === 'bullet' || tool === 'todo' ? (
+                  // Drawn, not typed: list marks from a font sit at different heights.
+                  <View style={styles.listIcon}>
+                    <View
+                      style={[
+                        tool === 'bullet' ? styles.listDot : styles.listCircle,
+                        on && (tool === 'bullet' ? styles.listDotOn : styles.listCircleOn),
+                      ]}
+                    />
+                    <View style={[styles.listBar, on && styles.listBarOn]} />
+                  </View>
+                ) : (
+                  <Text
+                    style={[
+                      styles.toolText,
+                      tool === 'italic' && styles.toolItalic,
+                      on && styles.toolTextOn,
+                    ]}
+                  >
+                    {t(`notes:editor.toolbar.${tool}`)}
+                  </Text>
+                )}
+              </View>
             </Pressable>
-          ))}
-        </ScrollView>
+          );
+        })}
       </View>
     </KeyboardAvoidingView>
   );
@@ -362,18 +392,48 @@ const useStyles = themed((colors) =>
       fontSize: 12,
       color: colors.amberText,
     },
+    // Seven buttons share the width evenly, each a 44 px touch target.
     toolbar: {
+      flexDirection: 'row',
+      alignItems: 'center',
       borderTopWidth: 1,
       borderTopColor: colors.border,
       backgroundColor: colors.surface,
       paddingHorizontal: 8,
+      paddingTop: 6,
     },
-    tool: {
-      minWidth: 48,
-      height: 48,
+    tool: { flex: 1, height: 48, alignItems: 'center', justifyContent: 'center' },
+    toolFace: {
+      width: 40,
+      height: 36,
+      borderRadius: 10,
       alignItems: 'center',
       justifyContent: 'center',
     },
-    toolText: { fontFamily: tokens.font.bodyBold, fontSize: 16, color: colors.text },
+    // The style the current line has.
+    toolFaceOn: { backgroundColor: colors.tealSoft },
+    toolText: {
+      fontFamily: tokens.font.bodyBold,
+      fontSize: 16,
+      lineHeight: 20,
+      textAlign: 'center',
+      includeFontPadding: false,
+      color: colors.text,
+    },
+    toolItalic: { fontFamily: tokens.font.bodySemiBold, fontStyle: 'italic' },
+    toolTextOn: { color: colors.tealText },
+    listIcon: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+    listDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.text },
+    listDotOn: { backgroundColor: colors.tealText },
+    listCircle: {
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+      borderWidth: 2,
+      borderColor: colors.text,
+    },
+    listCircleOn: { borderColor: colors.tealText },
+    listBar: { width: 12, height: 2.5, borderRadius: 2, backgroundColor: colors.text },
+    listBarOn: { backgroundColor: colors.tealText },
   }),
 );
