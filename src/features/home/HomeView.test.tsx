@@ -265,4 +265,25 @@ describe('HomeView', () => {
       expect.objectContaining({ id: 'shop' }),
     );
   });
+
+  it('shows a picture of people when the People view is empty, and a pin for Places', async () => {
+    const HIDDEN = { includeHiddenElements: true };
+    const noPeople = setup({ people: [] });
+    await noPeople.view;
+    expect(screen.getByTestId('empty-people', HIDDEN)).toBeTruthy();
+    expect(
+      screen.getByText('No people yet. Save a place for someone and they appear here.'),
+    ).toBeTruthy();
+    await (await noPeople.view).unmount();
+
+    const noPlaces = setup({ view: 'places', places: [] });
+    await noPlaces.view;
+    expect(screen.getByTestId('empty-places', HIDDEN)).toBeTruthy();
+    expect(screen.getByText('No places yet. Tap + to add one.')).toBeTruthy();
+    await (await noPlaces.view).unmount();
+
+    await setup({ people: [], places: [] }).view;
+    expect(screen.getByTestId('empty-people', HIDDEN)).toBeTruthy();
+    expect(screen.getByText(/Nothing saved yet/)).toBeTruthy();
+  });
 });

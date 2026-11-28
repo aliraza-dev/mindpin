@@ -9,7 +9,7 @@ const HIDDEN = { includeHiddenElements: true };
 describe('EmptyIllustration', () => {
   afterEach(() => jest.restoreAllMocks());
 
-  it.each<EmptyKind>(['places', 'notes', 'search'])(
+  it.each<EmptyKind>(['people', 'places', 'notes', 'search'])(
     'draws the %s picture and hides it from screen readers',
     async (kind) => {
       jest.spyOn(AccessibilityInfo, 'isReduceMotionEnabled').mockResolvedValue(true);
@@ -30,9 +30,10 @@ describe('EmptyIllustration', () => {
       reset: jest.fn(),
     });
     const view = await render(<EmptyIllustration kind="places" />);
-    await waitFor(() => expect(loop).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(loop).toHaveBeenCalled());
+    const started = loop.mock.calls.length;
     await view.unmount();
-    expect(stop).toHaveBeenCalledTimes(1);
+    expect(stop).toHaveBeenCalledTimes(started);
   });
 
   it('stays still when the phone is set to reduce motion (R11.5)', async () => {

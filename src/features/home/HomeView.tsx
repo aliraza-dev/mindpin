@@ -63,6 +63,11 @@ export function HomeView(props: Props) {
   const { t } = useTranslation();
   const greeting = t(`home:greeting.${props.greeting}`);
   const nothingSaved = people.length === 0 && places.length === 0;
+  // Each view has its own picture and message when it has nothing to list.
+  const viewEmpty = view === 'people' ? people.length === 0 : places.length === 0;
+  const emptyText = nothingSaved
+    ? t('home:empty')
+    : t(view === 'people' ? 'home:emptyPeople' : 'home:emptyPlaces');
 
   const placeRow = (place: Memory, personName: string | null, status: string | null) => (
     <SwipeRow
@@ -241,10 +246,10 @@ export function HomeView(props: Props) {
             />
           </View>
 
-          {nothingSaved ? (
+          {viewEmpty ? (
             <>
-              <EmptyIllustration kind="places" />
-              <Text style={styles.message}>{t('home:empty')}</Text>
+              <EmptyIllustration kind={view === 'people' ? 'people' : 'places'} />
+              <Text style={[styles.message, styles.centered]}>{emptyText}</Text>
             </>
           ) : (
             <>
@@ -387,6 +392,7 @@ const useStyles = themed((colors) =>
       fontSize: 15,
       color: colors.text,
     },
+    centered: { textAlign: 'center' },
     message: {
       marginTop: 18,
       fontFamily: tokens.font.body,

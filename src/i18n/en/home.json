@@ -18,6 +18,8 @@
   "results": "Results",
   "noResults": "Nothing matches \"{{text}}\".",
   "empty": "Nothing saved yet. Share a location to MindPin from another app, or tap + to add a place or write a note.",
+  "emptyPeople": "No people yet. Save a place for someone and they appear here.",
+  "emptyPlaces": "No places yet. Tap + to add one.",
   "add": {
     "openA11y": "Add a place or a note",
     "closeA11y": "Close the add menu",

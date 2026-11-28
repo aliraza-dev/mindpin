@@ -207,7 +207,7 @@ Not themed yet: the round back, edit, and more buttons and the place tiles are d
 
 ### Empty screens (R11.4)
 
-The illustrations are drawn in code from the theme colors (`src/ui/EmptyIllustration.tsx`), with no image files and no animation package: a pin that bobs over its shadow (places, map), a sheet whose lines write themselves (notes), and a magnifying glass that sweeps (search). Each is 120 px high, decoration only, and hidden from screen readers; the message under it carries the meaning.
+The illustrations are drawn in code from the theme colors (`src/ui/EmptyIllustration.tsx`), with no image files and no animation package: three people standing together (the People view), a pin that bobs over its shadow (places, map), a sheet whose lines write themselves (notes), and a magnifying glass that sweeps (search). Each is a scene 280 px wide and 180 px high, with two sweeping strokes of color, a cloud, and a ground line behind the figure, after the line-drawn pictures in the phone's own apps (owner request, 2026-11-28). They are decoration only, and hidden from screen readers; the message under it carries the meaning.
 
 ## Security rules
 
