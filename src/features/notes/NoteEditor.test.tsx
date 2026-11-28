@@ -173,7 +173,8 @@ describe('NoteEditor', () => {
     await setup('Trip\nPacking').view;
     expect(screen.getByText(/2026/)).toBeTruthy();
     const rules = screen.getByTestId('note-rules', { includeHiddenElements: true });
-    expect(rules.props.children.length).toBeGreaterThanOrEqual(20);
+    // Two rows of writing, then empty rules on down the sheet.
+    expect(rules.props.children.length + 2).toBeGreaterThanOrEqual(20);
     // Every row is the height of one rule, so the lines fall under the writing.
     const heights = [first(), line(2)].map(
       (input) => StyleSheet.flatten(input.props.style).lineHeight,

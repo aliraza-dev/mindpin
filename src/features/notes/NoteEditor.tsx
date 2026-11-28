@@ -4,7 +4,7 @@
 // the text on screen is exactly what was typed. There is no Save button: every change is handed to the screen, which
 // stores it. It looks like a sheet of ruled paper, after the phone's own notes app: the date
 // at the top, a large first line, and a faint rule under every row (owner request,
-// 2026-11-28). The Figma frame "07 Note editor" could not be read when this was built.
+// 2026-11-28). Each row draws its own rule, so the rules cannot drift from the writing. The Figma frame "07 Note editor" could not be read when this was built.
 import { useEffect, useRef, useState, type ComponentRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -71,6 +71,23 @@ type Props = {
   bottomInset?: number;
 };
 
+// One line of the note on ruled paper. The rules belong to the row and are measured up from
+// its own bottom edge, so each sits under its writing whatever height the phone gives the
+// row. A long line that wraps gets a rule under each row of its text.
+function RuledRow({ children }: { children: React.ReactNode }) {
+  const styles = useStyles();
+  const [height, setHeight] = useState(RULE);
+  const rules = Math.max(1, Math.round(height / RULE));
+  return (
+    <View style={styles.line} onLayout={(event) => setHeight(event.nativeEvent.layout.height)}>
+      {Array.from({ length: rules }, (_, row) => (
+        <View key={row} pointerEvents="none" style={[styles.rule, { bottom: row * RULE }]} />
+      ))}
+      {children}
+    </View>
+  );
+}
+
 export function NoteEditor(props: Props) {
   const styles = useStyles();
   const colors = useColors();
@@ -81,9 +98,6 @@ export function NoteEditor(props: Props) {
   const [full, setFull] = useState(false);
   // Where the cursor must go after two lines are joined; cleared once the user moves it.
   const [cursor, setCursor] = useState<{ line: number; at: number } | null>(null);
-  // The height of the writing, so the rules can run under all of it and on down the page.
-  const [pageHeight, setPageHeight] = useState(0);
-  const ruleCount = Math.max(MIN_RULES, Math.ceil(pageHeight / RULE) + 4);
   // The cursor or the selected text, and the line it is in.
   const [selected, setSelected] = useState({ line: 0, start: 0, end: 0 });
   // Bold or italic switched on or off with nothing selected: what is typed next takes it.
@@ -201,28 +215,12 @@ export function NoteEditor(props: Props) {
 
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
         <Text style={styles.date}>{editedText(props.editedAt)}</Text>
-        <View
-          style={[styles.page, { minHeight: ruleCount * RULE }]}
-          onLayout={(event) => setPageHeight(event.nativeEvent.layout.height)}
-        >
-          {/* Ruled paper: one faint line under every row of writing, and on down the page. */}
-          <View
-            testID="note-rules"
-            style={StyleSheet.absoluteFill}
-            pointerEvents="none"
-            accessible={false}
-            importantForAccessibility="no-hide-descendants"
-            accessibilityElementsHidden
-          >
-            {Array.from({ length: ruleCount }, (_, row) => (
-              <View key={row} style={[styles.rule, { top: (row + 1) * RULE - 1 }]} />
-            ))}
-          </View>
+        <View>
           {lines.map((line, index) => {
             const first = index === 0;
             const checklist = line.kind === 'todo' || line.kind === 'done';
             return (
-              <View key={index} style={styles.line}>
+              <RuledRow key={index}>
                 {line.kind === 'bullet' ? <Text style={styles.prefix}>•</Text> : null}
                 {line.kind === 'number' ? (
                   <Text style={styles.prefix}>{numbers[index]}.</Text>
@@ -282,9 +280,21 @@ export function NoteEditor(props: Props) {
                     </Text>
                   ))}
                 </TextInput>
-              </View>
+              </RuledRow>
             );
           })}
+          {/* The rest of the sheet: empty rules on down the page. */}
+          <View
+            testID="note-rules"
+            pointerEvents="none"
+            accessible={false}
+            importantForAccessibility="no-hide-descendants"
+            accessibilityElementsHidden
+          >
+            {Array.from({ length: Math.max(6, MIN_RULES - lines.length) }, (_, row) => (
+              <View key={row} style={styles.emptyRow} />
+            ))}
+          </View>
         </View>
         {full ? (
           <Text accessibilityRole="alert" style={styles.full}>
@@ -356,7 +366,11 @@ const useStyles = themed((colors) =>
       fontSize: 12,
       color: colors.mutedText,
     },
-    page: {},
+    emptyRow: {
+      height: RULE,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.controlBorder,
+    },
     rule: {
       position: 'absolute',
       start: 0,

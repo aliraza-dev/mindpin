@@ -62,9 +62,17 @@ export function SwipeRow({ actions, children }: Props) {
     return { slide: position, settle: moveTo, responder: pan };
   });
 
+  // The actions are see-through until the row starts to move. They lie under the row, and
+  // would otherwise show through it whenever the list fades in.
+  const shown = slide.interpolate({
+    inputRange: side < 0 ? [-1, 0] : [0, 1],
+    outputRange: side < 0 ? [1, 0] : [0, 1],
+    extrapolate: 'clamp',
+  });
+
   return (
     <View>
-      <View style={styles.actions}>
+      <Animated.View testID="swipe-actions" style={[styles.actions, { opacity: shown }]}>
         {actions.map((action) => (
           <Pressable
             key={action.key}
@@ -82,7 +90,7 @@ export function SwipeRow({ actions, children }: Props) {
             />
           </Pressable>
         ))}
-      </View>
+      </Animated.View>
       <Animated.View
         style={[styles.slider, { transform: [{ translateX: slide }] }]}
         {...responder.panHandlers}

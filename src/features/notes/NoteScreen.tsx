@@ -2,9 +2,9 @@
 // no database row until the first keystroke, so opening the screen never waits for a write.
 // The ids come from the screen address and have been checked by the route.
 import { useRouter } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, StyleSheet, View } from 'react-native';
+import { Alert, BackHandler, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getDatabase } from '../../db/database';
@@ -143,7 +143,7 @@ function OpenNote({ loaded, topInset, bottomInset, onClose }: OpenProps) {
     return queue.current;
   };
 
-  const close = async () => {
+  const finish = async () => {
     await write();
     // A note left empty is not kept.
     if (id.current !== null && latest.current.trim() === '') {
@@ -155,8 +155,23 @@ function OpenNote({ loaded, topInset, bottomInset, onClose }: OpenProps) {
         logEvent('note_delete_failed');
       }
     }
-    onClose();
   };
+
+  // Leaving never waits for the phone's storage: the screen closes at once, and what was
+  // typed finishes saving behind it.
+  const close = () => {
+    onClose();
+    void finish();
+  };
+
+  // The phone's own Back button closes the note the same way.
+  useEffect(() => {
+    const back = BackHandler.addEventListener('hardwareBackPress', () => {
+      close();
+      return true;
+    });
+    return () => back.remove();
+  });
 
   const saveLinks = async (next: { personId: string | null; placeId: string | null }) => {
     setPicking(false);
