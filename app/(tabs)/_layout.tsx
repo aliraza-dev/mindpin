@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { tabs } from '../../src/features/navigation/tabs';
-import { Icon } from '../../src/ui/Icon';
+import { TabIcon } from '../../src/ui/TabIcon';
 import { useColors } from '../../src/ui/theme';
 
 // The bar is 64 px high above the phone's own bottom inset.
@@ -36,9 +36,7 @@ export default function TabsLayout() {
           options={{
             title: t(tab.labelKey),
             tabBarAccessibilityLabel: t(tab.accessibilityKey),
-            tabBarIcon: ({ focused }) => (
-              <Icon name={tab.icon} tintColor={focused ? colors.text : colors.mutedText} />
-            ),
+            tabBarIcon: ({ focused }) => <TabIcon icon={tab.icon} active={focused} />,
           }}
         />
       ))}

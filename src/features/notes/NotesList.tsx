@@ -95,7 +95,14 @@ export function NotesList(props: Props) {
                   <SwipeRow
                     actions={ACTIONS.map((action) => ({
                       key: action,
-                      label: actionText(action, note),
+                      icon:
+                        action === 'pin'
+                          ? note.pinned
+                            ? 'unpin'
+                            : 'pin'
+                          : action === 'link'
+                            ? 'link'
+                            : 'trash',
                       accessibilityLabel: actionA11y(action, note),
                       danger: action === 'delete',
                       onPress: () => props.onAction(action, note),

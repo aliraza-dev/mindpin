@@ -70,13 +70,13 @@ export function HomeView(props: Props) {
       actions={[
         {
           key: 'edit',
-          label: t('home:swipe.edit'),
+          icon: 'pencil',
           accessibilityLabel: t('home:swipe.editA11y', { name: place.title }),
           onPress: () => props.onEditPlace(place.id),
         },
         {
           key: 'delete',
-          label: t('home:swipe.delete'),
+          icon: 'trash',
           accessibilityLabel: t('home:swipe.deleteA11y', { name: place.title }),
           danger: true,
           onPress: () => props.onDeletePlace(place),
@@ -259,13 +259,13 @@ export function HomeView(props: Props) {
                         actions={[
                           {
                             key: 'edit',
-                            label: t('home:swipe.edit'),
+                            icon: 'pencil',
                             accessibilityLabel: t('home:swipe.editA11y', { name: row.person.name }),
                             onPress: () => props.onEditPerson(row.person.id),
                           },
                           {
                             key: 'delete',
-                            label: t('home:swipe.delete'),
+                            icon: 'trash',
                             accessibilityLabel: t('home:swipe.deleteA11y', {
                               name: row.person.name,
                             }),

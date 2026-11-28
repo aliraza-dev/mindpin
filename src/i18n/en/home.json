@@ -31,9 +31,7 @@
     "toLightA11y": "Switch to the light theme"
   },
   "swipe": {
-    "edit": "Edit",
     "editA11y": "Edit {{name}}",
-    "delete": "Delete",
     "deleteA11y": "Delete {{name}}"
   },
   "placesBadge_one": "{{count}}\nplace",

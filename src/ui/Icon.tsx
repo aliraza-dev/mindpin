@@ -6,16 +6,20 @@ import back from '../../assets/icons/back.svg';
 import check from '../../assets/icons/check.svg';
 import clock from '../../assets/icons/clock.svg';
 import edit from '../../assets/icons/edit.svg';
+import link from '../../assets/icons/link.svg';
 import mapThumb from '../../assets/icons/map-thumb.svg';
 import more from '../../assets/icons/more.svg';
 import pickCheck from '../../assets/icons/pick-check.svg';
 import navHome from '../../assets/icons/nav-home.svg';
 import navMap from '../../assets/icons/nav-map.svg';
-import navPlus from '../../assets/icons/nav-plus.svg';
 import navSettings from '../../assets/icons/nav-settings.svg';
 import navigate from '../../assets/icons/navigate.svg';
+import pencil from '../../assets/icons/pencil.svg';
+import pin from '../../assets/icons/pin.svg';
 import search from '../../assets/icons/search.svg';
 import share from '../../assets/icons/share.svg';
+import trash from '../../assets/icons/trash.svg';
+import unpin from '../../assets/icons/unpin.svg';
 import tileHome from '../../assets/icons/tile-home.svg';
 import tileShop from '../../assets/icons/tile-shop.svg';
 
@@ -29,9 +33,14 @@ const ICONS = {
   more: { source: more, width: 44, height: 44 },
   mapThumb: { source: mapThumb, width: 89.33, height: 72.97 },
   pickCheck: { source: pickCheck, width: 13.67, height: 10.33 },
+  // Drawn for the actions behind a list row; not from Figma.
+  link: { source: link, width: 24, height: 24 },
+  pencil: { source: pencil, width: 24, height: 24 },
+  pin: { source: pin, width: 24, height: 24 },
+  trash: { source: trash, width: 24, height: 24 },
+  unpin: { source: unpin, width: 24, height: 24 },
   navHome: { source: navHome, width: 18, height: 18 },
   navMap: { source: navMap, width: 20, height: 18 },
-  navPlus: { source: navPlus, width: 56, height: 56 },
   navSettings: { source: navSettings, width: 18, height: 19 },
   navigate: { source: navigate, width: 16.67, height: 16.67 },
   search: { source: search, width: 15, height: 15 },

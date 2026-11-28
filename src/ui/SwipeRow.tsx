@@ -1,23 +1,15 @@
 // A list row that slides aside to show its actions (R10.11, and the Home lists). The actions
 // are real buttons underneath, so a screen reader reaches them without the gesture.
 import { useState } from 'react';
-import {
-  Animated,
-  I18nManager,
-  PanResponder,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Animated, I18nManager, PanResponder, Pressable, StyleSheet, View } from 'react-native';
 
-import { themed } from './theme';
-import { tokens } from './tokens';
+import { Icon, type IconName } from './Icon';
+import { themed, useColors } from './theme';
 
 export type SwipeAction = {
   key: string;
-  // Already translated.
-  label: string;
+  // The action is shown as an icon; this says what it does, already translated.
+  icon: IconName;
   accessibilityLabel: string;
   // Drawn in the warning colors: for deleting.
   danger?: boolean;
@@ -26,10 +18,11 @@ export type SwipeAction = {
 
 type Props = { actions: SwipeAction[]; children: React.ReactNode };
 
-const ACTION_WIDTH = 76;
+const ACTION_WIDTH = 64;
 
 export function SwipeRow({ actions, children }: Props) {
   const styles = useStyles();
+  const colors = useColors();
   const openAt = ACTION_WIDTH * actions.length;
   // In a right-to-left layout the actions sit at the left, so the row slides the other way.
   const side = I18nManager.isRTL ? 1 : -1;
@@ -76,9 +69,10 @@ export function SwipeRow({ actions, children }: Props) {
             }}
             style={[styles.action, action.danger && styles.actionDanger]}
           >
-            <Text style={[styles.actionText, action.danger && styles.actionDangerText]}>
-              {action.label}
-            </Text>
+            <Icon
+              name={action.icon}
+              tintColor={action.danger ? colors.amberText : colors.tealText}
+            />
           </Pressable>
         ))}
       </View>
@@ -102,8 +96,6 @@ const useStyles = themed((colors) =>
       justifyContent: 'center',
       backgroundColor: colors.tealSoft,
     },
-    actionText: { fontFamily: tokens.font.bodyBold, fontSize: 13, color: colors.tealText },
     actionDanger: { backgroundColor: colors.amberTint },
-    actionDangerText: { color: colors.amberText },
   }),
 );
