@@ -1,10 +1,12 @@
-// A row of tabs in the manner of the "liquid glass" bars of iOS 26 (owner request,
-// 2026-11-28): a capsule of tinted glass holding the tabs, and over the open one a brighter
-// bubble of glass. The bubble can be dragged: it follows the finger, swells and stretches
+// A row of tabs in the manner of the "liquid glass" bars of iOS 26 (owner request and
+// example, 2026-11-28): a capsule in the theme color holding the tabs, and over the open one
+// a clear lens of glass that is larger than the capsule, with a thick bright rim, so the bar
+// shows through it. The lens can be dragged: it follows the finger, swells and stretches
 // like a drop of water while it is held, and settles on the nearest tab with a soft bounce.
-// Tapping a tab sends the bubble there the same way.
-// Built from plain views and the built-in animation system; real background blur would need
-// a native package. Used for People, Places, and Notes on Home and for the bottom bar.
+// Tapping a tab sends the lens there the same way.
+// Built from plain views and the built-in animation system. Real blur and bending of what is
+// behind the glass would need a native package. Used for People, Places, and Notes on Home
+// and for the bottom bar.
 import { useEffect, useState } from 'react';
 import {
   Animated,
@@ -23,7 +25,7 @@ import { tokens } from './tokens';
 
 export type GlassTab = {
   key: string;
-  // Already translated. A tab shows its label, or its icon when it has no label.
+  // Already translated. With an icon, the label is shown under it on the open tab only.
   label?: string;
   icon?: IconName;
   accessibilityLabel: string;
@@ -35,35 +37,45 @@ type Props = {
   onSelect: (index: number) => void;
   // How tall the capsule is. Never under the 44 px touch target.
   height?: number;
+  // "solid" fills the capsule with the theme color; "soft" gives it only a wash of it.
+  tone?: 'solid' | 'soft';
   // What a screen reader calls each item.
   role?: 'button' | 'tab';
 };
 
 const PAD = 4;
-// Soft and a little bouncy, like the bubble has weight.
+// How far the lens reaches past the capsule, above and below and to each side.
+export const LENS_OVER = 7;
+// Soft and a little bouncy, like the lens has weight.
 const SETTLE = { tension: 170, friction: 11, useNativeDriver: true };
 
-export function GlassTabs({ tabs, activeIndex, onSelect, height = 48, role = 'button' }: Props) {
+export function GlassTabs(props: Props) {
+  const { tabs, activeIndex, onSelect, height = 48, tone = 'soft', role = 'button' } = props;
   const styles = useStyles();
   const colors = useColors();
   const [width, setWidth] = useState(0);
-  // Raised after every drag, so the bubble settles again even when the open tab did not
+  // Raised after every drag, so the lens settles again even when the open tab did not
   // change (a tab may open another screen instead of becoming the open one).
   const [settles, setSettles] = useState(0);
 
+  const solid = tone === 'solid';
   const count = tabs.length;
   const slot = width > 0 ? (width - PAD * 2) / count : 0;
   const rtl = I18nManager.isRTL;
 
-  // Made once: the bubble's position and shape, and the drag that moves them. What the drag
+  // Made once: the lens's position and shape, and the drag that moves them. What the drag
   // needs to know is handed to it after every draw.
   const [{ left, swell, stretch, drag, keep }] = useState(() => {
     const position = new Animated.Value(0);
     const held = new Animated.Value(0);
     const wide = new Animated.Value(1);
     let now = { slot: 0, count: 1, rtl: false, home: 0, select: (_index: number) => {} };
+    const rest = () => {
+      Animated.spring(held, { toValue: 0, ...SETTLE }).start();
+      Animated.spring(wide, { toValue: 1, ...SETTLE }).start();
+    };
     const pan = PanResponder.create({
-      // Taps go to the tabs; only a sideways drag takes the bubble.
+      // Taps go to the tabs; only a sideways drag takes the lens.
       onMoveShouldSetPanResponder: (_event, gesture) =>
         Math.abs(gesture.dx) > 6 && Math.abs(gesture.dx) > Math.abs(gesture.dy),
       onPanResponderGrant: () => {
@@ -74,13 +86,11 @@ export function GlassTabs({ tabs, activeIndex, onSelect, height = 48, role = 'bu
         wide.setValue(stretchFor(gesture.vx));
       },
       onPanResponderRelease: (_event, gesture) => {
-        Animated.spring(held, { toValue: 0, ...SETTLE }).start();
-        Animated.spring(wide, { toValue: 1, ...SETTLE }).start();
+        rest();
         now.select(tabUnderBubble(now.home + gesture.dx, now.count, now.slot, now.rtl));
       },
       onPanResponderTerminate: () => {
-        Animated.spring(held, { toValue: 0, ...SETTLE }).start();
-        Animated.spring(wide, { toValue: 1, ...SETTLE }).start();
+        rest();
         now.select(-1);
       },
     });
@@ -110,101 +120,130 @@ export function GlassTabs({ tabs, activeIndex, onSelect, height = 48, role = 'bu
     });
   });
 
-  // The bubble goes to the open tab whenever that changes, the row is measured, or a drag ends.
+  // The lens goes to the open tab whenever that changes, the row is measured, or a drag ends.
   useEffect(() => {
     if (slot <= 0) return;
     Animated.spring(left, { toValue: home, ...SETTLE }).start();
   }, [home, slot, settles, left]);
 
-  const grow = swell.interpolate({ inputRange: [0, 1], outputRange: [1, 1.1] });
+  const grow = swell.interpolate({ inputRange: [0, 1], outputRange: [1, 1.08] });
+  const lensHeight = height + LENS_OVER * 2;
+  const onBar = solid ? colors.onAccent : colors.text;
 
   return (
-    <View style={[styles.capsule, { height, borderRadius: height / 2 }]} {...drag.panHandlers}>
-      {/* Measures the row. Kept apart from the drag, which takes over the capsule's touches. */}
+    // Room around the capsule for the lens, which is larger than it.
+    <View style={styles.room}>
       <View
-        testID="glass-measure"
-        pointerEvents="none"
-        style={StyleSheet.absoluteFill}
-        onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
-      />
-      {slot > 0 ? (
-        <Animated.View
-          testID="glass-bubble"
+        style={[styles.capsule, solid && styles.capsuleSolid, { height, borderRadius: height / 2 }]}
+        {...drag.panHandlers}
+      >
+        {/* Measures the row. Kept apart from the drag, which takes over the capsule's touches. */}
+        <View
+          testID="glass-measure"
           pointerEvents="none"
-          style={[
-            styles.bubble,
-            {
-              width: slot,
-              height: height - PAD * 2,
-              borderRadius: (height - PAD * 2) / 2,
-              transform: [{ translateX: left }, { scaleX: stretch }, { scale: grow }],
-            },
-          ]}
-        >
-          {/* The light catching the top of the glass. */}
-          <View style={styles.gloss} />
-        </Animated.View>
-      ) : null}
-      {tabs.map((tab, index) => {
-        const active = index === activeIndex;
-        return (
-          <Pressable
-            key={tab.key}
-            accessibilityRole={role}
-            accessibilityLabel={tab.accessibilityLabel}
-            accessibilityState={{ selected: active }}
-            onPress={() => onSelect(index)}
-            style={styles.tab}
+          style={StyleSheet.absoluteFill}
+          onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
+        />
+        {tabs.map((tab, index) => {
+          const active = index === activeIndex;
+          return (
+            <Pressable
+              key={tab.key}
+              accessibilityRole={role}
+              accessibilityLabel={tab.accessibilityLabel}
+              accessibilityState={{ selected: active }}
+              onPress={() => onSelect(index)}
+              style={[styles.tab, !active && solid && styles.tabQuiet]}
+            >
+              {tab.icon ? <Icon name={tab.icon} tintColor={onBar} /> : null}
+              {tab.label && (!tab.icon || active) ? (
+                <Text
+                  style={[
+                    tab.icon ? styles.caption : styles.label,
+                    { color: active || solid ? onBar : colors.mutedText },
+                    active && !tab.icon && styles.labelOn,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {tab.label}
+                </Text>
+              ) : null}
+            </Pressable>
+          );
+        })}
+        {slot > 0 ? (
+          <Animated.View
+            testID="glass-lens"
+            pointerEvents="none"
+            style={[
+              styles.lens,
+              {
+                top: -LENS_OVER - 1,
+                left: PAD - LENS_OVER - 1,
+                width: slot + LENS_OVER * 2,
+                height: lensHeight,
+                borderRadius: lensHeight / 2.4,
+                transform: [{ translateX: left }, { scaleX: stretch }, { scale: grow }],
+              },
+            ]}
           >
-            {tab.label ? (
-              <Text style={[styles.label, active && styles.labelOn]} numberOfLines={1}>
-                {tab.label}
-              </Text>
-            ) : tab.icon ? (
-              <Icon name={tab.icon} tintColor={active ? colors.accent : colors.mutedText} />
-            ) : null}
-          </Pressable>
-        );
-      })}
+            {/* The thick edge of the glass, where it bends the light. */}
+            <View style={[styles.rim, { borderRadius: lensHeight / 2.4 - 2 }]} />
+            {/* A thin line of light along the top edge. */}
+            <View style={styles.glint} />
+          </Animated.View>
+        ) : null}
+      </View>
     </View>
   );
 }
 
+// The glass is lit the same in both themes: it is the light on it that makes it glass.
+const GLASS = {
+  body: 'rgba(255, 255, 255, 0.07)',
+  rim: 'rgba(255, 255, 255, 0.24)',
+  glint: 'rgba(255, 255, 255, 0.75)',
+};
+
 const useStyles = themed((colors) =>
   StyleSheet.create({
-    // The capsule: tinted glass, a shade off the screen behind it, with a fine bright rim.
+    room: { paddingVertical: LENS_OVER, paddingHorizontal: LENS_OVER },
+    // The capsule: a wash of the theme color, or all of it.
     capsule: {
       flexDirection: 'row',
       alignItems: 'center',
       padding: PAD,
-      borderWidth: 1,
-      borderColor: colors.shine,
-      backgroundColor: colors.divider,
-    },
-    // The bubble: glass with a faint wash of the theme color and a bright rim. It has no
-    // drop shadow: on Android a shadow under a moving, rounded view can show as a dark box.
-    bubble: {
-      position: 'absolute',
-      top: PAD - 1,
-      left: PAD - 1,
-      overflow: 'hidden',
-      borderWidth: 1,
-      borderColor: colors.shine,
       backgroundColor: colors.tealSoft,
     },
-    // The gloss: the top half of the bubble is a touch lighter, edge to edge, so it reads as
-    // light on curved glass and not as a shape sitting on the button.
-    gloss: {
+    capsuleSolid: { backgroundColor: colors.accent },
+    tab: { flex: 1, height: '100%', alignItems: 'center', justifyContent: 'center', gap: 3 },
+    // On the solid bar the tabs that are not open are a little fainter.
+    tabQuiet: { opacity: 0.8 },
+    label: { fontFamily: tokens.font.body, fontSize: 14 },
+    labelOn: { fontFamily: tokens.font.bodyBold },
+    caption: { fontFamily: tokens.font.bodyBold, fontSize: 11 },
+    // The lens: clear glass, so the capsule shows through. No drop shadow: on Android a
+    // shadow under a moving, rounded view can show as a dark box.
+    lens: {
       position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      height: '50%',
-      backgroundColor: colors.shine,
-      opacity: 0.5,
+      borderWidth: 1,
+      borderColor: colors.controlBorder,
+      backgroundColor: GLASS.body,
     },
-    tab: { flex: 1, height: '100%', alignItems: 'center', justifyContent: 'center' },
-    label: { fontFamily: tokens.font.body, fontSize: 14, color: colors.mutedText },
-    labelOn: { fontFamily: tokens.font.bodyBold, color: colors.text },
+    rim: {
+      ...StyleSheet.absoluteFill,
+      margin: 1,
+      borderWidth: 5,
+      borderColor: GLASS.rim,
+    },
+    glint: {
+      position: 'absolute',
+      top: 4,
+      left: '22%',
+      right: '22%',
+      height: 2,
+      borderRadius: 1,
+      backgroundColor: GLASS.glint,
+    },
   }),
 );

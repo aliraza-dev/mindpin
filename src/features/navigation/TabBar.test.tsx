@@ -1,9 +1,7 @@
 // The bottom bar shows which screen is open and moves between them (R6.5).
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { processColor } from 'react-native';
 
 import { initI18n } from '../../i18n';
-import { lightColors } from '../../ui/tokens';
 import { TabBar } from './TabBar';
 
 describe('TabBar', () => {
@@ -19,11 +17,11 @@ describe('TabBar', () => {
     expect(screen.getByRole('tab', { name: 'Go to Home' })).not.toBeSelected();
   });
 
-  it('colors the icon of the open tab', async () => {
+  it('names the open tab under its icon', async () => {
     await render(<TabBar activeIndex={0} onSelect={() => {}} />);
-    const drawn = JSON.stringify(screen.toJSON());
-    expect(drawn).toContain(`"tintColor":${String(processColor(lightColors.accent))}`);
-    expect(drawn).toContain(`"tintColor":${String(processColor(lightColors.mutedText))}`);
+    expect(screen.getByText('Home')).toBeTruthy();
+    expect(screen.queryByText('Map')).toBeNull();
+    expect(screen.queryByText('Settings')).toBeNull();
   });
 
   it('reports the tab that was tapped', async () => {
